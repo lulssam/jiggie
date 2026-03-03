@@ -26,22 +26,15 @@ kotlin {
             isStatic = true
         }
     }
-    
-    js {
-        browser()
-        binaries.executable()
-    }
-    
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        binaries.executable()
-    }
-    
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+
+            implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
+            implementation("com.google.firebase:firebase-common-ktx:20.3.3")
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -55,6 +48,9 @@ kotlin {
 
             implementation("io.github.mirzemehdi:kmpauth-google:2.0.0")
             implementation("io.github.mirzemehdi:kmpauth-uihelper:2.0.0")
+
+            implementation("dev.gitlive:firebase-auth:1.11.1")
+            implementation("dev.gitlive:firebase-firestore:1.11.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
