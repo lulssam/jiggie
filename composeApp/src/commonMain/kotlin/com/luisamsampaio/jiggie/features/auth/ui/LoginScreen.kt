@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.features.auth.LoginViewModel
 import com.luisamsampaio.jiggie.features.auth.UserProfile
+import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import jiggie.composeapp.generated.resources.Res
 import jiggie.composeapp.generated.resources.app_name
 import jiggie.composeapp.generated.resources.continuarBtn
@@ -49,7 +50,6 @@ fun LoginScreenContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         // icone
-
 
 
         Text(
@@ -89,30 +89,35 @@ fun LoginScreenContent(
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
-            Text(text = stringResource(Res.string.continuarBtn), style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(Res.string.continuarBtn),
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
-    MaterialTheme {
-        LoginScreenContent(
-            profiles = UserProfile.values().toList(),
-            selectedProfile = viewModel.selectedProfile.value,
-            onProfileSelected = { viewModel.onProfileSelected(it) },
-            onLoginClick = { viewModel.onLoginClick() }
-        )
-    }
+    LoginScreenContent(
+        profiles = UserProfile.values().toList(),
+        selectedProfile = viewModel.selectedProfile.value,
+        onProfileSelected = { viewModel.onProfileSelected(it) },
+        onLoginClick = { viewModel.onLoginClick() }
+    )
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreenContent(
-        profiles = UserProfile.values().toList(),
-        selectedProfile = UserProfile.CATARINA,
-        onProfileSelected = {},
-        onLoginClick = {}
-    )
+    JiggieTheme {
+
+        LoginScreenContent(
+            profiles = UserProfile.values().toList(),
+            selectedProfile = UserProfile.CATARINA,
+            onProfileSelected = {},
+            onLoginClick = {}
+        )
+    }
 }
