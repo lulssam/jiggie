@@ -20,6 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.features.auth.LoginViewModel
 import com.luisamsampaio.jiggie.features.auth.UserProfile
+import jiggie.composeapp.generated.resources.Res
+import jiggie.composeapp.generated.resources.app_name
+import jiggie.composeapp.generated.resources.continuarBtn
+import jiggie.composeapp.generated.resources.selectPerfil
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreenContent(
@@ -36,7 +41,7 @@ fun LoginScreenContent(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Jiggie!",
+            text = stringResource(Res.string.app_name),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary
         )
@@ -48,7 +53,7 @@ fun LoginScreenContent(
 
 
         Text(
-            text = "Selecione o seu Perfil",
+            text = stringResource(Res.string.selectPerfil),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -84,7 +89,7 @@ fun LoginScreenContent(
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
-            Text("Continuar", style = MaterialTheme.typography.titleMedium)
+            Text(text = stringResource(Res.string.continuarBtn), style = MaterialTheme.typography.titleMedium)
         }
     }
 }

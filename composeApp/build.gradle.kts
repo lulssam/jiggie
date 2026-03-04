@@ -88,7 +88,7 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 
-    implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.10.0"))
     implementation("com.google.firebase:firebase-analytics")
 }
 

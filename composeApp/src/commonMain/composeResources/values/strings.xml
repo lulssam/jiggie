@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <!-- LOGIN PAGE -->
+    <string name="app_name">Jiggie!</string>
+    <string name="selectPerfil">Selecione o seu Perfil</string>
+    <string name="continuarBtn">Continuar</string>
+
+</resources>

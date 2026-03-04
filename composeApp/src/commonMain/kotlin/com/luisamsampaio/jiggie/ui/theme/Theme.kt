@@ -27,6 +27,7 @@ fun JiggieTheme(
 ) {
     MaterialTheme(
         colorScheme = LightColorScheme,
-        content = content
+        content = content,
+        typography = SpaceGroteskTypography()
     )
 }

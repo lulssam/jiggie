@@ -1,4 +1,3 @@
 package com.luisamsampaio.jiggie.features.medication
 
-class MedicationViewModel {
-}
+class MedicationViewModel
