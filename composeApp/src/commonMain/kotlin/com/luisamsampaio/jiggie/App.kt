@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.luisamsampaio.jiggie.features.auth.LoginViewModel
 import com.luisamsampaio.jiggie.features.auth.UserProfile
 import com.luisamsampaio.jiggie.features.auth.ui.LoginScreen
+import com.luisamsampaio.jiggie.features.medication.ui.MedicationScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 
 @Composable
@@ -33,21 +34,11 @@ fun App() {
                     }
                 )
             } else {
-                MedicationScreenPlaceholder(user = loggedInUser!!)
+                MedicationScreen(
+                    user = loggedInUser!!,
+                    onLogout = { loggedInUser = null }
+                )
             }
         }
-    }
-}
-@Composable
-fun MedicationScreenPlaceholder(user: UserProfile) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Ecrã de Medicamentos\nBem-vindo(a), ${user.displayName}!",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
     }
 }

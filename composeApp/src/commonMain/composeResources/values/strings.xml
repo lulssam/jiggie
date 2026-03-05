@@ -12,4 +12,14 @@
     <string name="recentAct">Atividade Recente</string>
     <string name="noRecentAct">Ainda sem atividades registadas</string>
 
+    <!-- REMÉDIOS -->
+    <string name="remediosTab">Remédios</string>
+    <string name="regRem">Registar Remédio</string>
+    <string name="remSubtitle">Quando é que o Jiggie tomou o remédio</string>
+    <string name="nomeRemedio">Nome do Remédio</string>
+    <string name="placeholderNomeRemedio">ex: Ultralevur </string>
+    <string name="dosagem">Dosagem</string>
+    <string name="placeholderDosagem">ex: 1 comprimido, 5ml</string>
+    <string name="hora">Hora</string>
+    <string name="placeholderHora">9:30</string>
 </resources>
