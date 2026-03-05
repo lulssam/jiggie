@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MovableContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +46,8 @@ import com.luisamsampaio.jiggie.ui.theme.BackgroundColor
 import com.luisamsampaio.jiggie.ui.theme.CardColor
 import com.luisamsampaio.jiggie.ui.theme.ForegroundColor
 import com.luisamsampaio.jiggie.ui.theme.MutedForegroundColor
+import com.luisamsampaio.jiggie.ui.theme.Orange500
+import com.luisamsampaio.jiggie.ui.theme.Orange600
 import com.luisamsampaio.jiggie.ui.theme.PrimaryColor
 import com.luisamsampaio.jiggie.ui.theme.SecondaryColor
 import jiggie.composeapp.generated.resources.Res
@@ -76,6 +81,7 @@ fun MainLayout(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundColor)
+            .statusBarsPadding()
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {
@@ -94,11 +100,26 @@ fun MainLayout(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // logo
-                    Image(
-                        painter = painterResource(Res.drawable.dogicon),
-                        contentDescription = "Logo",
-                        modifier = Modifier.size(56.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .shadow(elevation = 8.dp)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Orange500, Orange600
+                                    )
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.dogicon),
+                            contentDescription = "Logo",
+                            modifier = Modifier.size(56.dp)
+                        )
+                    }
 
                     // nome da app + perfil atual
                     Column(modifier = Modifier.weight(1f)) {
@@ -106,7 +127,13 @@ fun MainLayout(
                         Text(
                             text = stringResource(Res.string.app_name),
                             color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Orange500, Orange600
+                                    )
+                                )
+                            ),
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         )

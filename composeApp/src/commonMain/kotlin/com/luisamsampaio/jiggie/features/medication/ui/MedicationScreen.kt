@@ -1,13 +1,16 @@
 package com.luisamsampaio.jiggie.features.medication.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +32,7 @@ import com.luisamsampaio.jiggie.features.dashboard.ui.MainLayout
 import com.luisamsampaio.jiggie.features.medication.MedicationViewModel
 import com.luisamsampaio.jiggie.ui.theme.DestructiveColor
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
+import com.luisamsampaio.jiggie.ui.theme.Orange500
 import com.mmk.kmpauth.google.GoogleUser
 import jiggie.composeapp.generated.resources.Res
 import jiggie.composeapp.generated.resources.dosagem
@@ -70,11 +75,21 @@ fun MedicationScreen(
             viewModel.registarRemedio(perfilId = user.id, perfilNome = user.displayName)
         },
         titleIcon = {
-            Image(
-                painter = painterResource(Res.drawable.pill),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = Orange500,
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ){
+                Image(
+                    painter = painterResource(Res.drawable.pill),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
         },
         atividades = atividades
 
