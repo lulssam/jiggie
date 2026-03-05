@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.luisamsampaio.jiggie.features.auth.LoginViewModel
 import com.luisamsampaio.jiggie.features.auth.UserProfile
 import com.luisamsampaio.jiggie.features.auth.ui.LoginScreen
+import com.luisamsampaio.jiggie.features.medication.MedicationViewModel
 import com.luisamsampaio.jiggie.features.medication.ui.MedicationScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 
@@ -25,6 +26,7 @@ fun App() {
         ) {
             var loggedInUser by remember { mutableStateOf<UserProfile?>(null) }
 
+            val medicationViewModel = remember { MedicationViewModel() }
             if (loggedInUser == null) {
                 val loginViewModel = remember { LoginViewModel() }
                 LoginScreen(
@@ -36,7 +38,8 @@ fun App() {
             } else {
                 MedicationScreen(
                     user = loggedInUser!!,
-                    onLogout = { loggedInUser = null }
+                    onLogout = { loggedInUser = null },
+                    viewModel = medicationViewModel
                 )
             }
         }

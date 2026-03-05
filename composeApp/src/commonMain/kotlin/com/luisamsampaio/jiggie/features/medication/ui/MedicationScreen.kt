@@ -1,45 +1,59 @@
 package com.luisamsampaio.jiggie.features.medication.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.luisamsampaio.jiggie.features.auth.UserProfile
 import com.luisamsampaio.jiggie.features.dashboard.ui.MainLayout
+import com.luisamsampaio.jiggie.features.medication.MedicationViewModel
+import com.luisamsampaio.jiggie.ui.theme.DestructiveColor
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import com.mmk.kmpauth.google.GoogleUser
 import jiggie.composeapp.generated.resources.Res
 import jiggie.composeapp.generated.resources.dosagem
 import jiggie.composeapp.generated.resources.hora
 import jiggie.composeapp.generated.resources.nomeRemedio
+import jiggie.composeapp.generated.resources.pill
 import jiggie.composeapp.generated.resources.placeholderDosagem
 import jiggie.composeapp.generated.resources.placeholderHora
 import jiggie.composeapp.generated.resources.placeholderNomeRemedio
 import jiggie.composeapp.generated.resources.regRem
 import jiggie.composeapp.generated.resources.remSubtitle
 import jiggie.composeapp.generated.resources.remediosTab
+import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import kotlin.math.sin
+
 
 @Composable
 fun MedicationScreen(
     user: UserProfile,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    viewModel: MedicationViewModel
 ) {
-    // estados para guardar o que o utilizador escreve nos campos
-    var nomeRemedio by remember { mutableStateOf("") }
-    var dosagem by remember { mutableStateOf("") }
-    var hora by remember { mutableStateOf("") }
+
+    // recolher as atividades do flow
+    val atividades by viewModel.atividades.collectAsState()
 
     MainLayout(
         user = user,
@@ -53,9 +67,17 @@ fun MedicationScreen(
         pageSubtitle = stringResource(Res.string.remSubtitle),
         actionButtonText = stringResource(Res.string.regRem),
         onActionClick = {
-            // TODO: Chamar o viewModel para guardar no Firestore
-            println("A guardar remédio: $nomeRemedio, $dosagem às $hora")
-        }
+            viewModel.registarRemedio(perfilId = user.id, perfilNome = user.displayName)
+        },
+        titleIcon = {
+            Image(
+                painter = painterResource(Res.drawable.pill),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
+        },
+        atividades = atividades
+
     ) {
         // form dos medicamentos
         Column(
@@ -63,12 +85,13 @@ fun MedicationScreen(
         ) {
             // campo nome do remédio
             OutlinedTextField(
-                value = nomeRemedio,
-                onValueChange = { nomeRemedio = it },
+                value = viewModel.nomeRemedio,
+                onValueChange = { viewModel.onNomeRemedioChange(it) },
                 label = { Text(stringResource(Res.string.nomeRemedio)) },
                 placeholder = { Text(stringResource(Res.string.placeholderNomeRemedio)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                enabled = !viewModel.isSaving
             )
 
             // campo dosagem e hora lado a lado
@@ -77,35 +100,66 @@ fun MedicationScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
-                    value = dosagem,
-                    onValueChange = { dosagem = it },
+                    value = viewModel.dosagem,
+                    onValueChange = { viewModel.onDosagemChange(it) },
                     label = { Text(stringResource(Res.string.dosagem)) },
                     placeholder = { Text(stringResource(Res.string.placeholderDosagem)) },
                     modifier = Modifier.weight(2f),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = !viewModel.isSaving
                 )
 
                 OutlinedTextField(
-                    value = hora,
-                    onValueChange = { hora = it },
+                    value = viewModel.hora,
+                    onValueChange = { viewModel.onHoraChange(it) },
                     label = { Text(stringResource(Res.string.hora)) },
                     placeholder = { Text(stringResource(Res.string.placeholderHora)) },
                     modifier = Modifier.weight(1f),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = !viewModel.isSaving
                 )
+            }
+
+            // mensagens de feedback
+            viewModel.mensagemSucesso?.let { mensagem ->
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = mensagem,
+                    color = Color(0xFF16A34A),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                LaunchedEffect(mensagem) {
+                    delay(3000)
+                    viewModel.limparMensagens()
+                }
+            }
+
+            viewModel.mensagemErro?.let { mensagem ->
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = mensagem,
+                    color = DestructiveColor,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                LaunchedEffect(mensagem) {
+                    delay(3000)
+                    viewModel.limparMensagens()
+                }
             }
         }
     }
 }
 
+/*
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MedicationScreenPreview() {
     JiggieTheme {
-
         MedicationScreen(
             user = UserProfile("1", "Catarina", "USER"),
             onLogout = {}
         )
     }
-}
+}*/
