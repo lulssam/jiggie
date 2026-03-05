@@ -42,7 +42,7 @@ class WaterViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 activityRepository.getAtividades().collect { atividade ->
-                    _atividades.value = atividade
+                    _atividades.value = atividade.filter { it.categoria == "AGUA" }
                 }
             } catch (e: Exception) {
                 println("Erro ao observar atividades: ${e.message}")
@@ -70,7 +70,7 @@ class WaterViewModel : ViewModel() {
     }
 
     /**Função para dar reset as mensagens de feedback*/
-    fun limparMensagens(){
+    fun limparMensagens() {
         mensagemSucesso = null
         mensagemErro = null
     }

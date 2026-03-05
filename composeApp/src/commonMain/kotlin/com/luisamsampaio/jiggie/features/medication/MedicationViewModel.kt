@@ -42,8 +42,8 @@ class MedicationViewModel : ViewModel() {
         viewModelScope.launch {
             try {
 
-                activityRepository.getAtividades().collect { atividades ->
-                    _atividades.value = atividades
+                activityRepository.getAtividades().collect { atividade ->
+                    _atividades.value = atividade.filter { it.categoria == "REMEDIOS" }
                 }
             } catch (e: Exception) {
                 println("Erro ao observar atividades: ${e.message}")

@@ -103,10 +103,7 @@ fun WaterScreenContent(
         user = user,
         onLogout = onLogout,
         currentTab = stringResource(Res.string.aguaTab),
-        onTabSelected = { novaTab ->
-            // TODO: navegação entre tabs
-            println("Navegar para $novaTab")
-        },
+        onTabSelected = onTabSelected,
         pageTitle = stringResource(Res.string.regAgua),
         pageSubtitle = stringResource(Res.string.aguaSubtitle),
         actionButtonText = stringResource(Res.string.regAgua),

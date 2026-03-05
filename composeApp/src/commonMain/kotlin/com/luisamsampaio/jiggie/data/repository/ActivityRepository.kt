@@ -60,7 +60,7 @@ class ActivityRepository {
     fun getAtividades(): Flow<List<Atividade>> {
         return atividadesRef
             .orderBy("timestamp", Direction.DESCENDING)
-            .limit(10)
+            .limit(50)
             .snapshots
             .map { snapshot ->
                 snapshot.documents.mapNotNull { doc ->
