@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -326,20 +327,32 @@ fun ProfileListItem(
 }
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(
+    viewModel: LoginViewModel,
+    onNavigateToApp: (UserProfile) -> Unit
+) {
+    val selected by viewModel.selectedProfile
+    val profiles by viewModel.profilesList
+    val isLoading by viewModel.isLoading
 
-    val selected = viewModel.selectedProfile.value
-
-    LoginScreenContent(
-        profiles = UserProfile.values().toList(),
-        selectedProfile = selected,
-        onProfileSelected = { viewModel.onProfileSelected(it) },
-        onLoginClick = { viewModel.onLoginClick() }
-    )
-
+    if (isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+    } else {
+        LoginScreenContent(
+            profiles = profiles,
+            selectedProfile = selected,
+            onProfileSelected = { viewModel.onProfileSelected(it) },
+            onLoginClick = { viewModel.onLoginClick(onSucess = onNavigateToApp) }
+        )
+    }
 }
 
-@Preview(
+/*@Preview(
     showBackground = true,
     showSystemUi = true,
 )
@@ -353,4 +366,4 @@ fun LoginScreenPreview() {
             onLoginClick = {}
         )
     }
-}
+}*/
