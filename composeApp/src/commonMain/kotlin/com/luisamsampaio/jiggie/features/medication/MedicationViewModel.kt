@@ -40,8 +40,13 @@ class MedicationViewModel : ViewModel() {
 
     private fun observaAtividades() {
         viewModelScope.launch {
-            activityRepository.getAtividades().collect { atividades ->
-                _atividades.value = atividades
+            try {
+
+                activityRepository.getAtividades().collect { atividades ->
+                    _atividades.value = atividades
+                }
+            } catch (e: Exception) {
+                println("Erro ao observar atividades: ${e.message}")
             }
         }
     }

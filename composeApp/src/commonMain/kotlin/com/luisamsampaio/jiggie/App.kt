@@ -26,7 +26,6 @@ fun App() {
         ) {
             var loggedInUser by remember { mutableStateOf<UserProfile?>(null) }
 
-            val medicationViewModel = remember { MedicationViewModel() }
             if (loggedInUser == null) {
                 val loginViewModel = remember { LoginViewModel() }
                 LoginScreen(
@@ -36,6 +35,7 @@ fun App() {
                     }
                 )
             } else {
+                val medicationViewModel = remember { MedicationViewModel() }
                 MedicationScreen(
                     user = loggedInUser!!,
                     onLogout = { loggedInUser = null },

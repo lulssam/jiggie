@@ -6,6 +6,7 @@ import dev.gitlive.firebase.firestore.FieldValue
 import dev.gitlive.firebase.firestore.firestore
 import dev.gitlive.firebase.firestore.orderBy
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 
@@ -43,11 +44,11 @@ class ActivityRepository {
                 "timestamp" to FieldValue.Companion.serverTimestamp
             )
 
-           /* db.collection("households")
-                .document("minha_casa")
-                .collection("recent_activities")
-                .add(novaAtividade)
-*/
+            /* db.collection("households")
+                 .document("minha_casa")
+                 .collection("recent_activities")
+                 .add(novaAtividade)
+ */
             atividadesRef.add(novaAtividade)
             println("Atividade guardada com sucesso!")
         } catch (e: Exception) {
@@ -62,20 +63,29 @@ class ActivityRepository {
             .limit(10)
             .snapshots
             .map { snapshot ->
-                snapshot.documents.map { doc ->
-                    Atividade(
-                        id = doc.id,
-                        perfilId = doc.get("perfilId"),
-                        perfilNome = doc.get("perfilNome"),
-                        categoria = doc.get("categoria"),
-                        acao = doc.get("acao"),
-                        timestamp = try {
-                            doc.get("timestamp") as Long
-                        } catch (e: Exception) {
-                            0L
-                        }
-                    )
+                snapshot.documents.mapNotNull { doc ->
+                    try {
+
+                        Atividade(
+                            id = doc.id,
+                            perfilId = doc.get("perfilId"),
+                            perfilNome = doc.get("perfilNome"),
+                            categoria = doc.get("categoria"),
+                            acao = doc.get("acao"),
+                            timestamp = try {
+                                doc.get("timestamp") as Long
+                            } catch (e: Exception) {
+                                0L
+                            }
+                        )
+                    } catch (e: Exception) {
+                        println("Erro ao observar atividade ID ${doc.id}: ${e.message}")
+                        null
+                    }
                 }
+            }
+            .catch { e ->
+                println("Erro critico ao observar atividades ${e.message}")
             }
     }
 }
