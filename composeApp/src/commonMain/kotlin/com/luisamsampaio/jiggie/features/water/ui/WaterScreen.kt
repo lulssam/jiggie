@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.medication.ui
+package com.luisamsampaio.jiggie.features.water.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,50 +18,78 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.data.repository.Atividade
 import com.luisamsampaio.jiggie.features.auth.UserProfile
 import com.luisamsampaio.jiggie.features.dashboard.ui.MainLayout
-import com.luisamsampaio.jiggie.features.medication.MedicationViewModel
+import com.luisamsampaio.jiggie.features.water.WaterViewModel
+import com.luisamsampaio.jiggie.ui.theme.Blue500
 import com.luisamsampaio.jiggie.ui.theme.DestructiveColor
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
-import com.luisamsampaio.jiggie.ui.theme.Orange500
-import com.mmk.kmpauth.google.GoogleUser
 import jiggie.composeapp.generated.resources.Res
-import jiggie.composeapp.generated.resources.dosagem
+import jiggie.composeapp.generated.resources.aguaSubtitle
+import jiggie.composeapp.generated.resources.aguaTab
+import jiggie.composeapp.generated.resources.droplet
 import jiggie.composeapp.generated.resources.hora
-import jiggie.composeapp.generated.resources.nomeRemedio
-import jiggie.composeapp.generated.resources.pill
-import jiggie.composeapp.generated.resources.placeholderDosagem
 import jiggie.composeapp.generated.resources.placeholderHoraAgua
-import jiggie.composeapp.generated.resources.placeholderHoraRemedio
-import jiggie.composeapp.generated.resources.placeholderNomeRemedio
-import jiggie.composeapp.generated.resources.regRem
-import jiggie.composeapp.generated.resources.remSubtitle
-import jiggie.composeapp.generated.resources.remediosTab
+import jiggie.composeapp.generated.resources.placeholderQtdAgua
+import jiggie.composeapp.generated.resources.placeholderQuantidade
+import jiggie.composeapp.generated.resources.qtdAgua
+import jiggie.composeapp.generated.resources.regAgua
+import jiggie.composeapp.generated.resources.unidadeAgua
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+@Composable
+fun WaterScreen(
+    user: UserProfile,
+    onLogout: () -> Unit,
+    viewModel: WaterViewModel,
+    onTabSelected: (String) -> Unit
+) {
+    // recolher atividades do flow
+    val atividades by viewModel.atividades.collectAsState()
+
+    WaterScreenContent(
+        user = user,
+        onLogout = onLogout,
+        atividades = atividades,
+        quantidade = viewModel.quantidade,
+        onQuantidadeChange = { viewModel.onQuantidadeChange(it) },
+        unidade = viewModel.unidade,
+        onUnidadeChange = { viewModel.onUnidadeChange(it) },
+        hora = viewModel.hora,
+        onHoraChange = { viewModel.onHoraChange(it) },
+        isSaving = viewModel.isSaving,
+        mensagemSucesso = viewModel.mensagemSucesso,
+        mensagemErro = viewModel.mensagemErro,
+        onRegistarClick = {
+            viewModel.registarAgua(
+                perfilId = user.id,
+                perfilNome = user.displayName
+            )
+        },
+        limparMensagens = { viewModel.limparMensagens() },
+        onTabSelected = onTabSelected
+    )
+
+}
 
 @Composable
-fun MedicationScreenContent(
+fun WaterScreenContent(
     user: UserProfile,
     onLogout: () -> Unit,
     atividades: List<Atividade>,
-    nomeRemedio: String,
-    onNomeRemedioChange: (String) -> Unit,
-    dosagem: String,
-    onDosagemChange: (String) -> Unit,
+    quantidade: String,
+    onQuantidadeChange: (String) -> Unit,
+    unidade: String,
+    onUnidadeChange: (String) -> Unit,
     hora: String,
     onHoraChange: (String) -> Unit,
     isSaving: Boolean,
@@ -71,68 +99,63 @@ fun MedicationScreenContent(
     limparMensagens: () -> Unit,
     onTabSelected: (String) -> Unit
 ) {
-
     MainLayout(
         user = user,
         onLogout = onLogout,
-        currentTab = stringResource(Res.string.remediosTab),
-        onTabSelected = onTabSelected,
-        pageTitle = stringResource(Res.string.regRem),
-        pageSubtitle = stringResource(Res.string.remSubtitle),
-        actionButtonText = stringResource(Res.string.regRem),
-        onActionClick = {
-            onRegistarClick()
+        currentTab = stringResource(Res.string.aguaTab),
+        onTabSelected = { novaTab ->
+            // TODO: navegação entre tabs
+            println("Navegar para $novaTab")
         },
+        pageTitle = stringResource(Res.string.regAgua),
+        pageSubtitle = stringResource(Res.string.aguaSubtitle),
+        actionButtonText = stringResource(Res.string.regAgua),
+        onActionClick = onRegistarClick,
         titleIcon = {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .background(
-                        color = Orange500,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
+                    .background(color = Blue500, shape = RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(Res.drawable.pill),
+                    painter = painterResource(Res.drawable.droplet),
                     contentDescription = null,
                     modifier = Modifier.size(28.dp)
                 )
             }
         },
         atividades = atividades
-
     ) {
-        // form dos medicamentos
+        // form da agua
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // campo nome do remédio lado a lado com a dosagem
+            // campo da quantidade e unidade lado a lado
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 OutlinedTextField(
-                    value = nomeRemedio,
-                    onValueChange = onNomeRemedioChange,
-                    label = { Text(stringResource(Res.string.nomeRemedio)) },
-                    placeholder = { Text(stringResource(Res.string.placeholderNomeRemedio)) },
+                    value = quantidade,
+                    onValueChange = onQuantidadeChange,
+                    label = { Text(stringResource(Res.string.qtdAgua)) },
+                    placeholder = { Text(stringResource(Res.string.placeholderQtdAgua)) },
                     modifier = Modifier.weight(2f),
                     singleLine = true,
                     enabled = !isSaving
                 )
 
                 OutlinedTextField(
-                    value = dosagem,
-                    onValueChange = onDosagemChange,
-                    label = { Text(stringResource(Res.string.dosagem)) },
-                    placeholder = { Text(stringResource(Res.string.placeholderDosagem)) },
+                    value = unidade,
+                    onUnidadeChange,
+                    label = { Text(stringResource(Res.string.unidadeAgua)) },
+                    placeholder = { Text(stringResource(Res.string.placeholderQuantidade)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     enabled = !isSaving
                 )
             }
-
 
             // hora
             OutlinedTextField(
@@ -145,13 +168,12 @@ fun MedicationScreenContent(
                 enabled = !isSaving
             )
 
-
-            // mensagens de feedback
+            // Mensagens de Sucesso ou Erro
             mensagemSucesso?.let { mensagem ->
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = mensagem,
-                    color = Color(0xFF16A34A),
+                    color = Color(0xFF16A34A), // Verde
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -165,7 +187,7 @@ fun MedicationScreenContent(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = mensagem,
-                    color = DestructiveColor,
+                    color = DestructiveColor, // Vermelho do teu tema
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -178,66 +200,36 @@ fun MedicationScreenContent(
     }
 }
 
-@Composable
-fun MedicationScreen(
-    user: UserProfile,
-    onLogout: () -> Unit,
-    viewModel: MedicationViewModel,
-    onTabSelected: (String) -> Unit,
-) {
-    val atividades by viewModel.atividades.collectAsState()
-
-    MedicationScreenContent(
-        user = user,
-        onLogout = onLogout,
-        atividades = atividades,
-        nomeRemedio = viewModel.nomeRemedio,
-        onNomeRemedioChange = { viewModel.onNomeRemedioChange(it) },
-        dosagem = viewModel.dosagem,
-        onDosagemChange = { viewModel.onDosagemChange(it) },
-        hora = viewModel.hora,
-        onHoraChange = { viewModel.onHoraChange(it) },
-        isSaving = viewModel.isSaving,
-        mensagemSucesso = viewModel.mensagemSucesso,
-        mensagemErro = viewModel.mensagemErro,
-        onRegistarClick = {
-            viewModel.registarRemedio(
-                perfilId = user.id,
-                perfilNome = user.displayName
-            )
-        },
-        limparMensagens = { viewModel.limparMensagens() },
-        onTabSelected = onTabSelected
-    )
-
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MedicationScreenPreview() {
+fun WaterScreenPreview() {
     JiggieTheme {
+
+        val mockUser = UserProfile(id = "1", displayName = "Luísa", role = "ADMIN")
+
         val mockAtividades = listOf(
             Atividade(
                 id = "1",
                 perfilNome = "Luísa",
-                acao = "Deu Ben-u-ron",
-                categoria = "REMEDIOS"
+                acao = "Bebeu água (250 ml)",
+                categoria = "AGUA"
             ),
             Atividade(
                 id = "2",
                 perfilNome = "Catarina",
-                acao = "Deu Ben-u-ron",
-                categoria = "REMEDIOS"
+                acao = "Bebeu água (100 ml)",
+                categoria = "AGUA"
             )
         )
-        MedicationScreenContent(
-            user = UserProfile("1", "Catarina", "USER"),
+
+        WaterScreenContent(
+            user = mockUser,
             onLogout = {},
             atividades = mockAtividades,
-            nomeRemedio = "Ben-u-ron",
-            onNomeRemedioChange = {},
-            dosagem = "500g",
-            onDosagemChange = {},
+            quantidade = "250",
+            onQuantidadeChange = {},
+            unidade = "1L",
+            onUnidadeChange = {},
             hora = "9:30",
             onHoraChange = {},
             isSaving = false,

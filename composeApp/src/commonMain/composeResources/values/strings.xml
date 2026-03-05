@@ -11,6 +11,7 @@
     <string name="sairBtn">Sair</string>
     <string name="recentAct">Atividade Recente</string>
     <string name="noRecentAct">Ainda sem atividades registadas</string>
+    <string name="hora">Hora</string>
 
     <!-- REMÉDIOS -->
     <string name="remediosTab">Remédios</string>
@@ -20,6 +21,17 @@
     <string name="placeholderNomeRemedio">ex: Ultralevur </string>
     <string name="dosagem">Dosagem</string>
     <string name="placeholderDosagem">ex: 1 comprimido, 5ml</string>
-    <string name="hora">Hora</string>
-    <string name="placeholderHora">9:30</string>
+    <string name="placeholderHoraRemedio">9:30</string>
+
+    <!-- ÁGUA -->
+    <string name="aguaTab">Água</string>
+    <string name="regAgua">Registar Água</string>
+    <string name="aguaSubtitle">Quantidade de água bebida</string>
+    <string name="quantidade">Quantidade</string>
+    <string name="placeholderQuantidade">ex: 1 litro</string>
+    <string name="placeholderHoraAgua">9:30</string>
+    <string name="qtdAgua">Quantidade</string>
+    <string name="placeholderQtdAgua">ex: 1</string>
+    <string name="unidadeAgua">Unidade</string>
+
 </resources>

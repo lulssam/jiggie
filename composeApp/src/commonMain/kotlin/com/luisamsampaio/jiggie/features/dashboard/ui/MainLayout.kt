@@ -43,12 +43,20 @@ import androidx.compose.ui.unit.sp
 import com.luisamsampaio.jiggie.data.repository.Atividade
 import com.luisamsampaio.jiggie.features.auth.UserProfile
 import com.luisamsampaio.jiggie.ui.theme.BackgroundColor
+import com.luisamsampaio.jiggie.ui.theme.Blue500
+import com.luisamsampaio.jiggie.ui.theme.Blue600
 import com.luisamsampaio.jiggie.ui.theme.CardColor
+import com.luisamsampaio.jiggie.ui.theme.Chart1
+import com.luisamsampaio.jiggie.ui.theme.Chart2
 import com.luisamsampaio.jiggie.ui.theme.ForegroundColor
+import com.luisamsampaio.jiggie.ui.theme.Green500
+import com.luisamsampaio.jiggie.ui.theme.Green600
 import com.luisamsampaio.jiggie.ui.theme.MutedForegroundColor
 import com.luisamsampaio.jiggie.ui.theme.Orange500
 import com.luisamsampaio.jiggie.ui.theme.Orange600
 import com.luisamsampaio.jiggie.ui.theme.PrimaryColor
+import com.luisamsampaio.jiggie.ui.theme.Red500
+import com.luisamsampaio.jiggie.ui.theme.Red600
 import com.luisamsampaio.jiggie.ui.theme.SecondaryColor
 import jiggie.composeapp.generated.resources.Res
 import jiggie.composeapp.generated.resources.app_name
@@ -76,6 +84,16 @@ fun MainLayout(
     content: @Composable () -> Unit
 ) {
     val scrollState = rememberScrollState()
+
+    val (corPrincipal, corClara) = when (currentTab) {
+        "Remédios" -> Pair(Orange500, Orange600)
+        "Água" -> Pair(Blue500, Blue600)
+        "Passeios" -> Pair(Green500, Green600)
+        "Saúde" -> Pair(Red500, Red600)
+        "Gráficos" -> Pair(Chart1, Chart2) // todo
+        else -> Pair(Orange500, Orange600)
+    }
+
     // card cabeçalho superior
     Column(
         modifier = Modifier
@@ -177,8 +195,16 @@ fun MainLayout(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.5.dp, Color(0xFFFFD6A8), RoundedCornerShape(10.dp))
                 .padding(6.dp)
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFFFFEDD4),
+                            Color(0xFFFFEDD4)
+                        )
+                    )
+                )
+                .border(1.5.dp, Color(0xFFFFD6A8), RoundedCornerShape(10.dp))
         ) {
             Row(
                 modifier = Modifier
@@ -188,13 +214,12 @@ fun MainLayout(
             ) {
                 tabs.forEach { tab ->
                     val isSelected = tab == currentTab
-
                     Box(
                         modifier = Modifier
                             .then(
                                 if (isSelected) {
                                     Modifier.background(
-                                        Color(0xFFFF6900),
+                                        corPrincipal,
                                         RoundedCornerShape(10.dp),
                                     )
                                 } else {
@@ -224,7 +249,7 @@ fun MainLayout(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
             color = CardColor,
-            border = BorderStroke(3.dp, Color(0xFFFFD6A8)),
+            border = BorderStroke(3.dp, corClara),
             shadowElevation = 6.dp
         ) {
             Column(
@@ -265,7 +290,7 @@ fun MainLayout(
                         .fillMaxWidth()
                         .height(36.dp),
                     shape = RoundedCornerShape(4.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = corPrincipal),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 2.dp
                     )
