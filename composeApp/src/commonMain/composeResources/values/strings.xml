@@ -6,4 +6,10 @@
     <string name="continuarBtn">Continuar</string>
     <string name="nEncontrou">Não encontrou? </string>
     <string name="AddPerfil">Adicionar Perfil</string>
+
+    <!-- MAIN LAYOUT -->
+    <string name="sairBtn">Sair</string>
+    <string name="recentAct">Atividade Recente</string>
+    <string name="noRecentAct">Ainda sem atividades registadas</string>
+
 </resources>
