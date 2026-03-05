@@ -263,7 +263,6 @@ fun ProfileListItem(
 
     // animação drop shadow
     val shadowElevation by animateDpAsState(
-
         targetValue = if (isSelected) 4.dp else 0.dp
     )
 
