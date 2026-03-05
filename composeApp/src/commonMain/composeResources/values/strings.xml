@@ -4,5 +4,6 @@
     <string name="app_name">Jiggie!</string>
     <string name="selectPerfil">Selecione o seu Perfil</string>
     <string name="continuarBtn">Continuar</string>
-
+    <string name="nEncontrou">Não encontrou? </string>
+    <string name="AddPerfil">Adicionar Perfil</string>
 </resources>

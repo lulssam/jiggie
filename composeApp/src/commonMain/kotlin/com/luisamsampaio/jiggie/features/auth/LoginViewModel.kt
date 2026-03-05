@@ -1,11 +1,13 @@
 package com.luisamsampaio.jiggie.features.auth
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class LoginViewModel : ViewModel() {
     // estado vai ser o perfil selecionado
-    var selectedProfile = mutableStateOf<UserProfile?>(null)
+    var selectedProfile by mutableStateOf<UserProfile?>(null)
         private set
 
     /**
@@ -13,16 +15,14 @@ class LoginViewModel : ViewModel() {
      * @param profile Perfil selecionado
      */
     fun onProfileSelected(profile: UserProfile) {
-        selectedProfile.value = profile
+        selectedProfile = profile
 
     }
 
     fun onLoginClick() {
-        val user = selectedProfile.value
+        val user = selectedProfile
         if (user != null) {
             // TODO: Integrar firestore mais tarde.
-            // Exemplo: guardar userId nas SharedPreferences/DataStore
-            // ou fazer um login anónimo no Firebase e associar este ID.
             println("A iniciar sessão como ${user.displayName} (Role: ${user.role})")
         }
     }
