@@ -1,5 +1,7 @@
 package com.luisamsampaio.jiggie.features.auth.ui
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -159,7 +161,6 @@ fun LoginScreenContent(
                     // Lista de Perfis
                     profiles.forEach { profile ->
                         val isSelected = profile == selectedProfile
-
                         val itemGradient = when (profile.displayName) {
                             "Catarina" -> listOf(Color(0xFFF54900), Color(0xFFBB4d00))
                             "Zé" -> listOf(Color(0xFFFFA726), Color(0xFFFB8C00))
@@ -244,18 +245,36 @@ fun ProfileListItem(
     gradientColors: List<Color>,
     onClick: () -> Unit
 ) {
+    // animaççao cor de fundo
+    val cardBgColor by animateColorAsState(
+        targetValue = if (isSelected) MaterialTheme.colorScheme.surfaceVariant
+        else MaterialTheme.colorScheme.surface,
+    )
 
-    val cardBgColor =
-        if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+    // animação cor
+    val borderColor by animateColorAsState(
+        targetValue = if (isSelected) Orange500 else Color(0xFFFFD6A8)
+    )
+
+    // animação border radius
+    val borderWidth by animateDpAsState(
+        targetValue = if (isSelected) 2.dp else 1.dp,
+    )
+
+    // animação drop shadow
+    val shadowElevation by animateDpAsState(
+
+        targetValue = if (isSelected) 4.dp else 0.dp
+    )
 
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = cardBgColor,
         border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = if (isSelected) Orange500 else Color(0xFFFFD6A8)
+            width = borderWidth,
+            color = borderColor
         ),
-        shadowElevation = if (isSelected) 4.dp else 0.dp,
+        shadowElevation = shadowElevation,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
@@ -310,7 +329,7 @@ fun ProfileListItem(
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
 
-    val selected = viewModel.selectedProfile
+    val selected = viewModel.selectedProfile.value
 
     LoginScreenContent(
         profiles = UserProfile.values().toList(),
