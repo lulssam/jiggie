@@ -35,7 +35,7 @@ fun App() {
             color = MaterialTheme.colorScheme.background
 
         ) {
-            val loginViewModel: LoginViewModel = viewModel()
+            val loginViewModel = remember { LoginViewModel() }
             LoginScreen(viewModel = loginViewModel)
         }
     }
