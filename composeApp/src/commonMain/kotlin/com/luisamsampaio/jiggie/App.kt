@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +27,8 @@ import com.luisamsampaio.jiggie.features.water.WaterViewModel
 import com.luisamsampaio.jiggie.features.water.ui.WaterScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import androidx.navigation.compose.rememberNavController
+import com.luisamsampaio.jiggie.features.charts.ChartsViewModel
+import com.luisamsampaio.jiggie.features.charts.ui.ChartsScreen
 import com.luisamsampaio.jiggie.features.health.HealthViewModel
 import com.luisamsampaio.jiggie.features.health.ui.HealthScreen
 import com.luisamsampaio.jiggie.features.walks.WalksViewModel
@@ -56,6 +59,8 @@ fun App() {
                 val waterViewModel = remember { WaterViewModel() }
                 val walksViewModel = remember { WalksViewModel() }
                 val healthViewModel = remember { HealthViewModel() }
+                val chartsViewModel = remember { ChartsViewModel() }
+
 
 
                 NavHost(
@@ -121,28 +126,21 @@ fun App() {
                             }
                         )
                     }
-                    composable("Gráficos") { AbaEmConstrucao("Gráficos", navController) }
+                    composable("Gráficos") {
+                        ChartsScreen(
+                            user = loggedInUser!!,
+                            onLogout = { loggedInUser = null },
+                            viewModel = chartsViewModel,
+                            onTabSelected = { novaAba ->
+                                navController.navigate(novaAba) {
+                                    popUpTo("Remédios") { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun AbaEmConstrucao(nomeAba: String, navController: NavController) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "A aba '$nomeAba' ainda está em construção 🚧")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                navController.navigate("Remédios") {
-                    popUpTo("Remédios") { inclusive = true }
-                }
-            }) {
-                Text("Voltar aos Remédios")
             }
         }
     }

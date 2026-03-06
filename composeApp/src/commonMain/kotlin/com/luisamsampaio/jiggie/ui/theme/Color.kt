@@ -53,5 +53,38 @@ val Chart3 = Color(0xFFCD853F)
 val Chart4 = Color(0xFFDAA520)
 val Chart5 = Color(0xFF88860B)
 
+val AguaBorderColor = Color(0xFF8EC5FF)
+val AguaValueColor = Color(0xFF1447E6)
+val AguaLabelColor = Color(0xFF1C398E)
+val AguaGradientLight = Color(0xFFDBEAFE)
+val AguaGradientDark = Color(0xFFBEDBFF)
+
+
+val RemediosBorderColor = Color(0xFFFFB86A)
+val RemediosValueColor = Color(0xFFCA3500)
+val RemediosLabelColor = Color(0xFF7E2A0C)
+val RemediosGradientLight = Color(0xFFFFEDD4)
+val RemediosGradientDark = Color(0XFFFFD6A8)
+
+val PasseiosBorderColor = Color(0xFF7BF1A8)
+val PasseiosValueColor = Color(0xFF008236)
+val PasseiosLabelColor = Color(0xFF0D542B)
+val PasseiosGradientLight = Color(0xFFDCFCE7)
+val PasseiosGradientDark = Color(0xFFB9F8CF)
+
+val SaudeBorderColor = Color(0xFFFFA2A2)
+val SaudeValueColor = Color(0xFFC10007)
+val SaudeLabelColor = Color(0xFF82181A)
+val SaudeGradientLight = Color(0xFFFFE2E2)
+val SaudeGradientDark = Color(0xFFFFC9C9)
+
+//o card principal
+val CardBorderColor = Color(0xFFFEE685)
+val TitleColor = Color(0xFF7B3306)
+val SubtitleColor = Color(0xFF8B6914)
+val SelectorBorderColor = Color(0xFFFFB86A)
+val SelectorBgColor = Color(0x7FFFF7ED)
+
+
 // Outros 
 val DestructiveColor = Color(0xFFCD5C5C)

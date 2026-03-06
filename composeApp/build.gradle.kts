@@ -53,7 +53,7 @@ kotlin {
             implementation("dev.gitlive:firebase-firestore:1.11.1")
 
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
         }
         commonTest.dependencies {

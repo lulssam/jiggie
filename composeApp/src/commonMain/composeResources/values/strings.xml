@@ -51,4 +51,13 @@
     <string name="sintomasPreocupacoes">Sintomas / Preocupações</string>
     <string name="notas">Notas</string>
     <string name="placeholderNotas">Descreva o que observou...</string>
+
+    <!--GRÁFICOS -->
+    <string name="graficoTab">📊 Visão Mensal</string>
+    <string name="graficoSubtitle">Tendências de saúde ao longo do tempo</string>
+    <string name="totalAgua">Total Água</string>
+    <string name="totalRemedios">Remédios</string>
+    <string name="totalPasseios">Passeios</string>
+    <string name="totalSaude">Notas Saúde</string>
+
 </resources>
