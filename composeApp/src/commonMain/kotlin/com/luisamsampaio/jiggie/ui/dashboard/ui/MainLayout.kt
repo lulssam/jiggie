@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.dashboard.ui
+package com.luisamsampaio.jiggie.ui.dashboard.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -29,7 +29,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MovableContent
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -37,7 +36,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luisamsampaio.jiggie.data.repository.Atividade
@@ -65,7 +63,6 @@ import jiggie.composeapp.generated.resources.logout
 import jiggie.composeapp.generated.resources.noRecentAct
 import jiggie.composeapp.generated.resources.recentAct
 import jiggie.composeapp.generated.resources.sairBtn
-import org.jetbrains.compose.resources.getFontResourceBytes
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

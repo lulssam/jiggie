@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.luisamsampaio.jiggie.data.repository.Atividade
 import com.luisamsampaio.jiggie.features.auth.UserProfile
-import com.luisamsampaio.jiggie.features.dashboard.ui.MainLayout
+import com.luisamsampaio.jiggie.ui.dashboard.ui.MainLayout
 import com.luisamsampaio.jiggie.features.water.WaterViewModel
 import com.luisamsampaio.jiggie.ui.theme.Blue500
 import com.luisamsampaio.jiggie.ui.theme.DestructiveColor
