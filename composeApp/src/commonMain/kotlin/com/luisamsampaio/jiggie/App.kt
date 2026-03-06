@@ -26,6 +26,8 @@ import com.luisamsampaio.jiggie.features.water.WaterViewModel
 import com.luisamsampaio.jiggie.features.water.ui.WaterScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import androidx.navigation.compose.rememberNavController
+import com.luisamsampaio.jiggie.features.health.HealthViewModel
+import com.luisamsampaio.jiggie.features.health.ui.HealthScreen
 import com.luisamsampaio.jiggie.features.walks.WalksViewModel
 import com.luisamsampaio.jiggie.features.walks.ui.WalksScreen
 
@@ -53,6 +55,7 @@ fun App() {
                 val medicationViewModel = remember { MedicationViewModel() }
                 val waterViewModel = remember { WaterViewModel() }
                 val walksViewModel = remember { WalksViewModel() }
+                val healthViewModel = remember { HealthViewModel() }
 
 
                 NavHost(
@@ -104,7 +107,20 @@ fun App() {
                             }
                         )
                     }
-                    composable("Saúde") { AbaEmConstrucao("Saúde", navController) }
+                    composable("Saúde") {
+                        HealthScreen(
+                            user = loggedInUser!!,
+                            onLogout = { loggedInUser = null },
+                            viewModel = healthViewModel,
+                            onTabSelected = { novaAba ->
+                                navController.navigate(novaAba) {
+                                    popUpTo("Remédios") { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                     composable("Gráficos") { AbaEmConstrucao("Gráficos", navController) }
                 }
             }

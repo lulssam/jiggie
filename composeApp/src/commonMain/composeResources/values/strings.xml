@@ -44,4 +44,11 @@
     <string name="xixi">Fez xixi</string>
     <string name="coco">Fez coco</string>
 
+    <!-- SAUDE -->
+    <string name="saudeTab">Saúde</string>
+    <string name="regSaude">Registar Saúde</string>
+    <string name="saudeSubtitle">Notas sobre saúde</string>
+    <string name="sintomasPreocupacoes">Sintomas / Preocupações</string>
+    <string name="notas">Notas</string>
+    <string name="placeholderNotas">Descreva o que observou...</string>
 </resources>

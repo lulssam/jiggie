@@ -27,11 +27,24 @@ val Orange600 = Color(0xFFEA580C)
 val Blue500 = Color(0xFF3B82F6)
 val Blue600 = Color(0xFF2563EB)
 
-// Saúde
+// Passeios
 val Green500 = Color(0xFF22C55E)
 val Green600 = Color(0xFF16A34A)
+val darkGreen = Color(0xFF0D542B)
+val lightGreenBg = Color(0xFFF0FDF4)
+val lightGreenBorder = Color(0xFFB9F8CF)
+val brownText = Color(0xFF8B6914)
+
+// Saúde
 val Red500 = Color(0xFFEF4444)
 val Red600 = Color(0xFFDC2626)
+val HealthCardBorder = Color(0xFFFFC9C9)
+val HealthTitleColor = Color(0xFF82181A)
+val HealthBadgeBorder = Color(0xFFFFA2A2)
+val HealthBadgeText = Color(0xFFC10007)
+val HealthBadgeSelectedBg = Color(0xFFFB2C36)
+val HealthBadgeSelectedText = Color(0xFFFFFAF5)
+val HealthNotasPlaceholder = Color(0xFF8B6914)
 
 // Gráficos
 val Chart1 = Color(0xFFD2691E)
