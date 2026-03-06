@@ -99,7 +99,7 @@ class WalksViewModel : ViewModel() {
             try {
                 val acao = buildString {
                     append("Passeou")
-                    if (hora.isNotBlank()) append(" às $hora)")
+                    if (hora.isNotBlank()) append(" às $hora")
                     if (duracao != null) append(" durante $duracao min")
 
                     // Integração do Xixi e Cocó na mensagem de histórico

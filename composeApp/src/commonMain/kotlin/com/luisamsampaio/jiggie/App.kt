@@ -26,6 +26,8 @@ import com.luisamsampaio.jiggie.features.water.WaterViewModel
 import com.luisamsampaio.jiggie.features.water.ui.WaterScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import androidx.navigation.compose.rememberNavController
+import com.luisamsampaio.jiggie.features.walks.WalksViewModel
+import com.luisamsampaio.jiggie.features.walks.ui.WalksScreen
 
 @Composable
 @Preview
@@ -50,13 +52,14 @@ fun App() {
 
                 val medicationViewModel = remember { MedicationViewModel() }
                 val waterViewModel = remember { WaterViewModel() }
+                val walksViewModel = remember { WalksViewModel() }
+
 
                 NavHost(
                     navController = navController,
                     startDestination = "Remédios"
                 ) {
 
-                    // 2. Rota "Remédios" (com 'R' maiúsculo e acento)
                     composable("Remédios") {
                         MedicationScreen(
                             user = loggedInUser!!,
@@ -72,7 +75,6 @@ fun App() {
                         )
                     }
 
-                    // 3. Rota "Água" (com 'Á' maiúsculo)
                     composable("Água") {
                         WaterScreen(
                             user = loggedInUser!!,
@@ -88,9 +90,20 @@ fun App() {
                         )
                     }
 
-                    // 4. PREVENIR CRASHES: Adicionar as rotas em falta
-                    // Assim podes clicar nelas no menu e em vez de crashar, aparece apenas texto
-                    composable("Passeios") { AbaEmConstrucao("Passeios", navController) }
+                    composable("Passeios") {
+                        WalksScreen(
+                            user = loggedInUser!!,
+                            onLogout = { loggedInUser = null },
+                            viewModel = walksViewModel,
+                            onTabSelected = { novaAba ->
+                                navController.navigate(novaAba) {
+                                    popUpTo("Remédios") { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                     composable("Saúde") { AbaEmConstrucao("Saúde", navController) }
                     composable("Gráficos") { AbaEmConstrucao("Gráficos", navController) }
                 }

@@ -34,4 +34,14 @@
     <string name="placeholderQtdAgua">ex: 1</string>
     <string name="unidadeAgua">Unidade</string>
 
+    <!-- PASSEIOS -->
+    <string name="passeiosTab">Passeios</string>
+    <string name="regPasseio">Registar Passeio</string>
+    <string name="passeioSubtitle">Passeios e necessidades</string>
+    <string name="duracaoPasseio">Duração (minutos)</string>
+    <string name="placeholderDuracaoPasseio">15</string>
+    <string name="tituloWC">Atividade WC</string>
+    <string name="xixi">Fez xixi</string>
+    <string name="coco">Fez coco</string>
+
 </resources>
