@@ -118,6 +118,14 @@ fun ChartsScreenContent(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
+
+                // botão mês seguinte
+                Text(
+                    text = "▶",
+                    fontSize = 14.sp,
+                    color = ForegroundColor,
+                    modifier = Modifier.clickable { onMesSeguinte() }
+                )
             }
             Spacer(modifier = Modifier.height(4.dp))
 

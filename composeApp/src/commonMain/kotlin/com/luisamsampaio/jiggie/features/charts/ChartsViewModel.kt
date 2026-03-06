@@ -10,7 +10,7 @@ import com.luisamsampaio.jiggie.data.repository.ActivityRepository
 import com.luisamsampaio.jiggie.data.repository.Atividade
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.collections.emptyList
@@ -88,10 +88,25 @@ class ChartsViewModel : ViewModel() {
     private fun atualizarEstatisticas() {
         val todas = _todasAtividades.value
 
-        totalAgua = todas.count { it.categoria == "AGUA" }
-        totalRemedios = todas.count { it.categoria == "REMEDIOS" }
-        totalPasseios = todas.count { it.categoria == "PASSEIOS" }
-        totalSaude = todas.count { it.categoria == "SAUDE" }
+
+        val filtradas = todas.filter { atividade ->
+            if (atividade.timestamp == 0L) {
+                false
+            } else {
+                try {
+                    val instant = Instant.fromEpochMilliseconds(atividade.timestamp)
+                    val date = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                    date.monthNumber == mesSelecionado && date.year == anoSelecionado
+                } catch (e: Exception) {
+                    false
+                }
+            }
+        }
+
+        totalAgua = filtradas.count { it.categoria == "AGUA" }
+        totalRemedios = filtradas.count { it.categoria == "REMEDIOS" }
+        totalPasseios = filtradas.count { it.categoria == "PASSEIOS" }
+        totalSaude = filtradas.count { it.categoria == "SAUDE" }
     }
 }
 
