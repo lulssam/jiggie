@@ -86,20 +86,17 @@ fun LoginScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .background(surface)
-            .safeDrawingPadding()   // não escrever por baixo do notch nem da barra de baixo
-            .imePadding(),          // encolher quando o teclado abre
+            .safeDrawingPadding(),
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .widthIn(max = 420.dp)   // em ecrãs largos não se estica, fica centrado
+                .widthIn(max = 420.dp)
                 .padding(start = 26.dp, end = 26.dp, bottom = 34.dp)
         ) {
             BoxWithConstraints(Modifier.weight(1f)) {
 
-                // Se houver altura de sobra, o formulário fica centrado.
-                // Se não houver — teclado aberto num ecrã pequeno — passa a deslizar.
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
