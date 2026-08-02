@@ -1,0 +1,40 @@
+package com.luisamsampaio.jiggie.features.login
+
+/**
+ * Tudo o que o ecrã login precisa para se mostrar corretamente.
+ *
+ * É imutável — quando algo muda, cria-se uma cópia nova com `.copy()`.
+ * O Compose deteta essas mudanças e redesenha apenas o necessário.
+ *
+ * @property isLoading True enquanto estamos à espera de dados do backend.
+ *                     O ecrã mostra um indicador de carregamento durante este tempo.
+ * @property error Mensagem de erro para mostrar ao utilizador.
+ *                 Null significa que não há nenhum erro.
+ * @property email O que o utilizador já escreveu no campo do email.
+ * @property password O que o utilizador já escreveu no campo da palavra-passe.
+ */
+data class LoginUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val email: String = "",
+    val password: String = "",
+) {
+    private companion object {
+        /**
+         * Aceita qualquer coisa com um @ pelo meio e um ponto depois.
+         * Não é uma verificação a sério — só evita mandar disparates para o
+         * servidor. Quem diz se o email existe mesmo é o Supabase.
+         */
+        val EMAIL_PLAUSIVEL = Regex(".+@.+\\..+")
+    }
+
+    /**
+     * Verdadeiro quando já faz sentido deixar a pessoa carregar em "Log in":
+     * o email tem um aspeto plausível e a palavra-passe não está vazia.
+     *
+     * Fica aqui, e não dentro do ecrã, porque decidir se uns dados servem ou
+     * não é uma regra da aplicação. O ecrã limita-se a obedecer ao resultado.
+     */
+    val podeEntrar: Boolean
+        get() = EMAIL_PLAUSIVEL.matches(email.trim()) && password.isNotBlank()
+}
