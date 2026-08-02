@@ -118,6 +118,20 @@ create index on administracao_medicamento (medicamento_id);
 
 -- =============================================================================
 -- 4. FUNÇÕES
+--
+-- Códigos de erro. Um SQLSTATE personalizado cai no default do PostgREST
+-- (HTTP 400) e chega ao cliente no campo "code" do JSON. O cliente decide
+-- pelo código; a "message" é só para debug e nunca para lógica.
+--
+--   JG001  Utilizador não autenticado
+--   JG002  Já pertences a uma família
+--   JG003  Perfil de utilizador não encontrado
+--   JG004  Código de convite inválido
+--   JG005  Código de convite expirado
+--   JG006  Não pertences a nenhuma família
+--
+-- Ao acrescentar um raise novo, dá-lhe código. Sem "using errcode" volta a
+-- ser P0001 e o cliente fica outra vez a comparar texto.
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -174,11 +188,11 @@ declare
   v_codigo text;
 begin
   if auth.uid() is null then
-    raise exception 'Utilizador não autenticado';
+    raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
   if exists (select 1 from dono d where d.id = auth.uid() and d.familia_id is not null) then
-    raise exception 'Já pertences a uma família';
+    raise exception 'Já pertences a uma família' using errcode = 'JG002';
   end if;
 
   v_codigo := upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 6));
@@ -190,7 +204,8 @@ begin
   update dono d set familia_id = v_familia_id where d.id = auth.uid();
 
   if not found then
-    raise exception 'Perfil de utilizador não encontrado — cria o teu perfil antes de criares uma família';
+    raise exception 'Perfil de utilizador não encontrado — cria o teu perfil antes de criares uma família'
+      using errcode = 'JG003';
   end if;
 
   return query select v_familia_id, v_codigo;
@@ -212,11 +227,11 @@ declare
   v_expira_em timestamptz;
 begin
   if auth.uid() is null then
-    raise exception 'Utilizador não autenticado';
+    raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
   if exists (select 1 from dono where id = auth.uid() and familia_id is not null) then
-    raise exception 'Já pertences a uma família';
+    raise exception 'Já pertences a uma família' using errcode = 'JG002';
   end if;
 
   select id, codigo_expira_em into v_familia_id, v_expira_em
@@ -224,11 +239,11 @@ begin
   where codigo_convite = codigo;
 
   if v_familia_id is null then
-    raise exception 'Código de convite inválido';
+    raise exception 'Código de convite inválido' using errcode = 'JG004';
   end if;
 
   if v_expira_em < now() then
-    raise exception 'Código de convite expirado';
+    raise exception 'Código de convite expirado' using errcode = 'JG005';
   end if;
 
   update dono set familia_id = v_familia_id where id = auth.uid();
@@ -236,7 +251,8 @@ begin
   -- O "if not found" tem de vir imediatamente a seguir ao update da "dono":
   -- qualquer statement pelo meio reescreve o FOUND e o guarda deixa de valer.
   if not found then
-    raise exception 'Perfil de utilizador não encontrado — cria o teu perfil antes de te juntares a uma família';
+    raise exception 'Perfil de utilizador não encontrado — cria o teu perfil antes de te juntares a uma família'
+      using errcode = 'JG003';
   end if;
 
   -- Alguém voltou a entrar: a família já não está órfã.
@@ -263,13 +279,13 @@ declare
   v_restantes int;
 begin
   if auth.uid() is null then
-    raise exception 'Utilizador não autenticado';
+    raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
   select familia_id into v_familia_id from dono where id = auth.uid();
 
   if v_familia_id is null then
-    raise exception 'Não pertences a nenhuma família';
+    raise exception 'Não pertences a nenhuma família' using errcode = 'JG006';
   end if;
 
   update dono set familia_id = null where id = auth.uid();
@@ -298,13 +314,13 @@ declare
   v_expira timestamptz;
 begin
   if auth.uid() is null then
-    raise exception 'Utilizador não autenticado';
+    raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
   select familia_id into v_familia_id from dono where id = auth.uid();
 
   if v_familia_id is null then
-    raise exception 'Não pertences a nenhuma família';
+    raise exception 'Não pertences a nenhuma família' using errcode = 'JG006';
   end if;
 
   select f.codigo_convite, f.codigo_expira_em into v_codigo, v_expira
