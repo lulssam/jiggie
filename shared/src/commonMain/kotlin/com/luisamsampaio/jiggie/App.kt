@@ -57,7 +57,7 @@ fun App() {
                     val r = supabase.from("passeio")
                         .select()
                         .decodeList<kotlinx.serialization.json.JsonObject>()
-                    "OK — \${r.size} linhas (esperado 0: a RLS bloqueia o anon)"
+                    "OK — ${r.size} linhas (esperado 0: a RLS bloqueia o anon)"
                 } catch (e: Exception) {
                     "\"FALHOU — \${e::class.simpleName}: \${e.message}\""
                 }
