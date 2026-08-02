@@ -1,0 +1,38 @@
+package com.luisamsampaio.jiggie.theme
+
+import androidx.compose.ui.graphics.Color
+
+// brand & primary
+val primary = Color(0xFF0099A0)
+val primaryDark = Color(0xFF162525)
+val primaryContainer = Color(0xFFE6FAFA)
+val primaryBorder = Color(0xFFB2E2E4)
+
+// neutral & surface
+val background = Color(0xFFE5E8EC)
+val surface = Color(0xFFFBFCFD)
+val onSurface = Color(0xFF1E2226)
+val textStrong = Color(0xFF25292E)
+val textBody = Color(0xFF44484D)
+val textSecondary = Color(0xFF6D7277)
+val textTertiary = Color(0xFF5F6469)
+val textDisabled = Color(0xFF7C8186)
+val outline = Color(0xFFDDE2E6)
+val outlineStrong = Color(0xFFD3D8DE)
+val divider = Color(0xFFE9EBEE)
+
+// semantic — log categories
+val walk = Color(0xFF0099A0)
+val food = Color(0xFFA38043)
+val water = Color(0xFF3A89B3)
+val med = Color(0xFF7F64AB)
+val symptom = Color(0xFFCB6440)
+val success = Color(0xFF0B7643)
+val danger = Color(0xFFB54A46)
+
+// dog avatar palette
+val dog1 = Color(0xFF56B6BB)
+val dog2 = Color(0xFFA693C9)
+val dog3 = Color(0xFF69AA77)
+val dog4 = Color(0xFFD7935A)
+val dog5 = Color(0xFFD2736C)
