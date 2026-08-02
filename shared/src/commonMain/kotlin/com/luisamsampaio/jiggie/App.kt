@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.postgrest.from
 
 private fun String.debug(): String =
     if (isEmpty()) "(vazio)"
@@ -49,6 +50,20 @@ fun App() {
             var fundo by remember { mutableStateOf("") }
 
             val campo = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+
+            var estado by remember { mutableStateOf("a ligar...") }
+            LaunchedEffect(Unit) {
+                estado = try {
+                    val r = supabase.from("passeio")
+                        .select()
+                        .decodeList<kotlinx.serialization.json.JsonObject>()
+                    "OK — \${r.size} linhas (esperado 0: a RLS bloqueia o anon)"
+                } catch (e: Exception) {
+                    "\"FALHOU — \${e::class.simpleName}: \${e.message}\""
+                }
+            }
+
+            Text(estado, Modifier.padding(8.dp))
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
