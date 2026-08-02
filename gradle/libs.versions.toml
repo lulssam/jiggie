@@ -6,6 +6,9 @@ kotlin = "2.4.10"
 kotlin-wrappers = "2026.7.2"
 material3 = "1.11.0-alpha07"
 
+supabase = "3.7.0"
+ktor = "3.5.2"
+
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -20,7 +23,13 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 wrappers-browser = { module = "org.jetbrains.kotlin-wrappers:kotlin-browser", version.ref = "kotlin-wrappers" }
 
+supabase-auth      = { module = "io.github.jan-tennert.supabase:auth-kt",      version.ref = "supabase" }
+supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+supabase-realtime  = { module = "io.github.jan-tennert.supabase:realtime-kt",  version.ref = "supabase" }
+ktor-client-js     = { module = "io.ktor:ktor-client-js",                      version.ref = "ktor" }
+
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
