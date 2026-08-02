@@ -111,10 +111,10 @@ else
   exit 1
 fi
 
-MSG=$(rpc "$TOKEN_LU" create_familia '{"p_nome":"Outra"}' | jget message)
-[[ "$MSG" == "Já pertences a uma família" ]] \
-  && ok "segunda chamada rejeitada com a mensagem certa" \
-  || bad "esperava 'Já pertences a uma família', veio: '$MSG'"
+C=$(rpc "$TOKEN_LU" create_familia '{"p_nome":"Outra"}' | jget code)
+[[ "$C" == "JG002" ]] \
+  && ok "segunda chamada rejeitada com JG002" \
+  || bad "esperava code JG002, veio: '$C'"
 
 
 # ---------------------------------------------------------------------------
@@ -122,20 +122,20 @@ head_ "3. join_familia"
 # ---------------------------------------------------------------------------
 read -r TOKEN_MAE ID_MAE <<< "$(signup "mae+$STAMP@teste.pt" "Mãe")"
 
-MSG=$(rpc "$TOKEN_MAE" join_familia '{"codigo":"XXXXXX"}' | jget message)
-[[ "$MSG" == "Código de convite inválido" ]] \
-  && ok "código inválido rejeitado" \
-  || bad "esperava 'Código de convite inválido', veio: '$MSG'"
+C=$(rpc "$TOKEN_MAE" join_familia '{"codigo":"XXXXXX"}' | jget code)
+[[ "$C" == "JG004" ]] \
+  && ok "código inválido rejeitado com JG004" \
+  || bad "esperava code JG004, veio: '$C'"
 
 R=$(rpc "$TOKEN_MAE" join_familia "{\"codigo\":\"$CODIGO\"}")
 [[ "$R" == "\"$FAM_ID\"" ]] \
   && ok "entrou na família da Lu" \
   || bad "join_familia devolveu: $R"
 
-MSG=$(rpc "$TOKEN_MAE" join_familia "{\"codigo\":\"$CODIGO\"}" | jget message)
-[[ "$MSG" == "Já pertences a uma família" ]] \
-  && ok "segunda entrada rejeitada" \
-  || bad "esperava 'Já pertences a uma família', veio: '$MSG'"
+C=$(rpc "$TOKEN_MAE" join_familia "{\"codigo\":\"$CODIGO\"}" | jget code)
+[[ "$C" == "JG002" ]] \
+  && ok "segunda entrada rejeitada com JG002" \
+  || bad "esperava code JG002, veio: '$C'"
 
 
 # ---------------------------------------------------------------------------
