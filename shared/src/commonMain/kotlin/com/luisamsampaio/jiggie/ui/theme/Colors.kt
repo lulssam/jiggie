@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.theme
+package com.luisamsampaio.jiggie.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -7,6 +7,8 @@ val primary = Color(0xFF0099A0)
 val primaryDark = Color(0xFF162525)
 val primaryContainer = Color(0xFFE6FAFA)
 val primaryBorder = Color(0xFFB2E2E4)
+val primaryLink = Color(0xFF00848B)
+val inputBorder = Color(0xFFDADEE3)
 
 // neutral & surface
 val background = Color(0xFFE5E8EC)
