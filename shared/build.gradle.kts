@@ -38,17 +38,24 @@ val generateBuildInfo = tasks.register("generateBuildInfo") {
     }
 }
 
+compose.desktop {
+    application {
+        mainClass = "com.luisamsampaio.jiggie.MainDesktopKt"
+    }
+}
+
 kotlin {
     js {
         browser()
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
-    
-    
+
+    jvm()
+
     sourceSets {
         commonMain {
             kotlin.srcDir(generateBuildInfo)
@@ -65,7 +72,6 @@ kotlin {
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgrest)
             implementation(libs.supabase.realtime)
-            implementation(libs.ktor.client.js)
 
         }
         commonTest.dependencies {
@@ -73,6 +79,17 @@ kotlin {
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
+            implementation(libs.ktor.client.js)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.ktor.client.cio)
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
+        }
+
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
     }
 }
