@@ -9,10 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.luisamsampaio.jiggie.features.codigo.CodigoFamiliaScreen
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
@@ -45,7 +47,7 @@ fun App() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = CriarFamilia
+                    startDestination = inicio
                 ) {
 
                     composable<Welcome> {
@@ -81,11 +83,17 @@ fun App() {
 
                     composable<CodigoFamilia> { entrada ->
                         val dados = entrada.toRoute<CodigoFamilia>()
-                        /*CodigoFamiliaScreen(
+                        CodigoFamiliaScreen(
                             nome = dados.nome,
                             codigo = dados.codigo,
-                            onEntrar = {/*todo: entrar na aplicação*/}
-                        )*/
+                            onEntrar = {
+                                navController.navigate(Home) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        )
                     }
 
                     composable<Home> {
