@@ -2,6 +2,7 @@ package com.luisamsampaio.jiggie.features.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
@@ -76,7 +77,7 @@ class CreateFamViewModel : ViewModel() {
                 throw cancelamento
             } catch (erro: Exception) {
                 println("onCreateFamilia falhou: $erro")
-                _state.update { it.copy(isLoading = false, error = mensagem(erro)) }
+                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
             }
         }
     }
@@ -112,33 +113,4 @@ class CreateFamViewModel : ViewModel() {
     fun onPasswordChange(nova: String) {
         _state.update { it.copy(password = nova, error = null) }
     }
-}
-
-/**
- * Transforma um erro do backend numa frase legível para o utilizador.
- *
- * @param erro O erro devolvido pelo backend.
- * @return Uma mensagem em português para mostrar no ecrã.
- */
-private fun mensagem(erro: Throwable): String = when (erro) {
-    is AuthRestException -> when (erro.errorCode) {
-        AuthErrorCode.UserAlreadyExists,
-        AuthErrorCode.EmailExists -> "Já existe uma conta com esse email."
-
-        AuthErrorCode.WeakPassword -> "Escolhe uma palavra-passe mais forte."
-        AuthErrorCode.EmailAddressInvalid -> "Esse email não parece válido."
-        AuthErrorCode.SignupDisabled -> "Os registos estão desactivados de momento."
-        AuthErrorCode.OverRequestRateLimit -> "Demasiadas tentativas. Espera um pouco."
-        else -> "Não foi possível criar a conta. Tenta outra vez."
-    }
-
-    is PostgrestRestException -> when (erro.code) {
-        "JG001" -> "Sessão perdida. Entra outra vez."
-        "JG002" -> "Já pertences a uma família."
-        "JG003" -> "O teu perfil ainda não está pronto. Tenta outra vez."
-        else -> "Não foi possível criar a família. Tenta outra vez."
-    }
-
-    is HttpRequestException -> "Sem ligação. Verifica a internet."
-    else -> "Não foi possível criar a conta. Tenta outra vez."
 }

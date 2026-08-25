@@ -1,5 +1,6 @@
 package com.luisamsampaio.jiggie.features.create
 
+import com.luisamsampaio.jiggie.MINIMO_PASSWORD
 import com.luisamsampaio.jiggie.emailPlausivel
 
 /**
@@ -38,9 +39,4 @@ data class CreateFamUiState(
                 yourName.isNotBlank() &&
                 emailPlausivel(email) &&
                 password.length >= MINIMO_PASSWORD
-
-    companion object {
-        /** O mínimo que o Supabase aceita. Barramos aqui para não gastar uma ida ao servidor. */
-        const val MINIMO_PASSWORD = 6
-    }
 }

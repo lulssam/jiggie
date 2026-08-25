@@ -2,6 +2,7 @@ package com.luisamsampaio.jiggie.features.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
@@ -76,27 +77,9 @@ class LoginViewModel : ViewModel() {
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
             } catch (erro: Exception) {
-                _state.update { it.copy(isLoading = false, error = mensagem(erro)) }
+                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
             }
 
         }
-    }
-
-    /**
-     * Transforma um erro do backend numa frase legível para o utilizador.
-     *
-     * @param erro O erro devolvido pelo backend.
-     * @return Uma mensagem em português para mostrar no ecrã.
-     */
-    private fun mensagem(erro: Throwable): String = when (erro) {
-        is AuthRestException -> when (erro.errorCode) {
-            AuthErrorCode.InvalidCredentials -> "Email ou palavra-passe errados."
-            AuthErrorCode.EmailNotConfirmed -> "Confirma o email antes de entrares."
-            AuthErrorCode.UserBanned -> "Esta conta foi suspensa."
-            AuthErrorCode.OverRequestRateLimit -> "Demasiadas tentativas. Espera um pouco."
-            else -> "Não foi possível entrar. Tenta outra vez."
-        }
-        is HttpRequestException -> "Sem ligação. Verifica a internet."
-        else -> "Não foi possível entrar. Tenta outra vez."
     }
 }

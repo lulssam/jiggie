@@ -71,6 +71,7 @@ fun CampoTexto(
     placeholder: String,
     tipoDeTeclado: KeyboardType,
     esconderTexto: Boolean = false,
+    estilo: TextStyle = MaterialTheme.typography.bodyLarge,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -89,7 +90,7 @@ fun CampoTexto(
         if (valor.isEmpty()) {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.bodyLarge,
+                style = estilo,
                 color = textDisabled
             )
         }
@@ -98,7 +99,7 @@ fun CampoTexto(
             value = valor,
             onValueChange = onValor,
             singleLine = true,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(color = onSurface),
+            textStyle = estilo.copy(color = onSurface),
             cursorBrush = SolidColor(primary),
             keyboardOptions = KeyboardOptions(keyboardType = tipoDeTeclado),
             visualTransformation =

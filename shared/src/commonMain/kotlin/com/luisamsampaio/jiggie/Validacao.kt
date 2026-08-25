@@ -11,3 +11,5 @@ private val EMAIL_PLAUSIVEL = Regex(".+@.+\\..+")
  * Verdeiro quando [email] tem forma de email*/
 fun emailPlausivel(email: String): Boolean =
     EMAIL_PLAUSIVEL.matches(email.trim())
+
+const val MINIMO_PASSWORD = 6
