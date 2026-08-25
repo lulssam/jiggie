@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,11 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.MINIMO_PASSWORD
 import com.luisamsampaio.jiggie.ui.BotaoPrincipal
 import com.luisamsampaio.jiggie.ui.CampoTexto
 import com.luisamsampaio.jiggie.ui.Etiqueta
+import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
@@ -123,6 +127,15 @@ private fun JoinFamilyScreenContent(
                     onPasswordChange = onPasswordChange
                 )
 
+                if (state.error != null) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = state.error,
+                        style = typography.bodySmall,
+                        color = danger
+                    )
+                }
+
                 Spacer(Modifier.height(8.dp))
 
                 Text(
@@ -130,6 +143,7 @@ private fun JoinFamilyScreenContent(
                     style = typography.bodySmall,
                     color = textTertiary
                 )
+
             }
 
             BotaoPrincipal(
@@ -154,9 +168,17 @@ private fun JoinFamilyScreenContent(
 fun JoinFamilyScreen(
     viewModel: JoinFamilyViewModel = viewModel { JoinFamilyViewModel() },
     onBack: () -> Unit,
-    onJoinFamily: () -> Unit
+    onEntrou: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    LaunchedEffect(
+        state.entrou
+    ) {
+        if (state.entrou) {
+            onEntrou()
+        }
+    }
+
     JoinFamilyScreenContent(
         state = state,
         onBack = onBack,
@@ -186,7 +208,12 @@ private fun JoinFamForms(
             valor = state.codigo,
             onValor = onInviteCodeChange,
             placeholder = "XXXXXX",
-            tipoDeTeclado = KeyboardType.Text
+            tipoDeTeclado = KeyboardType.Text,
+            estilo = typography.bodyLarge.copy(
+                fontFamily = plexMono(),
+                fontSize = 16.sp,
+                letterSpacing = 2.sp,
+            )
         )
 
         Spacer(Modifier.height(16.dp))
@@ -222,7 +249,8 @@ private fun JoinFamForms(
             valor = state.password,
             onValor = onPasswordChange,
             placeholder = "At least $MINIMO_PASSWORD characters",
-            tipoDeTeclado = KeyboardType.Password
+            tipoDeTeclado = KeyboardType.Password,
+            esconderTexto = true
         )
     }
 

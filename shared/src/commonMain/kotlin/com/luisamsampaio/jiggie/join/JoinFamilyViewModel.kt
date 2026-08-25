@@ -7,7 +7,7 @@ import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.postgrest
-import io.ktor.utils.io.CancellationException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +25,7 @@ import kotlinx.serialization.json.put
  */
 class JoinFamilyViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow(JoinFamilyUiState(isLoading = true))
+    private val _state = MutableStateFlow(JoinFamilyUiState())
 
     /**
      * O estado atual do ecrã, disponível para o Composable observar.

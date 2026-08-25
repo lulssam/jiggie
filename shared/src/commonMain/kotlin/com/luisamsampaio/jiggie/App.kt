@@ -104,7 +104,7 @@ fun App() {
                     composable<JuntarFamilia> {
                         JoinFamilyScreen(
                             onBack = { navController.popBackStack() },
-                            onJoinFamily = {
+                            onEntrou = {
                                 navController.navigate(Home) {
                                     popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
                                 }

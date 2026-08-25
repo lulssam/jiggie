@@ -245,16 +245,9 @@ private fun CreateFamForm(
         CampoTexto(
             valor = state.password,
             onValor = onPasswordChange,
-            placeholder = "••••••••",
+            placeholder = "At least $MINIMO_PASSWORD characters",
             tipoDeTeclado = KeyboardType.Password,
             esconderTexto = true
-        )
-
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = "At least $MINIMO_PASSWORD characters",
-            style = typography.bodySmall,
-            color = textTertiary
         )
     }
 }
