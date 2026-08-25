@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
+import com.luisamsampaio.jiggie.features.welcome.WelcomeScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 
 @Composable
@@ -22,7 +23,11 @@ fun App(onNavHostReady: suspend (NavController) -> Unit = {}) {
         ) {
 
             composable<Welcome> {
-                // TODO: mostrar welcome screen
+                WelcomeScreen(
+                    onCreateFamily = { navController.navigate(CriarFamilia) },
+                    onJoinCode = {/*TODO: adicionar ecra de juntar com codigo*/ },
+                    onLogIn = { navController.navigate(Login) }
+                )
             }
 
             composable<Login> {
