@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object Login
 @Serializable
-data object Boasvindas
+data object Welcome
 @Serializable
 data object CriarFamilia
 @Serializable
@@ -19,4 +19,4 @@ data object Aplicacao
  * Leva os dados consigo em vez de os ir buscar outra vez: quem criou a
  * familia já os tem na mão, e assim este ecrã não precisa de ViewModel.*/
 @Serializable
-data class CodigoFamilia(val nomeFam: String, val nomeMembro: String)
+data class CodigoFamilia(val nome: String, val codigo: String)

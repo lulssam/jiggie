@@ -19,9 +19,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.TopCenter
@@ -93,7 +96,7 @@ private fun CreateFamScreenContent(
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.left_arrow),
-                        contentDescription = null,
+                        contentDescription = "Voltar",
                         tint = textStrong,
                         modifier = Modifier.size(28.dp)
                     )
@@ -103,9 +106,7 @@ private fun CreateFamScreenContent(
                 // create your family
                 Text(
                     text = "Create your family",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    letterSpacing = (-0.7).sp,
+                    style = typography.titleLarge,
                     color = textStrong,
                 )
 
@@ -114,8 +115,7 @@ private fun CreateFamScreenContent(
                 // subtitle
                 Text(
                     text = "You'll get a code to invite the rest of the household.",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 13.sp,
+                    style = typography.bodyMedium,
                     color = textSecondary,
                 )
 
@@ -132,8 +132,7 @@ private fun CreateFamScreenContent(
                     Spacer(Modifier.height(12.dp))
                     Text(
                         text = state.error,
-                        fontFamily = plexSans(),
-                        fontSize = 12.sp,
+                        style = typography.bodySmall,
                         color = danger,
                     )
                 }
@@ -166,17 +165,20 @@ fun CreateFamScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    // quando o código deixa de ser null, a família ficou criada e é altura de sair
+    // do ecrã. quem navega é o ecrã, não o viewmodel
+
+    LaunchedEffect(state.codigoCriado) {
+        val codigo = state.codigoCriado ?: return@LaunchedEffect
+        onContinue(state.familyName, codigo)
+    }
+
     CreateFamScreenContent(
         state = state,
         onBack = onVoltar,
         onFamilyNameChange = viewModel::onFamilyNameChange,
         onYourNameChange = viewModel::onYourNameChange,
-        onContinue = {
-            onContinue(
-                state.familyName,
-                state.yourName
-            )
-        }
+        onContinue = viewModel::onCreateFamilia
     )
 }
 

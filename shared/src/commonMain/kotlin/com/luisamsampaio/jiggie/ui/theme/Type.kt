@@ -80,9 +80,15 @@ fun jiggieTypography(): Typography {
             ),
 
             titleLarge = base.titleLarge.copy(
-                fontFamily = sans, fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                fontFamily = sans,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.4).sp
             ),
-            titleMedium = base.titleMedium.copy(fontFamily = sans),
+            titleMedium = base.titleMedium.copy(
+                fontFamily = sans, fontSize = 19.sp,
+                fontWeight = FontWeight.Bold, letterSpacing = (-0.3).sp,
+            ),
             titleSmall = base.titleSmall.copy(
                 fontFamily = sans, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
             ),

@@ -80,7 +80,7 @@ fun CampoTexto(
         if (valor.isEmpty()) {
             Text(
                 text = placeholder,
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.bodyLarge,
                 color = textDisabled
             )
         }
@@ -129,9 +129,7 @@ fun BotaoPrincipal(
     ) {
         Text(
             text = texto,
-            fontFamily = plexSans(),
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.labelLarge,
             color = if (activo) Color.White else textDisabled,
         )
     }
@@ -147,10 +145,7 @@ fun BotaoPrincipal(
 fun Etiqueta(texto: String) {
     Text(
         text = texto,
-        fontFamily = plexSans(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 11.sp,
-        letterSpacing = 0.3.sp,
-        color = textTertiary,
+        style = MaterialTheme.typography.labelSmall,
+        color = textTertiary
     )
 }

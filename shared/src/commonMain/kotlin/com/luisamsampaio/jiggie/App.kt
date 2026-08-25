@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
@@ -19,6 +20,11 @@ fun App(onNavHostReady: suspend (NavController) -> Unit = {}) {
             navController = navController,
             startDestination = Login
         ) {
+
+            composable<Welcome> {
+                // TODO: mostrar welcome screen
+            }
+
             composable<Login> {
                 LoginScreen(
                     onCriarFamilia = { navController.navigate(CriarFamilia) }
@@ -27,17 +33,23 @@ fun App(onNavHostReady: suspend (NavController) -> Unit = {}) {
 
             composable<CriarFamilia> {
                 CreateFamScreen(
-                    onVoltar = {navController.popBackStack()},
-                    onContinue = {nomeFam, nomMembro ->
+                    onVoltar = { navController.popBackStack() },
+                    onContinue = { nome, codigo ->
                         // apaga "welcome" e "create" atrás de si: a familia já foi criada
-                        navController.navigate(CodigoFamilia(nomeFam, nomMembro)) {
+                        navController.navigate(CodigoFamilia(nome, codigo)) {
+                            popUpTo<Login> { inclusive = true }
                         }
                     }
                 )
             }
 
-            composable<CodigoFamilia> {
-                // TODO: mostrar código de convite
+            composable<CodigoFamilia> { entrada ->
+                val dados = entrada.toRoute<CodigoFamilia>()
+                /*CodigoFamiliaScreen(
+                    nome = dados.nome,
+                    codigo = dados.codigo,
+                    onEntrar = {/*todo: entrar na aplicação*/}
+                )*/
             }
         }
     }

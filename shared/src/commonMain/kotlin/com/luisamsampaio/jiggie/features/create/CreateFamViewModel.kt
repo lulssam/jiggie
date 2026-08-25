@@ -31,18 +31,13 @@ class CreateFamViewModel : ViewModel() {
     fun onCreateFamilia() {
         val currentState = _state.value
 
-        if (currentState.familyName.isBlank() || currentState.yourName.isBlank()) {
-            _state.update {
-                it.copy(error = "Fill out all fields")
-            }
-            return
-        }
+        if (!currentState.podeContinuar || currentState.isLoading) return
 
-        _state.update {
-            it.copy(
-                isLoading = true,
-                error = null
-            )
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+
+            // TODO: criar a familia no supabase e usar o codigo que ele devolver
+            _state.update { it.copy(isLoading = false, codigoCriado = gerarCodigo()) }
         }
 
         // chamada ao backend
@@ -88,6 +83,12 @@ class CreateFamViewModel : ViewModel() {
     }
 
 
+    /**
+     * Gera um código de convite curto para a família.
+     *
+     * O alfabeto não tem I, O, 0 nem 1 de propósito: estes códigos vão ser
+     * lidos em voz alta e escritos à mão, e essas quatro letras confundem-se.
+     */
     private fun gerarCodigo(): String {
         val alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         val sufixo = (1..4).map { alfabeto.random() }.joinToString("")

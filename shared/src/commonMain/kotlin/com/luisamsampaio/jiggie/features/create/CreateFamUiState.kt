@@ -8,6 +8,8 @@ package com.luisamsampaio.jiggie.features.create
  *
  * @property familyName O nome que a pessoa já escreveu para a família.
  * @property yourName O nome com que a pessoa se vai apresentar aos outros membros.
+ * @property codigoCriado O código de convite gerado pelo backend. Null enquanto a familia não for
+ *                          criada. Quando deixa de ser null, o ecrã sabe que pode navegar.
  * @property isLoading True enquanto estamos à espera de dados do backend.
  *                     O ecrã mostra um indicador de carregamento durante este tempo.
  * @property error Mensagem de erro para mostrar ao utilizador.
@@ -16,6 +18,7 @@ package com.luisamsampaio.jiggie.features.create
 data class CreateFamUiState(
     val familyName: String = "",
     val yourName: String = "",
+    val codigoCriado: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
 ) {

@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -126,9 +127,7 @@ fun LoginScreenContent(
                         Spacer(Modifier.height(18.dp))
                         Text(
                             text = "Welcome back",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 26.sp,
-                            letterSpacing = (-0.7).sp,
+                            style = typography.headlineSmall,
                             color = primaryDark,
                         )
                         Spacer(Modifier.height(7.dp))
@@ -138,7 +137,7 @@ fun LoginScreenContent(
                                 withStyle(SpanStyle(color = primary)) { append("!") }
                                 append(" account.")
                             },
-                            fontSize = 13.sp,
+                            style = typography.bodyMedium,
                             color = textTertiary,
                         )
                     }
@@ -161,9 +160,7 @@ fun LoginScreenContent(
                         Etiqueta("PASSWORD")
                         Text(
                             text = "Forgot?",
-                            fontFamily = plexSans(),
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 11.sp,
+                            style = typography.bodySmall,
                             color = primaryLink,
                             modifier = Modifier.clickable(onClick = onEsqueciPalavraPasse),
                         )
@@ -181,8 +178,7 @@ fun LoginScreenContent(
                         Spacer(Modifier.height(12.dp))
                         Text(
                             text = state.error,
-                            fontFamily = plexSans(),
-                            fontSize = 12.sp,
+                            style = typography.bodySmall,
                             color = danger,
                         )
                     }
@@ -202,15 +198,12 @@ fun LoginScreenContent(
             ) {
                 Text(
                     text = "New here? ",
-                    fontFamily = plexSans(),
-                    fontSize = 13.sp,
+                    style = typography.bodyMedium,
                     color = textTertiary,
                 )
                 Text(
                     text = "Create a family",
-                    fontFamily = plexSans(),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp,
+                    style = typography.bodyMedium,
                     color = primaryLink,
                     modifier = Modifier.clickable(onClick = onCriarFamilia),
                 )
