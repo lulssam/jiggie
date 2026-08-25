@@ -19,6 +19,7 @@ import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
 import com.luisamsampaio.jiggie.features.welcome.WelcomeScreen
+import com.luisamsampaio.jiggie.join.JoinFamilyScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.surface
@@ -53,7 +54,7 @@ fun App() {
                     composable<Welcome> {
                         WelcomeScreen(
                             onCreateFamily = { navController.navigate(CriarFamilia) },
-                            onJoinCode = {/*TODO: adicionar ecra de juntar com codigo*/ },
+                            onJoinCode = {navController.navigate(JuntarFamilia) },
                             onLogIn = { navController.navigate(Login) }
                         )
                     }
@@ -98,6 +99,17 @@ fun App() {
 
                     composable<Home> {
                         HomeScreen()
+                    }
+
+                    composable<JuntarFamilia> {
+                        JoinFamilyScreen(
+                            onBack = { navController.popBackStack() },
+                            onJoinFamily = {
+                                navController.navigate(Home) {
+                                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                                }
+                            }
+                        )
                     }
                 }
             }

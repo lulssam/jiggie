@@ -39,7 +39,8 @@ class CreateFamViewModel : ViewModel() {
 
 
     /**
-     * Quando se clica no botão para criar a familia.*/
+     * Quando se clica no botão para criar a familia.
+     * Faz chamada ao backend*/
     fun onCreateFamilia() {
         val currentState = _state.value
 
