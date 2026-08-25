@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,15 +20,17 @@ import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
 import com.luisamsampaio.jiggie.features.welcome.WelcomeScreen
-import com.luisamsampaio.jiggie.join.JoinFamilyScreen
+import com.luisamsampaio.jiggie.features.join.JoinFamilyScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.surface
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.postgrest.postgrest
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.ic_pets
 import org.jetbrains.compose.resources.painterResource
+import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
 fun App() {
@@ -38,84 +41,94 @@ fun App() {
             is SessionStatus.Initializing -> EcraDeArranque()
 
             else -> {
-                // Decide-se uma vez só. Quando a pessoa fizer login, o
-                // sessionStatus muda para Authenticated — mas a partir daqui
-                // quem manda na navegação é o NavController, não este `when`
-                val inicio: Any = remember {
-                    if (sessao is SessionStatus.Authenticated) Home else Login
-                }
-                val navController = rememberNavController()
+                // Decide-se uma vez só, quando a sessão assenta. Quando a pessoa
+                // fizer login o sessionStatus volta a mudar — mas a partir daqui
+                // quem manda na navegação é o NavController, não este `when`.
+                var inicio by remember { mutableStateOf<Any?>(null) }
+                LaunchedEffect(Unit) { inicio = decidirArranque() }
 
-                NavHost(
-                    navController = navController,
-                    startDestination = inicio
-                ) {
-
-                    composable<Welcome> {
-                        WelcomeScreen(
-                            onCreateFamily = { navController.navigate(CriarFamilia) },
-                            onJoinCode = {navController.navigate(JuntarFamilia) },
-                            onLogIn = { navController.navigate(Login) }
-                        )
-                    }
-
-                    composable<Login> {
-                        LoginScreen(
-                            onCriarFamilia = { navController.navigate(Welcome) },
-                            onEntrou = {
-                                navController.navigate(Home) {
-                                    popUpTo<Login> { inclusive = true }
-                                }
-                            }
-                        )
-                    }
-
-                    composable<CriarFamilia> {
-                        CreateFamScreen(
-                            onVoltar = { navController.popBackStack() },
-                            onContinue = { nome, codigo ->
-                                // apaga "welcome" e "create" atrás de si: a familia já foi criada
-                                navController.navigate(CodigoFamilia(nome, codigo)) {
-                                    popUpTo<Login> { inclusive = true }
-                                }
-                            }
-                        )
-                    }
-
-                    composable<CodigoFamilia> { entrada ->
-                        val dados = entrada.toRoute<CodigoFamilia>()
-                        CodigoFamiliaScreen(
-                            nome = dados.nome,
-                            codigo = dados.codigo,
-                            onEntrar = {
-                                navController.navigate(Home) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        )
-                    }
-
-                    composable<Home> {
-                        HomeScreen()
-                    }
-
-                    composable<JuntarFamilia> {
-                        JoinFamilyScreen(
-                            onBack = { navController.popBackStack() },
-                            onEntrou = {
-                                navController.navigate(Home) {
-                                    popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
-                                }
-                            }
-                        )
-                    }
+                val destino = inicio
+                if (destino == null) {
+                    EcraDeArranque()
+                } else {
+                    Navegacao(inicio = destino)
                 }
             }
-
         }
     }
+}
+
+@Composable
+private fun Navegacao(inicio: Any) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = inicio
+    ) {
+
+        composable<Welcome> {
+            WelcomeScreen(
+                onCreateFamily = { navController.navigate(CriarFamilia) },
+                onJoinCode = { navController.navigate(JuntarFamilia) },
+                onLogIn = { navController.navigate(Login) }
+            )
+        }
+
+        composable<Login> {
+            LoginScreen(
+                onCriarFamilia = { navController.navigate(Welcome) },
+                onEntrou = {
+                    navController.navigate(Home) {
+                        popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable<CriarFamilia> {
+            CreateFamScreen(
+                onVoltar = { navController.popBackStack() },
+                onContinue = { nome, codigo ->
+                    // Apaga o formulário atrás de si: a família já foi criada.
+                    navController.navigate(CodigoFamilia(nome, codigo)) {
+                        popUpTo<CriarFamilia> { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable<CodigoFamilia> { entrada ->
+            val dados = entrada.toRoute<CodigoFamilia>()
+            CodigoFamiliaScreen(
+                nome = dados.nome,
+                codigo = dados.codigo,
+                onEntrar = {
+                    navController.navigate(Home) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable<Home> {
+            HomeScreen()
+        }
+
+        composable<JuntarFamilia> {
+            JoinFamilyScreen(
+                onBack = { navController.popBackStack() },
+                onEntrou = {
+                    navController.navigate(Home) {
+                        popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+                    }
+                }
+            )
+        }
+    }
+
 }
 
 /**
@@ -138,4 +151,31 @@ private fun EcraDeArranque() {
             modifier = Modifier.size(40.dp),
         )
     }
+}
+
+/**
+ * Decide onde a aplicação abre.
+ *
+ * São três casos e não dois: estar autenticado não é o mesmo que ter família.
+ * Quem se regista e falha logo a seguir a criar ou a entrar numa família — um
+ * código de convite mal copiado, a rede a cair a meio — fica exactamente nesse
+ * meio-termo. O [Welcome] é o ecrã que lhe dá as duas saídas de volta.
+ *
+ * @return A rota onde montar o grafo: [Login], [Welcome] ou [Home].
+ */
+private suspend fun decidirArranque(): Any {
+    if (supabase.auth.currentSessionOrNull() == null) return Login
+
+    // O current_familia_id() devolve um escalar: o uuid da família desta
+    // pessoa, ou null se ela ainda não pertence a nenhuma.
+    val temFamilia = try {
+        supabase.postgrest.rpc("current_familia_id").decodeAs<String?>() != null
+    } catch (cancelamento: CancellationException) {
+        throw cancelamento
+    } catch (erro: Exception) {
+        println("decidirArranque: não deu para saber a família — $erro")
+        true
+    }
+
+    return if (temFamilia) Home else Welcome
 }

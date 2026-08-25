@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.join
+package com.luisamsampaio.jiggie.features.join
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

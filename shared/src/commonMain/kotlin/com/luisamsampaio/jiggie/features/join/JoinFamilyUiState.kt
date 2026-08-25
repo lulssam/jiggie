@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.join
+package com.luisamsampaio.jiggie.features.join
 
 import com.luisamsampaio.jiggie.MINIMO_PASSWORD
 import com.luisamsampaio.jiggie.emailPlausivel
