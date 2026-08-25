@@ -30,6 +30,8 @@ import com.luisamsampaio.jiggie.ui.BotaoPrincipal
 import com.luisamsampaio.jiggie.ui.CampoTexto
 import com.luisamsampaio.jiggie.ui.Etiqueta
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
+import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.plexSans
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
@@ -110,9 +112,19 @@ private fun CreateFamScreenContent(
 
         BotaoPrincipal(
             texto = "Continue",
-            activo = state.familyName.isNotBlank() && state.yourName.isNotBlank(),
+            activo = state.podeContinuar,
             onClique = onContinue
         )
+
+        if (state.error != null) {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = state.error,
+                fontFamily = plexSans(),
+                fontSize = 12.sp,
+                color = danger,
+            )
+        }
 
     }
 }
@@ -160,7 +172,7 @@ private fun CreateFamForm(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Etiqueta("FAMILY NAME",)
+        Etiqueta("FAMILY NAME")
         Spacer(Modifier.height(7.dp))
         CampoTexto(
             valor = state.familyName,
@@ -171,7 +183,7 @@ private fun CreateFamForm(
 
         Spacer(Modifier.height(16.dp))
 
-        Etiqueta("YOUR NAME",)
+        Etiqueta("YOUR NAME")
         Spacer(Modifier.height(7.dp))
         CampoTexto(
             valor = state.yourName,

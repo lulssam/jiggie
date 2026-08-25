@@ -6,6 +6,8 @@ package com.luisamsampaio.jiggie.features.create
  * É imutável — quando algo muda, cria-se uma cópia nova com `.copy()`.
  * O Compose deteta essas mudanças e redesenha apenas o necessário.
  *
+ * @property familyName O nome que a pessoa já escreveu para a família.
+ * @property yourName O nome com que a pessoa se vai apresentar aos outros membros.
  * @property isLoading True enquanto estamos à espera de dados do backend.
  *                     O ecrã mostra um indicador de carregamento durante este tempo.
  * @property error Mensagem de erro para mostrar ao utilizador.
@@ -16,4 +18,14 @@ data class CreateFamUiState(
     val yourName: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
-)
+) {
+    /**
+     * Verdadeiro quando já faz sentido deixar a pessoa carregar em "Continue":
+     * os dois nomes estão preenchidos.
+     *
+     * Fica aqui, e não dentro do ecrã, porque decidir se uns dados servem ou
+     * não é uma regra da aplicação. O ecrã limita-se a obedecer ao resultado.
+     */
+    val podeContinuar: Boolean
+        get() = familyName.isNotBlank() && yourName.isNotBlank()
+}
