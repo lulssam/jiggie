@@ -1,15 +1,21 @@
 package com.luisamsampaio.jiggie.features.create
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +47,7 @@ import com.luisamsampaio.jiggie.ui.theme.textStrong
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.left_arrow
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.skia.paragraph.Alignment
 
 /**
  * Parte visual do ecrã CreateFam.
@@ -57,75 +65,85 @@ private fun CreateFamScreenContent(
     onYourNameChange: (String) -> Unit,
     onContinue: () -> Unit
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(surface)
-            .safeDrawingPadding()
-            .padding(start = 26.dp, end = 26.dp, bottom = 34.dp)
+            .safeDrawingPadding(),
+        contentAlignment = TopCenter,
     ) {
-        Spacer(Modifier.height(24.dp))
-
-        // back button
-        IconButton(
-            onClick = onBack
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 420.dp)
+                .padding(start = 26.dp, end = 26.dp, top = 14.dp, bottom = 34.dp)
         ) {
-            Icon(
-                painter = painterResource(Res.drawable.left_arrow),
-                contentDescription = null,
-                tint = primaryDark,
-                modifier = Modifier.size(28.dp)
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+
+                // back button
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier.offset(x = (-10).dp)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.left_arrow),
+                        contentDescription = null,
+                        tint = textStrong,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(Modifier.height(18.dp))
+
+                // create your family
+                Text(
+                    text = "Create your family",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    letterSpacing = (-0.7).sp,
+                    color = textStrong,
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                // subtitle
+                Text(
+                    text = "You'll get a code to invite the rest of the household.",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 13.sp,
+                    color = textSecondary,
+                )
+
+                Spacer(Modifier.height(26.dp))
+
+                // forms
+                CreateFamForm(
+                    state = state,
+                    onFamilyNameChange = onFamilyNameChange,
+                    onYourNameChange = onYourNameChange
+                )
+
+                if (state.error != null) {
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = state.error,
+                        fontFamily = plexSans(),
+                        fontSize = 12.sp,
+                        color = danger,
+                    )
+                }
+            }
+            BotaoPrincipal(
+                texto = if (state.isLoading) "Creating…" else "Continue",
+                activo = state.podeContinuar && !state.isLoading,
+                onClique = onContinue
             )
         }
-        Spacer(Modifier.height(12.dp))
-
-        // create your family
-        Text(
-            text = "Create your family",
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            letterSpacing = (-0.7).sp,
-            color = primaryDark,
-        )
-
-        Spacer(Modifier.height(6.dp))
-
-        // subtitle
-        Text(
-            text = "You'll get a code to invite the rest of the household.",
-            fontWeight = FontWeight.Normal,
-            fontSize = 13.sp,
-            color = textSecondary,
-        )
-
-        Spacer(Modifier.height(26.dp))
-
-        // forms
-        CreateFamForm(
-            state = state,
-            onFamilyNameChange = onFamilyNameChange,
-            onYourNameChange = onYourNameChange
-        )
-
-        // botão continue
-        Spacer(Modifier.weight(1f))
-
-        BotaoPrincipal(
-            texto = "Continue",
-            activo = state.podeContinuar,
-            onClique = onContinue
-        )
-
-        if (state.error != null) {
-            Spacer(Modifier.height(12.dp))
-            Text(
-                text = state.error,
-                fontFamily = plexSans(),
-                fontSize = 12.sp,
-                color = danger,
-            )
-        }
-
     }
 }
 

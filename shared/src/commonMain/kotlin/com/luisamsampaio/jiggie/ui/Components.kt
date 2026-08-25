@@ -149,7 +149,6 @@ fun Etiqueta(texto: String) {
         text = texto,
         fontFamily = plexSans(),
         fontWeight = FontWeight.SemiBold,
-        style = MaterialTheme.typography.labelSmall,
         fontSize = 11.sp,
         letterSpacing = 0.3.sp,
         color = textTertiary,
