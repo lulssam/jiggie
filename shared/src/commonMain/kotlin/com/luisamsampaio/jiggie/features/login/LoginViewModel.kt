@@ -2,11 +2,18 @@ package com.luisamsampaio.jiggie.features.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.exceptions.HttpRequestException
+import kotlinx.coroutines.CancellationException
 
 /**
  * Gere o estado e a lógica do ecrã login.
@@ -59,7 +66,18 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
-            _state.update { it.copy(isLoading = false) }
+            try {
+                supabase.auth.signInWith(Email) {
+                    email = atual.email.trim()
+                    password = atual.password
+                }
+
+                _state.update { it.copy(isLoading = false, sessaoIniciada = true) }
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                _state.update { it.copy(isLoading = false, error = mensagem(erro)) }
+            }
 
         }
     }
@@ -70,5 +88,15 @@ class LoginViewModel : ViewModel() {
      * @param erro O erro devolvido pelo backend.
      * @return Uma mensagem em português para mostrar no ecrã.
      */
-    private fun mensagem(erro: Any): String = "Erro desconhecido"
+    private fun mensagem(erro: Throwable): String = when (erro) {
+        is AuthRestException -> when (erro.errorCode) {
+            AuthErrorCode.InvalidCredentials -> "Email ou palavra-passe errados."
+            AuthErrorCode.EmailNotConfirmed -> "Confirma o email antes de entrares."
+            AuthErrorCode.UserBanned -> "Esta conta foi suspensa."
+            AuthErrorCode.OverRequestRateLimit -> "Demasiadas tentativas. Espera um pouco."
+            else -> "Não foi possível entrar. Tenta outra vez."
+        }
+        is HttpRequestException -> "Sem ligação. Verifica a internet."
+        else -> "Não foi possível entrar. Tenta outra vez."
+    }
 }

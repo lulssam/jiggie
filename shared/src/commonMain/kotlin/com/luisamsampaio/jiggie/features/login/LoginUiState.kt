@@ -12,12 +12,15 @@ package com.luisamsampaio.jiggie.features.login
  *                 Null significa que não há nenhum erro.
  * @property email O que o utilizador já escreveu no campo do email.
  * @property password O que o utilizador já escreveu no campo da palavra-passe.
+ * @property sessaoIniciada Passa a true quando o supabase aceitou as credenciais.
+ *                          É o sinal para o ecrã sair daqui, quem navega é o ecrã não o vm
  */
 data class LoginUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val email: String = "",
     val password: String = "",
+    val sessaoIniciada: Boolean = false
 ) {
     private companion object {
         /**

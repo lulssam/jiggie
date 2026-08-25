@@ -11,7 +11,7 @@ data object CriarFamilia
 @Serializable
 data object JuntarFamilia
 @Serializable
-data object Aplicacao
+data object Home
 
 /**
  * O ecrã que mostra o código de convite acabado de gerar.

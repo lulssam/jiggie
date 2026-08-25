@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -186,7 +187,7 @@ fun LoginScreenContent(
             }
 
             BotaoPrincipal(
-                texto = if (state.isLoading) "A entrar…" else "Log in",
+                texto = if (state.isLoading) "Signing in…" else "Log in",
                 activo = state.podeEntrar && !state.isLoading,
                 onClique = onEntrar,
             )
@@ -229,8 +230,14 @@ fun LoginScreenContent(
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel { LoginViewModel() },
     onCriarFamilia: () -> Unit = {},
+    onEntrou: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+
+    // quando a sessão fica aberta, é altura de sair deste ecrã
+    LaunchedEffect(state.sessaoIniciada) {
+        if (state.sessaoIniciada) onEntrou()
+    }
 
     LoginScreenContent(
         state = state,

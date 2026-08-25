@@ -1,6 +1,5 @@
 package com.luisamsampaio.jiggie
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -8,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
+import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
 import com.luisamsampaio.jiggie.features.welcome.WelcomeScreen
 import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
@@ -32,7 +32,12 @@ fun App(onNavHostReady: suspend (NavController) -> Unit = {}) {
 
             composable<Login> {
                 LoginScreen(
-                    onCriarFamilia = { navController.navigate(CriarFamilia) }
+                    onCriarFamilia = { navController.navigate(CriarFamilia) },
+                    onEntrou = {
+                        navController.navigate(Home) {
+                            popUpTo<Login> { inclusive = true }
+                        }
+                    }
                 )
             }
 
@@ -55,6 +60,10 @@ fun App(onNavHostReady: suspend (NavController) -> Unit = {}) {
                     codigo = dados.codigo,
                     onEntrar = {/*todo: entrar na aplicação*/}
                 )*/
+            }
+
+            composable<Home> {
+                HomeScreen()
             }
         }
     }
