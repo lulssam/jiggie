@@ -2,6 +2,12 @@ package com.luisamsampaio.jiggie.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.mensagemDeErro
+import com.luisamsampaio.jiggie.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
+import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,17 +45,37 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
-            // Carregar dados aqui
+            try {
+                // verificar se tem sessão iniciada
+                val uid = supabase.auth.currentUserOrNull()?.id
+                if (uid == null) {
+                    _state.update { it.copy(isLoading = false, error = "No session") }
+                    return@launch
+                }
 
-            _state.update { it.copy(isLoading = false) }
+                val perfil = supabase.from("dono")
+                    .select(
+                        Columns.raw("nome, familia(nome)")
+                    ) {
+                        filter { eq("id", uid) }
+                    }
+                    .decodeSingle<PerfilDto>()
+
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        nome = perfil.nome,
+                        familia = perfil.familia?.nome
+                    )
+                }
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("HomeViewModel.carregar falhou: $erro")
+                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
+            }
+
+
         }
     }
-
-    /**
-     * Transforma um erro do backend numa frase legível para o utilizador.
-     *
-     * @param erro O erro devolvido pelo backend.
-     * @return Uma mensagem em português para mostrar no ecrã.
-     */
-    private fun mensagem(erro: Any): String = "Erro desconhecido"
 }
