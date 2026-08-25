@@ -72,6 +72,7 @@ kotlin {
             implementation(libs.supabase.auth)
             implementation(libs.supabase.postgrest)
             implementation(libs.supabase.realtime)
+            implementation(libs.androidx.navigation.compose)
 
         }
         commonTest.dependencies {

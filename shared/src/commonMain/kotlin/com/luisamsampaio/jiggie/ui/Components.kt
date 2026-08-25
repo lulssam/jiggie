@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import androidx.compose.ui.Alignment
+import com.luisamsampaio.jiggie.ui.theme.textTertiary
 
 
 /**
@@ -63,7 +65,7 @@ fun CampoTexto(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 1.dp,
@@ -87,7 +89,7 @@ fun CampoTexto(
             value = valor,
             onValueChange = onValor,
             singleLine = true,
-            textStyle = TextStyle(fontSize = 14.sp, color = onSurface),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = onSurface),
             cursorBrush = SolidColor(primary),
             keyboardOptions = KeyboardOptions(keyboardType = tipoDeTeclado),
             visualTransformation =
@@ -133,4 +135,22 @@ fun BotaoPrincipal(
             color = if (activo) Color.White else textDisabled,
         )
     }
+}
+
+/**
+ * O título pequeno em maiúsculas que fica por cima de cada campo,
+ * como "EMAIL" ou "FAMILY NAME".
+ *
+ * @param texto A palavra a mostrar.
+ */
+@Composable
+fun Etiqueta(texto: String) {
+    Text(
+        text = texto,
+        fontFamily = plexSans(),
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 11.sp,
+        letterSpacing = 0.3.sp,
+        color = textTertiary,
+    )
 }

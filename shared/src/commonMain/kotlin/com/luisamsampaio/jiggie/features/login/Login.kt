@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.BotaoPrincipal
 import com.luisamsampaio.jiggie.ui.CampoTexto
+import com.luisamsampaio.jiggie.ui.Etiqueta
 import com.luisamsampaio.jiggie.ui.theme.danger
 import com.luisamsampaio.jiggie.ui.theme.plexSans
 import com.luisamsampaio.jiggie.ui.theme.primary
@@ -218,23 +219,6 @@ fun LoginScreenContent(
     }
 }
 
-/**
- * O título pequeno em maiúsculas que fica por cima de cada campo,
- * como "EMAIL" ou "PASSWORD".
- *
- * @param texto A palavra a mostrar.
- */
-@Composable
-private fun Etiqueta(texto: String) {
-    Text(
-        text = texto,
-        fontFamily = plexSans(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 11.sp,
-        letterSpacing = 0.3.sp,
-        color = textTertiary,
-    )
-}
 
 /**
  * Liga o [LoginViewModel] à parte visual.
