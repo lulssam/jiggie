@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +34,14 @@ import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.Dp
+import com.luisamsampaio.jiggie.ui.theme.primaryBorder
+import com.luisamsampaio.jiggie.ui.theme.primaryContainer
+import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import jiggie.shared.generated.resources.Res
+import jiggie.shared.generated.resources.ic_pets
+import org.jetbrains.compose.resources.painterResource
 
 
 /**
@@ -148,4 +157,52 @@ fun Etiqueta(texto: String) {
         style = MaterialTheme.typography.labelSmall,
         color = textTertiary
     )
+}
+
+@Composable
+fun BotaoSecundario(
+    texto: String,
+    onClique: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(13.dp))
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+            .clickable(onClick = onClique)
+            .padding(vertical = 15.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = texto,
+            style = MaterialTheme.typography.titleSmall,
+            color = textBody,
+        )
+    }
+}
+
+/**
+ * A caixa arredondada com a patinha, a marca do Jiggie.
+ *
+ * O raio e o ícone acompanham o tamanho da caixa, para o desenho ser o
+ * mesmo nos 66dp do login e nos 78dp das boas-vindas.
+ */
+@Composable
+fun Logotipo(tamanho: Dp, modifier: Modifier = Modifier) {
+    val forma = RoundedCornerShape(tamanho * 0.29f)
+    Box(
+        modifier = modifier
+            .size(tamanho)
+            .background(primaryContainer, forma)
+            .border(1.5.dp, primaryBorder, forma),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(Res.drawable.ic_pets),
+            contentDescription = null,
+            tint = primary,
+            modifier = Modifier.size(tamanho * 0.45f),
+        )
+    }
 }

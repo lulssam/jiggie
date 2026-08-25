@@ -53,7 +53,7 @@ private fun CodigoFamiliaScreenContent(
  */
 @Composable
 fun CodigoFamiliaScreen(
-    viewModel: CodigoFamiliaViewModel = viewModel()
+    viewModel: CodigoFamiliaViewModel = viewModel { CodigoFamiliaViewModel() }
 ) {
     val state by viewModel.state.collectAsState()
     CodigoFamiliaScreenContent(
