@@ -47,6 +47,7 @@ import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
+import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.left_arrow
 import org.jetbrains.compose.resources.painterResource
@@ -66,6 +67,8 @@ private fun CreateFamScreenContent(
     onBack: () -> Unit,
     onFamilyNameChange: (String) -> Unit,
     onYourNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onContinue: () -> Unit
 ) {
     Box(
@@ -114,7 +117,7 @@ private fun CreateFamScreenContent(
 
                 // subtitle
                 Text(
-                    text = "You'll get a code to invite the rest of the household.",
+                    text = "We'll create your account and give you a code to invite the rest of the household.",
                     style = typography.bodyMedium,
                     color = textSecondary,
                 )
@@ -125,7 +128,9 @@ private fun CreateFamScreenContent(
                 CreateFamForm(
                     state = state,
                     onFamilyNameChange = onFamilyNameChange,
-                    onYourNameChange = onYourNameChange
+                    onYourNameChange = onYourNameChange,
+                    onEmailChange = onEmailChange,
+                    onPasswordChange = onPasswordChange
                 )
 
                 if (state.error != null) {
@@ -178,7 +183,9 @@ fun CreateFamScreen(
         onBack = onVoltar,
         onFamilyNameChange = viewModel::onFamilyNameChange,
         onYourNameChange = viewModel::onYourNameChange,
-        onContinue = viewModel::onCreateFamilia
+        onContinue = viewModel::onCreateFamilia,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange
     )
 }
 
@@ -187,7 +194,9 @@ fun CreateFamScreen(
 private fun CreateFamForm(
     state: CreateFamUiState,
     onFamilyNameChange: (String) -> Unit,
-    onYourNameChange: (String) -> Unit
+    onYourNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -210,6 +219,35 @@ private fun CreateFamForm(
             onValor = onYourNameChange,
             placeholder = "e.g. Luísa",
             tipoDeTeclado = KeyboardType.Text
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Etiqueta("EMAIL")
+        Spacer(Modifier.height(7.dp))
+        CampoTexto(
+            valor = state.email,
+            onValor = onEmailChange,
+            placeholder = "your@email.address",
+            tipoDeTeclado = KeyboardType.Email
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Etiqueta("PASSWORD")
+        Spacer(Modifier.height(7.dp))
+        CampoTexto(
+            valor = state.password,
+            onValor = onPasswordChange,
+            placeholder = "••••••••",
+            tipoDeTeclado = KeyboardType.Password,
+            esconderTexto = true
+        )
+
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text = "At least ${CreateFamUiState.MINIMO_PASSWORD} characters",
+            style = typography.bodySmall,
+            color = textTertiary
         )
     }
 }

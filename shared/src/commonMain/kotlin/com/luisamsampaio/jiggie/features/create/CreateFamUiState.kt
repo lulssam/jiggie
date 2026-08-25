@@ -1,5 +1,7 @@
 package com.luisamsampaio.jiggie.features.create
 
+import com.luisamsampaio.jiggie.emailPlausivel
+
 /**
  * Tudo o que o ecrã CreateFam precisa para se mostrar corretamente.
  *
@@ -18,6 +20,8 @@ package com.luisamsampaio.jiggie.features.create
 data class CreateFamUiState(
     val familyName: String = "",
     val yourName: String = "",
+    val email: String = "",
+    val password: String = "",
     val codigoCriado: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -30,5 +34,13 @@ data class CreateFamUiState(
      * não é uma regra da aplicação. O ecrã limita-se a obedecer ao resultado.
      */
     val podeContinuar: Boolean
-        get() = familyName.isNotBlank() && yourName.isNotBlank()
+        get() = familyName.isNotBlank() &&
+                yourName.isNotBlank() &&
+                emailPlausivel(email) &&
+                password.length >= MINIMO_PASSWORD
+
+    companion object {
+        /** O mínimo que o Supabase aceita. Barramos aqui para não gastar uma ida ao servidor. */
+        const val MINIMO_PASSWORD = 6
+    }
 }

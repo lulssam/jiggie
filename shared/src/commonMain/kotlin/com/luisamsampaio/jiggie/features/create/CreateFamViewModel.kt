@@ -2,11 +2,22 @@ package com.luisamsampaio.jiggie.features.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.supabase
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Gere o estado e a lógica do ecrã CreateFam.
@@ -36,11 +47,38 @@ class CreateFamViewModel : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
-            // TODO: criar a familia no supabase e usar o codigo que ele devolver
-            _state.update { it.copy(isLoading = false, codigoCriado = gerarCodigo()) }
-        }
+            try {
+                supabase.auth.signUpWith(Email) {
+                    email = currentState.email.trim()
+                    password = currentState.password
+                    data = buildJsonObject { put("nome", currentState.yourName.trim()) }
+                }
+                // O signUpWith devolve o utilizador criado com ou sem confirmação por
+                // email. Quem sabe se ficou sessão aberta é o Auth — e é a sessão que
+                // o create_familia precisa para o auth.uid() responder.
+                if (supabase.auth.currentSessionOrNull() == null) {
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Check your email to confirm your account, then log in."
+                        )
+                    }
+                    return@launch
+                }
 
-        // chamada ao backend
+                val familia = supabase.postgrest
+                    .rpc("create_familia", buildJsonObject {
+                        put("p_nome", currentState.familyName.trim())
+                    }).decodeSingle<FamiliaCriada>()
+
+                _state.update { it.copy(isLoading = false, codigoCriado = familia.codigoConvite) }
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("onCreateFamilia falhou: $erro")
+                _state.update { it.copy(isLoading = false, error = mensagem(erro)) }
+            }
+        }
     }
 
     /**
@@ -67,32 +105,12 @@ class CreateFamViewModel : ViewModel() {
         }
     }
 
-
-    /**
-     * Quando se clica no botão para entrar na familia com código de convite*/
-    fun onJoinCode() {
-        _state.update { it.copy(error = null) }
+    fun onEmailChange(novo: String) {
+        _state.update { it.copy(email = novo, error = null) }
     }
 
-
-    /**
-     * Voltar quando já se tem uma conta e quer fazer login
-     */
-    fun onLogin() {
-        _state.update { it.copy(error = null) }
-    }
-
-
-    /**
-     * Gera um código de convite curto para a família.
-     *
-     * O alfabeto não tem I, O, 0 nem 1 de propósito: estes códigos vão ser
-     * lidos em voz alta e escritos à mão, e essas quatro letras confundem-se.
-     */
-    private fun gerarCodigo(): String {
-        val alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-        val sufixo = (1..4).map { alfabeto.random() }.joinToString("")
-        return "JGY-$sufixo"
+    fun onPasswordChange(nova: String) {
+        _state.update { it.copy(password = nova, error = null) }
     }
 }
 
@@ -102,4 +120,25 @@ class CreateFamViewModel : ViewModel() {
  * @param erro O erro devolvido pelo backend.
  * @return Uma mensagem em português para mostrar no ecrã.
  */
-private fun mensagem(erro: Any): String = "Erro desconhecido"
+private fun mensagem(erro: Throwable): String = when (erro) {
+    is AuthRestException -> when (erro.errorCode) {
+        AuthErrorCode.UserAlreadyExists,
+        AuthErrorCode.EmailExists -> "Já existe uma conta com esse email."
+
+        AuthErrorCode.WeakPassword -> "Escolhe uma palavra-passe mais forte."
+        AuthErrorCode.EmailAddressInvalid -> "Esse email não parece válido."
+        AuthErrorCode.SignupDisabled -> "Os registos estão desactivados de momento."
+        AuthErrorCode.OverRequestRateLimit -> "Demasiadas tentativas. Espera um pouco."
+        else -> "Não foi possível criar a conta. Tenta outra vez."
+    }
+
+    is PostgrestRestException -> when (erro.code) {
+        "JG001" -> "Sessão perdida. Entra outra vez."
+        "JG002" -> "Já pertences a uma família."
+        "JG003" -> "O teu perfil ainda não está pronto. Tenta outra vez."
+        else -> "Não foi possível criar a família. Tenta outra vez."
+    }
+
+    is HttpRequestException -> "Sem ligação. Verifica a internet."
+    else -> "Não foi possível criar a conta. Tenta outra vez."
+}

@@ -1,5 +1,7 @@
 package com.luisamsampaio.jiggie.features.login
 
+import com.luisamsampaio.jiggie.emailPlausivel
+
 /**
  * Tudo o que o ecrã login precisa para se mostrar corretamente.
  *
@@ -22,15 +24,6 @@ data class LoginUiState(
     val password: String = "",
     val sessaoIniciada: Boolean = false
 ) {
-    private companion object {
-        /**
-         * Aceita qualquer coisa com um @ pelo meio e um ponto depois.
-         * Não é uma verificação a sério — só evita mandar disparates para o
-         * servidor. Quem diz se o email existe mesmo é o Supabase.
-         */
-        val EMAIL_PLAUSIVEL = Regex(".+@.+\\..+")
-    }
-
     /**
      * Verdadeiro quando já faz sentido deixar a pessoa carregar em "Log in":
      * o email tem um aspeto plausível e a palavra-passe não está vazia.
@@ -39,5 +32,5 @@ data class LoginUiState(
      * não é uma regra da aplicação. O ecrã limita-se a obedecer ao resultado.
      */
     val podeEntrar: Boolean
-        get() = EMAIL_PLAUSIVEL.matches(email.trim()) && password.isNotBlank()
+        get() = emailPlausivel(email) && password.isNotBlank()
 }

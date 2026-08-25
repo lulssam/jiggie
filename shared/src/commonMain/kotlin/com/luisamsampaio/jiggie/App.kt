@@ -45,7 +45,7 @@ fun App() {
 
                 NavHost(
                     navController = navController,
-                    startDestination = inicio
+                    startDestination = CriarFamilia
                 ) {
 
                     composable<Welcome> {
