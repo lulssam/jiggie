@@ -10,8 +10,17 @@ data object Welcome
 data object CriarFamilia
 @Serializable
 data object JuntarFamilia
+
+@Serializable
+data object Aplicacao
+
+// separadores só alcançáveis de dentro da aplicação
 @Serializable
 data object Home
+@Serializable data object Inicio
+@Serializable data object Historico
+@Serializable data object Medicamentos
+@Serializable data object Relatorio
 
 /**
  * O ecrã que mostra o código de convite acabado de gerar.

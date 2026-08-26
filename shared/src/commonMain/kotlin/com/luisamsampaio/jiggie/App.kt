@@ -10,11 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.luisamsampaio.jiggie.features.aplicacao.AplicacaoScreen
+import com.luisamsampaio.jiggie.features.aplicacao.AplicacaoViewModel
 import com.luisamsampaio.jiggie.features.codigo.CodigoFamiliaScreen
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
@@ -79,7 +80,7 @@ private fun Navegacao(inicio: Any) {
             LoginScreen(
                 onCriarFamilia = { navController.navigate(Welcome) },
                 onEntrou = {
-                    navController.navigate(Home) {
+                    navController.navigate(Aplicacao) {
                         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
                     }
                 }
@@ -104,7 +105,7 @@ private fun Navegacao(inicio: Any) {
                 nome = dados.nome,
                 codigo = dados.codigo,
                 onEntrar = {
-                    navController.navigate(Home) {
+                    navController.navigate(Aplicacao) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             inclusive = true
                         }
@@ -121,11 +122,15 @@ private fun Navegacao(inicio: Any) {
             JoinFamilyScreen(
                 onBack = { navController.popBackStack() },
                 onEntrou = {
-                    navController.navigate(Home) {
+                    navController.navigate(Aplicacao) {
                         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
                     }
                 }
             )
+        }
+
+        composable<Aplicacao> {
+            AplicacaoScreen()
         }
     }
 
@@ -177,5 +182,5 @@ private suspend fun decidirArranque(): Any {
         true
     }
 
-    return if (temFamilia) Home else Welcome
+    return if (temFamilia) Aplicacao else Welcome
 }
