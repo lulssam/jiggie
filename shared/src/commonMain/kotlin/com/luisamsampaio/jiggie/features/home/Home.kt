@@ -1,13 +1,21 @@
 package com.luisamsampaio.jiggie.features.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -15,15 +23,29 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.internal.StabilityInferred
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.haloAvatar
+import com.luisamsampaio.jiggie.ui.theme.plexMono
+import com.luisamsampaio.jiggie.ui.theme.primary
+import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 /**
  * Parte visual do ecrã Home.
@@ -36,35 +58,39 @@ import com.luisamsampaio.jiggie.ui.theme.textTertiary
 @Composable
 private fun HomeScreenContent(
     state: HomeUiState,
+    onAdicionarCao: () -> Unit = {},
+    onCopiarCodigo: () -> Unit = {},
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(surface)
-            .safeDrawingPadding()
-            .padding(26.dp)
-    ) {
-        when {
-            state.isLoading ->
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+    when {
+        state.isLoading ->
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
 
-            state.error != null ->
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(state.error, color = danger)
-                }
+        state.error != null ->
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(state.error, color = danger)
+            }
 
-            else -> {
-                Text(
-                    text = state.nome, style = typography.titleLarge, color = textStrong
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = state.familia?.let { "Família: $it" } ?: "Ainda sem familia",
-                    style = typography.bodyMedium,
-                    color = textTertiary
-                )
+        else -> Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .background(surface)
+                .statusBarsPadding()
+                .padding(start = 18.dp, end = 18.dp, top = 4.dp)
+        ) {
+            Cabecalho(state)
+            Spacer(Modifier.height(22.dp))
+
+            if (state.temCaes) {
+                Text("TODO: chips dos cães e o cartão de estado")
+            } else {
+                CartaoAdicionarPrimeiroCao(state, onAdicionarCao)
+                Spacer(Modifier.height(22.dp))
+                PassosIniciais()
+                Spacer(Modifier.height(22.dp))
+                CartaoDeConvite(state, onCopiarCodigo)
             }
         }
     }
@@ -89,16 +115,82 @@ fun HomeScreen(
     )
 }
 
-/**
- * Pré-visualização do ecrã Home para usar durante o desenvolvimento.
- *
- * Usa dados fictícios para simular como o ecrã ficará com informação real.
- */
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun HomePreview() {
-    // TODO: envolver no tema do projeto
-    HomeScreenContent(
-        state = HomeUiState(),
-    )
+private fun Cabecalho(state: HomeUiState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        // titulo app
+        Text(
+            text = buildAnnotatedString {
+                append("Jiggie")
+                withStyle(SpanStyle(color = primary)) {append("!")}
+            },
+            style = typography.titleLarge,
+            color = primaryDark
+        )
+
+        // avatar + dia
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // halo effect
+            Box(
+                modifier = Modifier
+                    .size(31.dp)
+                    .background(haloAvatar, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(26.dp)
+                        .background(primary, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = state.primeiroNome.firstOrNull()?.uppercase().orEmpty(),
+                        style = typography.labelSmall,
+                        color = Color.White
+                    )
+                }
+            }
+            Text(
+                text = dataDeHoje(),
+                fontFamily = plexMono(),
+                fontSize = 11.sp,
+                color = textTertiary
+            )
+        }
+    }
+}
+
+@Composable
+private fun CartaoAdicionarPrimeiroCao(state: HomeUiState, onAdicionar: () -> Unit) {
+    Text("Add your first dog")
+}
+
+@Composable
+private fun PassosIniciais() {
+    Text("GETTING STARTED")
+}
+
+@Composable
+private fun CartaoDeConvite(state: HomeUiState, onCopiar: () -> Unit) {
+    Text("INVITE")
+}
+
+
+/**
+ * Devolve a data do dia de hoje*/
+private fun dataDeHoje(): String {
+    val hoje = Clock.System.todayIn(TimeZone.currentSystemDefault())
+    val dia = hoje.dayOfWeek.name.take(3)
+    val mes = hoje.month.number.toString().padStart(2, '0')
+    val diaDoMes = hoje.day.toString().padStart(2, '0')
+
+    return "$dia · $mes/$diaDoMes"
 }

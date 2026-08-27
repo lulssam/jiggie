@@ -41,3 +41,5 @@ val dog3 = Color(0xFF69AA77)
 val dog4 = Color(0xFFD7935A)
 val dog5 = Color(0xFFD2736C)
 
+// user avatars
+val haloAvatar = Color(0xFFCDEBEC)

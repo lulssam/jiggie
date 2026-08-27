@@ -51,14 +51,19 @@ import com.luisamsampaio.jiggie.Historico
 import com.luisamsampaio.jiggie.Home
 import com.luisamsampaio.jiggie.Medicamentos
 import com.luisamsampaio.jiggie.Relatorio
+import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
+import com.luisamsampaio.jiggie.features.meds.MedsScreen
+import com.luisamsampaio.jiggie.features.relatorio.RelatorioScreen
 import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
+import com.luisamsampaio.jiggie.ui.theme.textStrong
 import io.github.jan.supabase.realtime.Column
 import jiggie.shared.generated.resources.Res
+import jiggie.shared.generated.resources.close
 import jiggie.shared.generated.resources.history
 import jiggie.shared.generated.resources.home
 import jiggie.shared.generated.resources.meds
@@ -80,12 +85,22 @@ fun AplicacaoScreen() {
     val separadores = rememberNavController()
     var popUp by remember { mutableStateOf<TipoDeLog?>(null) }
 
+    val entrada by separadores.currentBackStackEntryAsState()
+    val destino = entrada?.destination
+
     Scaffold(
         containerColor = surface,
         contentWindowInsets = WindowInsets(0),
         bottomBar = {
             BarraDeBaixo(
-                separadores = separadores,
+                activo = when {
+                    destino?.hasRoute<Home>() == true -> Home
+                    destino?.hasRoute<Historico>() == true -> Historico
+                    destino?.hasRoute<Medicamentos>() == true -> Medicamentos
+                    destino?.hasRoute<Relatorio>() == true -> Relatorio
+                    else -> null
+                },
+                onSeparador = { separadores.irPara(it) },
                 onLog = { popUp = TipoDeLog.Menu }
             )
         }
@@ -96,9 +111,9 @@ fun AplicacaoScreen() {
             modifier = Modifier.padding(espaco)
         ) {
             composable<Home> { HomeScreen() }
-            composable<Historico> { /*TODO: implementar ecrã historico*/ }
-            composable<Medicamentos> { /*TODO: implementar ecrã medicamentos*/ }
-            composable<Relatorio> { /*TODO: implementar ecrã relatório*/ }
+            composable<Historico> { HistoricoScreen() }
+            composable<Medicamentos> { MedsScreen() }
+            composable<Relatorio> { RelatorioScreen() }
         }
     }
 
@@ -108,32 +123,55 @@ fun AplicacaoScreen() {
             containerColor = surface,
             shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)
         ) {
-            Text(
-                text = "PopUp: $tipo",
-                modifier = Modifier.padding(20.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
+            Column(
+                modifier = Modifier
+                    .padding(start = 20.dp, end = 20.dp, bottom = 22.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = tituloDoPopUp(tipo),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = textStrong
+                    )
+                    Icon(
+                        painter = painterResource(Res.drawable.close),
+                        contentDescription = "Fechar",
+                        tint = textDisabled,
+                        modifier = Modifier.size(20.dp).clickable { popUp = null }
+                    )
+                }
+
+                when (tipo) {
+                    //TipoDeLog.Cao -> PopUpAdicionarCao(onGravado = {popUp = null})
+                    else -> Text("Por fazer $tipo")
+                }
+            }
         }
     }
 }
 
+/**
+ * A barra de separadores.
+ *
+ * Não conhece navegação: recebe qual está activo e avisa quando se toca
+ * num. É isso que a torna pré-visualizável.
+ *
+ * @param activo A rota do separador actual, ou null se for nenhum deles.
+ */
 @Composable
 fun BarraDeBaixo(
-    separadores: NavHostController,
-    onLog: () -> Unit
+    activo: Any?,
+    onSeparador: (Any) -> Unit,
+    onLog: () -> Unit,
 ) {
-    val entrada by separadores.currentBackStackEntryAsState()
-    val destino = entrada?.destination
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(surface)
-    ) {
-        HorizontalDivider(
-            thickness = 1.dp,
-            color = divider
-        )
+    Column(Modifier.fillMaxWidth().background(surface)) {
+        HorizontalDivider(thickness = 1.dp, color = divider)
 
         Row(
             modifier = Modifier
@@ -141,29 +179,29 @@ fun BarraDeBaixo(
                 .navigationBarsPadding()
                 .padding(start = 12.dp, end = 12.dp, top = 9.dp, bottom = 20.dp),
             horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Separador(
                 Res.drawable.home, "Home",
-                ativo = destino?.hasRoute<Home>() == true
-            ) { separadores.irPara(Home) }
+                activo == Home
+            ) { onSeparador(Home) }
 
             Separador(
                 Res.drawable.history, "History",
-                ativo = destino?.hasRoute<Historico>() == true
-            ) { separadores.irPara(Historico) }
+                activo == Historico
+            ) { onSeparador(Historico) }
 
             BotaoDeLog(onLog)
 
             Separador(
                 Res.drawable.meds, "Meds",
-                ativo = destino?.hasRoute<Medicamentos>() == true
-            ) { separadores.irPara(Medicamentos) }
+                activo == Medicamentos
+            ) { onSeparador(Medicamentos) }
 
             Separador(
                 Res.drawable.summarize, "Vet",
-                ativo = destino?.hasRoute<Relatorio>() == true
-            ) { separadores.irPara(Relatorio) }
+                activo == Relatorio
+            ) { onSeparador(Relatorio) }
         }
     }
 }
@@ -181,7 +219,7 @@ fun BotaoDeLog(onClick: () -> Unit) {
     ) {
         Icon(
             painter = painterResource(Res.drawable.plus),
-            contentDescription = null,
+            contentDescription = "Log",
             tint = Color.White,
             modifier = Modifier.size(22.dp)
         )
@@ -212,9 +250,7 @@ private fun Separador(
 
         Text(
             text = etiqueta,
-            fontSize = 9.sp,
-            fontWeight = SemiBold,
-            letterSpacing = 0.2.sp,
+            style = MaterialTheme.typography.labelSmall,
             color = cor
         )
     }
@@ -227,4 +263,15 @@ private fun NavController.irPara(rota: Any) {
         launchSingleTop = true
         restoreState = true
     }
+}
+
+/** Os títulos vêm do TITLES do desenho. */
+private fun tituloDoPopUp(tipo: TipoDeLog): String = when (tipo) {
+    TipoDeLog.Menu -> "Quick log"
+    TipoDeLog.Passeio -> "Log walk"
+    TipoDeLog.Comida -> "Log food"
+    TipoDeLog.Agua -> "Log water"
+    TipoDeLog.Medicamento -> "Give medicine"
+    TipoDeLog.Sintoma -> "Log symptom"
+    TipoDeLog.Cao -> "Add a dog"
 }

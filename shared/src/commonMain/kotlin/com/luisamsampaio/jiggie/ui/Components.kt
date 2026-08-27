@@ -23,20 +23,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luisamsampaio.jiggie.ui.theme.inputBorder
 import com.luisamsampaio.jiggie.ui.theme.onSurface
 import com.luisamsampaio.jiggie.ui.theme.outline
-import com.luisamsampaio.jiggie.ui.theme.plexSans
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
 import com.luisamsampaio.jiggie.ui.theme.primaryContainer
+import com.luisamsampaio.jiggie.ui.theme.primarySurface
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
@@ -165,7 +171,7 @@ fun BotaoSecundario(
     texto: String,
     onClique: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -206,4 +212,24 @@ fun Logotipo(tamanho: Dp, modifier: Modifier = Modifier) {
             modifier = Modifier.size(tamanho * 0.45f),
         )
     }
+}
+
+/**
+ * Composable da caixa a tracejado.*/
+fun Modifier.bordaTracejada(
+    cor: Color,
+    raio: Dp,
+    largura: Dp = 1.5.dp
+) = drawBehind {
+    val traco = largura.toPx()
+    drawRoundRect(
+        color = cor,
+        topLeft = Offset(traco / 2, traco / 2),
+        size = Size(size.width - traco, size.height - traco),
+        cornerRadius = CornerRadius(raio.toPx()),
+        style = Stroke(
+            width = traco,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
+        )
+    )
 }

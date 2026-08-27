@@ -55,17 +55,23 @@ class HomeViewModel : ViewModel() {
 
                 val perfil = supabase.from("dono")
                     .select(
-                        Columns.raw("nome, familia(nome)")
+                        Columns.raw("nome, familia(nome, codigo_convite)")
                     ) {
                         filter { eq("id", uid) }
                     }
                     .decodeSingle<PerfilDto>()
 
+                val caes = supabase.from("cao")
+                    .select(Columns.list("id"))
+                    .decodeList<CaoId>()
+
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        nome = perfil.nome,
-                        familia = perfil.familia?.nome
+                        primeiroNome = perfil.nome.trim().substringBefore(' '),
+                        nomeFamilia = perfil.familia?.nome.orEmpty(),
+                        codigoFamilia = perfil.familia?.codigoConvite.orEmpty(),
+                        temCaes = caes.isNotEmpty()
                     )
                 }
             } catch (cancelamento: CancellationException) {

@@ -73,6 +73,7 @@ kotlin {
             implementation(libs.supabase.postgrest)
             implementation(libs.supabase.realtime)
             implementation(libs.androidx.navigation.compose)
+            implementation(libs.kotlinx.datetime)
 
         }
         commonTest.dependencies {
