@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,10 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.internal.StabilityInferred
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -50,9 +56,12 @@ import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
+import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.primarySurface
+import com.luisamsampaio.jiggie.ui.theme.success
 import com.luisamsampaio.jiggie.ui.theme.surface
+import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
@@ -76,7 +85,6 @@ import kotlin.time.Clock
 private fun HomeScreenContent(
     state: HomeUiState,
     onAdicionarCao: () -> Unit = {},
-    onCopiarCodigo: () -> Unit = {},
 ) {
     when {
         state.isLoading ->
@@ -115,7 +123,7 @@ private fun HomeScreenContent(
                 Spacer(Modifier.height(22.dp))
                 PassosIniciais()
                 Spacer(Modifier.height(22.dp))
-                CartaoDeConvite(state, onCopiarCodigo)
+                CartaoDeConvite(state.codigoFamilia)
             }
         }
     }
@@ -337,8 +345,80 @@ private fun LinhaDePasso(
 }
 
 @Composable
-private fun CartaoDeConvite(state: HomeUiState, onCopiar: () -> Unit) {
-    Text("INVITE")
+private fun CartaoDeConvite(codigo: String) {
+
+    val areaDeTransferencia = LocalClipboardManager.current
+    var copiado by remember { mutableStateOf(false) }
+
+    Column {
+        Text(
+            text = "INVITE THE HOUSEHOLD",
+            fontFamily = plexMono(),
+            fontSize = 11.sp,
+            letterSpacing = 1.5.sp,
+            color = textTertiary
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(13.dp))
+                .border(1.dp, outline, RoundedCornerShape(13.dp))
+                .padding(14.dp)
+        ) {
+            Text(
+                text = "Anyone with this code sees the same dogs and can log entries.",
+                style = typography.bodySmall,
+                color = textTertiary
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(9.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(primarySurface, RoundedCornerShape(10.dp))
+                        .padding(horizontal = 13.dp, vertical = 11.dp)
+                        .widthIn(min = 78.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = codigo,
+                        fontFamily = plexMono(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 19.sp,
+                        letterSpacing = 2.5.sp,
+                        color = primaryDark
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .border(1.dp, outline, RoundedCornerShape(10.dp))
+                        .clickable {
+                            areaDeTransferencia.setText(AnnotatedString(codigo))
+                            copiado = true
+                        }
+                        .padding(horizontal = 14.dp, vertical = 11.dp)
+                ) {
+                    Text(
+                        text = if (copiado) "Copied" else "Copy",
+                        style = typography.labelMedium,
+                        color = if (copiado) success else textBody
+                    )
+                }
+            }
+        }
+    }
+
+
 }
 
 
