@@ -1,6 +1,8 @@
 package com.luisamsampaio.jiggie.features.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
@@ -26,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.internal.StabilityInferred
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -34,17 +39,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.ui.bordaTracejada
 import com.luisamsampaio.jiggie.ui.theme.danger
 import com.luisamsampaio.jiggie.ui.theme.haloAvatar
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
+import com.luisamsampaio.jiggie.ui.theme.primaryBorder
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
+import com.luisamsampaio.jiggie.ui.theme.primarySurface
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import jiggie.shared.generated.resources.Res
+import jiggie.shared.generated.resources.dog
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.todayIn
+import org.jetbrains.compose.resources.painterResource
 import kotlin.time.Clock
 
 /**
@@ -86,7 +97,7 @@ private fun HomeScreenContent(
             if (state.temCaes) {
                 Text("TODO: chips dos cães e o cartão de estado")
             } else {
-                CartaoAdicionarPrimeiroCao(state, onAdicionarCao)
+                CartaoAdicionarPrimeiroCao(onAdicionarCao)
                 Spacer(Modifier.height(22.dp))
                 PassosIniciais()
                 Spacer(Modifier.height(22.dp))
@@ -127,7 +138,7 @@ private fun Cabecalho(state: HomeUiState) {
         Text(
             text = buildAnnotatedString {
                 append("Jiggie")
-                withStyle(SpanStyle(color = primary)) {append("!")}
+                withStyle(SpanStyle(color = primary)) { append("!") }
             },
             style = typography.titleLarge,
             color = primaryDark
@@ -169,8 +180,66 @@ private fun Cabecalho(state: HomeUiState) {
 }
 
 @Composable
-private fun CartaoAdicionarPrimeiroCao(state: HomeUiState, onAdicionar: () -> Unit) {
-    Text("Add your first dog")
+private fun CartaoAdicionarPrimeiroCao(
+    onAdicionar: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(primarySurface)
+            .clickable(onClick = onAdicionar)
+            .bordaTracejada(cor = primaryBorder, raio = 16.dp)
+            .padding(horizontal = 20.dp, vertical = 26.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .background(Color.White, CircleShape)
+                .border(1.dp, primaryBorder.copy(alpha = 0.6f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.dog),
+                contentDescription = "Dog",
+                tint = primary,
+                modifier = Modifier.size(32.dp)
+            )
+
+        }
+        Spacer(Modifier.height(13.dp))
+
+        Text(
+            text = "Add your first dog",
+            style = typography.titleMedium,
+            color = primaryDark
+        )
+
+        Spacer(Modifier.height(5.dp))
+
+        Text(
+            text = "Name, breed and age. Takes about 20 seconds.",
+            style = typography.bodyMedium,
+            color = textTertiary
+        )
+
+        Spacer(Modifier.height(15.dp))
+
+        // botão
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(11.dp))
+                .background(primaryDark)
+                .padding(horizontal = 22.dp, vertical = 11.dp)
+        ){
+            Text(
+                text = "+ Add dog",
+                style = typography.labelLarge,
+                color = Color.White
+            )
+        }
+    }
 }
 
 @Composable
