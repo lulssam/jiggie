@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
@@ -34,6 +35,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,13 +44,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.bordaTracejada
 import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.haloAvatar
+import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.primarySurface
 import com.luisamsampaio.jiggie.ui.theme.surface
+import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
@@ -92,6 +98,14 @@ private fun HomeScreenContent(
                 .padding(start = 18.dp, end = 18.dp, top = 4.dp)
         ) {
             Cabecalho(state)
+            Spacer(Modifier.height(22.dp))
+
+            Text(
+                text = "Welcome, ${state.primeiroNome}.",
+                style = typography.titleLarge,
+                color = primaryDark
+            )
+
             Spacer(Modifier.height(22.dp))
 
             if (state.temCaes) {
@@ -192,7 +206,7 @@ private fun CartaoAdicionarPrimeiroCao(
             .bordaTracejada(cor = primaryBorder, raio = 16.dp)
             .padding(horizontal = 20.dp, vertical = 26.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .size(52.dp)
@@ -221,7 +235,9 @@ private fun CartaoAdicionarPrimeiroCao(
         Text(
             text = "Name, breed and age. Takes about 20 seconds.",
             style = typography.bodyMedium,
-            color = textTertiary
+            color = textTertiary,
+            textAlign = TextAlign.Center
+
         )
 
         Spacer(Modifier.height(15.dp))
@@ -232,7 +248,7 @@ private fun CartaoAdicionarPrimeiroCao(
                 .clip(RoundedCornerShape(11.dp))
                 .background(primaryDark)
                 .padding(horizontal = 22.dp, vertical = 11.dp)
-        ){
+        ) {
             Text(
                 text = "+ Add dog",
                 style = typography.labelLarge,
@@ -244,7 +260,80 @@ private fun CartaoAdicionarPrimeiroCao(
 
 @Composable
 private fun PassosIniciais() {
-    Text("GETTING STARTED")
+    val passos = listOf(
+        PassoInicial("Add your first dog", "Name, breed, age"),
+        PassoInicial("Set up medicine", "Doses and times, so reminders line up"),
+        PassoInicial("Log your first walk", "Then the daily status card fills in")
+    )
+
+    Column {
+        // titulo da secção
+        Text(
+            text = "GETTING STARTED",
+            fontFamily = plexMono(),
+            fontSize = 11.sp,
+            letterSpacing = 1.5.sp,
+            color = textTertiary
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(13.dp))
+                .border(1.dp, outline, RoundedCornerShape(13.dp))
+        ) {
+            passos.forEachIndexed { indice, passo ->
+                if (indice > 0) HorizontalDivider(thickness = 1.dp, color = divider)
+                LinhaDePasso(numero = indice + 1, passo = passo, actual = indice == 0)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LinhaDePasso(
+    numero: Int,
+    passo: PassoInicial,
+    actual: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 13.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(21.dp)
+                .background(if (actual) primaryDark else divider, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            // numero
+            Text(
+                text = numero.toString(),
+                fontFamily = plexMono(),
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (actual) Color.White else textTertiary
+            )
+        }
+
+        Column(Modifier.weight(1f)) {
+
+            Text(
+                text = passo.titulo,
+                style = typography.titleSmall,
+                color = if (actual) textStrong else textTertiary,
+            )
+            Text(
+                text = passo.subtitulo,
+                fontSize = 11.sp,
+                color = textDisabled,
+            )
+        }
+    }
 }
 
 @Composable
@@ -263,3 +352,5 @@ private fun dataDeHoje(): String {
 
     return "$dia · $mes/$diaDoMes"
 }
+
+private data class PassoInicial(val titulo: String, val subtitulo: String)
