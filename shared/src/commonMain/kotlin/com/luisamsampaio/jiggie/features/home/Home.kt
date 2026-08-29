@@ -8,8 +8,10 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -73,6 +75,10 @@ import com.luisamsampaio.jiggie.ui.theme.success
 import com.luisamsampaio.jiggie.ui.theme.successContainer
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.symptom
+import com.luisamsampaio.jiggie.ui.theme.symptomBorder
+import com.luisamsampaio.jiggie.ui.theme.symptomContainer
+import com.luisamsampaio.jiggie.ui.theme.symptomSub
+import com.luisamsampaio.jiggie.ui.theme.symptomText
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
@@ -138,8 +144,19 @@ private fun HomeScreenContent(
                 )
 
                 Spacer(Modifier.height(18.dp))
+
+                // today status
                 EstadoDeHoje(state.estadoDoDia, onMedicamentos = onMedicamentos)
+
+                // flagged
+                state.sinalizado?.let { sinal ->
+                    Spacer(Modifier.height(18.dp))
+                    CartaoSinalizado(sinal, onHistorico)
+                }
+
                 Spacer(Modifier.height(18.dp))
+
+                // recent activity
                 RecentActivity(
                     registo = state.recentes,
                     nomeDoCao = state.caoAtivo?.nome.orEmpty(),
@@ -792,7 +809,8 @@ private fun ListaVazia(nomeDoCao: String) {
     ) {
         Text(
             text = "Nothing logged for $nomeDoCao yet",
-            style = typography.labelLarge,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
             color = textBody
         )
 
@@ -804,5 +822,53 @@ private fun ListaVazia(nomeDoCao: String) {
             color = textDisabled,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Composable
+private fun CartaoSinalizado(
+    sinalizado: Sinalizado,
+    onHistorico: () -> Unit
+){
+    Column(){
+        TituloDeSeccao("FLAGGED")
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .clip(RoundedCornerShape(13.dp))
+                .background(symptomContainer)
+                .border(1.dp, symptomBorder, RoundedCornerShape(13.dp))
+                .clickable(onClick = onHistorico)
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(9.dp)
+        ) {
+            // barra vertical
+            Box(
+                modifier = Modifier
+                    .width(3.dp)
+                    .fillMaxHeight()
+                    .background(symptom, RoundedCornerShape(3.dp))
+            )
+
+            Column {
+                Text(
+                    text = sinalizado.titulo,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = symptomText
+                )
+
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = sinalizado.subtitulo,
+                    fontSize = 11.sp,
+                    color = symptomSub
+                )
+            }
+        }
+
     }
 }

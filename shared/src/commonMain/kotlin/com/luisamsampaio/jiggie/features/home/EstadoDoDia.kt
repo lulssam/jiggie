@@ -42,3 +42,10 @@ data class Registo(
     val subtitulo: String,
     val tipo: TipoDeRegisto,
 )
+
+/**
+ * O sintoma mais recento do cão. Null quando não há*/
+data class Sinalizado(
+    val titulo: String,
+    val subtitulo: String
+)

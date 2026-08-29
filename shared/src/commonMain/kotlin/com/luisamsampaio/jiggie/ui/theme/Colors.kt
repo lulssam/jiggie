@@ -52,3 +52,9 @@ val xixi = Color(0xFF7C5F00)
 val xixiContainer = Color(0xFFFAF2D4)
 val coco = Color(0xFF7B461E)
 val cocoContainer = Color(0xFFFFE9D4)
+
+// cartão de sintoma assinalado
+val symptomContainer = Color(0xFFFFF0E4)
+val symptomBorder = Color(0xFFF5C5B4)
+val symptomText = Color(0xFF6F341F)
+val symptomSub = Color(0xFF785C52)
