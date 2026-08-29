@@ -165,7 +165,8 @@ private fun HomeScreenContent(
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel { HomeViewModel() },
     versao: Int = 0,
-    onAdicionarCao: () -> Unit = {}
+    onAdicionarCao: () -> Unit = {},
+    onMedicamentos: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -176,7 +177,8 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onAdicionarCao = onAdicionarCao,
-        onCao = viewModel::onCao
+        onCao = viewModel::onCao,
+        onMedicamentos = onMedicamentos
     )
 }
 
