@@ -52,6 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.bordaTracejada
+import com.luisamsampaio.jiggie.ui.theme.alerta
+import com.luisamsampaio.jiggie.ui.theme.alertaContainer
+import com.luisamsampaio.jiggie.ui.theme.coco
+import com.luisamsampaio.jiggie.ui.theme.cocoContainer
 import com.luisamsampaio.jiggie.ui.theme.coresDosCaes
 import com.luisamsampaio.jiggie.ui.theme.danger
 import com.luisamsampaio.jiggie.ui.theme.divider
@@ -66,11 +70,15 @@ import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.primarySurface
 import com.luisamsampaio.jiggie.ui.theme.success
+import com.luisamsampaio.jiggie.ui.theme.successContainer
 import com.luisamsampaio.jiggie.ui.theme.surface
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
+import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import com.luisamsampaio.jiggie.ui.theme.xixi
+import com.luisamsampaio.jiggie.ui.theme.xixiContainer
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.dog
 import jiggie.shared.generated.resources.plus
@@ -92,7 +100,8 @@ import kotlin.time.Clock
 private fun HomeScreenContent(
     state: HomeUiState,
     onAdicionarCao: () -> Unit = {},
-    onCao: (String) -> Unit = {}
+    onCao: (String) -> Unit = {},
+    onMedicamentos: () -> Unit = {}
 ) {
     when {
         state.isLoading ->
@@ -114,15 +123,7 @@ private fun HomeScreenContent(
                 .padding(start = 18.dp, end = 18.dp, top = 4.dp)
         ) {
             Cabecalho(state)
-            Spacer(Modifier.height(22.dp))
-
-            Text(
-                text = "Welcome, ${state.primeiroNome}.",
-                style = typography.titleLarge,
-                color = primaryDark
-            )
-
-            Spacer(Modifier.height(22.dp))
+            Spacer(Modifier.height(if (state.temCaes) 13.dp else 22.dp))
 
             if (state.temCaes) {
                 ChipsCaes(
@@ -131,7 +132,16 @@ private fun HomeScreenContent(
                     onCao = onCao,
                     onAdicionarCao = onAdicionarCao
                 )
+
+                Spacer(Modifier.height(18.dp))
+                EstadoDeHoje(state.estadoDoDia, onMedicamentos = onMedicamentos)
             } else {
+                Text(
+                    text = "Welcome, ${state.primeiroNome}.",
+                    style = typography.titleLarge,
+                    color = primaryDark
+                )
+                Spacer(Modifier.height(22.dp))
                 CartaoAdicionarPrimeiroCao(onAdicionarCao)
                 Spacer(Modifier.height(22.dp))
                 PassosIniciais()
@@ -298,14 +308,7 @@ private fun PassosIniciais() {
 
     Column {
         // titulo da secção
-        Text(
-            text = "GETTING STARTED",
-            fontFamily = plexMono(),
-            fontSize = 11.sp,
-            letterSpacing = 1.5.sp,
-            color = textTertiary
-        )
-
+        TituloDeSeccao("GETTING STARTED")
         Spacer(Modifier.height(8.dp))
 
         Column(
@@ -373,14 +376,7 @@ private fun CartaoDeConvite(codigo: String) {
     var copiado by remember { mutableStateOf(false) }
 
     Column {
-        Text(
-            text = "INVITE THE HOUSEHOLD",
-            fontFamily = plexMono(),
-            fontSize = 11.sp,
-            letterSpacing = 1.5.sp,
-            color = textTertiary
-        )
-
+        TituloDeSeccao("INVITE THE HOUSEHOLD")
         Spacer(Modifier.height(8.dp))
 
         Column(
@@ -554,4 +550,135 @@ private fun ChipsCaes(
         }
 
     }
+}
+
+/** Os títulos em maiúsculas e monoespaçado que separam as secções da Home. */
+@Composable
+private fun TituloDeSeccao(texto: String) {
+    Text(
+        text = texto,
+        fontFamily = plexMono(),
+        fontSize = 11.sp,
+        letterSpacing = 1.5.sp,
+        color = textTertiary
+    )
+}
+
+@Composable
+private fun EstadoDeHoje(
+    estado: EstadoDoDia,
+    onMedicamentos: () -> Unit
+) {
+    Column(
+    ) {
+        TituloDeSeccao("TODAY · STATUS")
+        Spacer(Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(13.dp))
+                .border(1.dp, outline, RoundedCornerShape(13.dp))
+        ) {
+            // meds
+            LinhaDeEstado("Medicine", estado.medicamentos, onClick = onMedicamentos) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
+                    PastilhaDeEstado(estado.medPastilha)
+                    Text(
+                        text = estado.medContagem,
+                        fontFamily = plexMono(),
+                        fontSize = 10.sp,
+                        color = textTertiary
+                    )
+                }
+            }
+
+            HorizontalDivider(thickness = 1.dp, color = divider)
+
+            // walks
+            LinhaDeEstado(
+                "Walk", estado.passeio, onClick = null
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    estado.passeioEtiquetas.forEach { PastilhaDeEstado(it) }
+                }
+            }
+
+            HorizontalDivider(thickness = 1.dp, color = divider)
+
+            LinhaDeEstado("Food", estado.comida) { ValorMono(estado.comidaContagem) }
+
+            HorizontalDivider(thickness = 1.dp, color = divider)
+
+            LinhaDeEstado("Water", estado.agua) { ValorMono(estado.aguaTotal) }
+        }
+    }
+}
+
+/**
+ * Uma linha do cartão: título e subtítulo à esquerda, o que quiseres à direita.
+ *
+ * @param onClick Null quando a linha não leva a lado nenhum — só a dos
+ *                medicamentos é que navega.
+ */
+@Composable
+private fun LinhaDeEstado(
+    titulo: String,
+    subtitulo: String,
+    onClick: (() -> Unit)? = null,
+    valor: @Composable () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .padding(horizontal = 13.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(titulo, style = typography.titleSmall, color = textStrong)
+            Text(subtitulo, fontSize = 11.sp, color = textTertiary)
+        }
+        valor()
+    }
+}
+
+@Composable
+private fun PastilhaDeEstado(pastilha: Pastilha) {
+    val (cor, fundo) = when (pastilha.tom) {
+        Tom.Neutro -> textSecondary to divider
+        Tom.Alerta -> alerta to alertaContainer
+        Tom.Bom -> success to successContainer
+        Tom.Xixi -> xixi to xixiContainer
+        Tom.Coco -> coco to cocoContainer
+    }
+
+    Text(
+        text = pastilha.texto,
+        fontFamily = plexMono(),
+        fontSize = 10.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = cor,
+        modifier = Modifier
+            .background(fundo, RoundedCornerShape(20.dp))
+            .padding(horizontal = 7.dp, vertical = 3.dp)
+    )
+}
+
+/** Os números à direita do cartão — "2/3", "270 ml". */
+@Composable
+private fun ValorMono(texto: String) {
+    Text(
+        text = texto,
+        fontFamily = plexMono(),
+        fontSize = 13.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = textStrong
+    )
 }

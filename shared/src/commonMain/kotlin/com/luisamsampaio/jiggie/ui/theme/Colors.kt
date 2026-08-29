@@ -44,3 +44,11 @@ val coresDosCaes = listOf(dog1, dog2, dog3, dog4, dog5)
 
 // user avatars
 val haloAvatar = Color(0xFFCDEBEC)
+
+// pastilhas do estado do dia
+val alerta = Color(0xFF9D4616)
+val alertaContainer = Color(0xFFFFECD8)
+val xixi = Color(0xFF7C5F00)
+val xixiContainer = Color(0xFFFAF2D4)
+val coco = Color(0xFF7B461E)
+val cocoContainer = Color(0xFFFFE9D4)

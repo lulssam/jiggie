@@ -20,6 +20,7 @@ data class HomeUiState(
     val codigoFamilia: String = "",
     val caes: List<CaoDto> = emptyList(),
     val idCaoAtivo: String? = null,
+    val estadoDoDia: EstadoDoDia = EstadoDoDia(),
     val isLoading: Boolean = false,
     val error: String? = null,
 ) {
