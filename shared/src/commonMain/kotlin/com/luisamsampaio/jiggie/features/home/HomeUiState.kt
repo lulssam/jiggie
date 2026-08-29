@@ -8,7 +8,7 @@ package com.luisamsampaio.jiggie.features.home
  *
  * @property primeiroNome Nome do utilizador logado
  * @property nomeFamilia Nome da família do utilizador logado
- * @property temCaes True se o utilizador tem um ou mais cães
+ * @property caes Lista de cães
  * @property isLoading True enquanto estamos à espera de dados do backend.
  *                     O ecrã mostra um indicador de carregamento durante este tempo.
  * @property error Mensagem de erro para mostrar ao utilizador.
@@ -18,7 +18,11 @@ data class HomeUiState(
     val primeiroNome: String = "",
     val nomeFamilia: String? = null,
     val codigoFamilia: String = "",
-    val temCaes: Boolean = false,
+    val caes: List<CaoDto> = emptyList(),
+    val idCaoAtivo: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
-)
+) {
+    val temCaes: Boolean get() = caes.isNotEmpty()
+    val caoAtivo: CaoDto? get() = caes.firstOrNull { it.id == idCaoAtivo } ?: caes.firstOrNull()
+}

@@ -62,8 +62,8 @@ class HomeViewModel : ViewModel() {
                     .decodeSingle<PerfilDto>()
 
                 val caes = supabase.from("cao")
-                    .select(Columns.list("id"))
-                    .decodeList<CaoId>()
+                    .select(Columns.list("id", "nome", "cor", "raca", "nascimento"))
+                    .decodeList<CaoDto>()
 
                 _state.update {
                     it.copy(
@@ -71,7 +71,8 @@ class HomeViewModel : ViewModel() {
                         primeiroNome = perfil.nome.trim().substringBefore(' '),
                         nomeFamilia = perfil.familia?.nome.orEmpty(),
                         codigoFamilia = perfil.familia?.codigoConvite.orEmpty(),
-                        temCaes = caes.isNotEmpty()
+                        caes = caes,
+                        idCaoAtivo = it.idCaoAtivo ?: caes.firstOrNull()?.id
                     )
                 }
             } catch (cancelamento: CancellationException) {
@@ -84,4 +85,6 @@ class HomeViewModel : ViewModel() {
 
         }
     }
+
+    fun onCao(id: String) = _state.update { it.copy(idCaoAtivo = id) }
 }

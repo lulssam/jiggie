@@ -71,4 +71,8 @@ class AdicionarCaoViewModel : ViewModel() {
         _state.update { it.copy(anoNascimento = digitos, error = null) }
     }
 
+    fun reiniciar(){
+        _state.value = AdicionarCaoUiState()
+    }
+
 }

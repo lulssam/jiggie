@@ -3,6 +3,7 @@ package com.luisamsampaio.jiggie.features.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,10 +51,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.bordaTracejada
+import com.luisamsampaio.jiggie.ui.theme.coresDosCaes
 import com.luisamsampaio.jiggie.ui.theme.danger
 import com.luisamsampaio.jiggie.ui.theme.divider
+import com.luisamsampaio.jiggie.ui.theme.dog1
 import com.luisamsampaio.jiggie.ui.theme.haloAvatar
 import com.luisamsampaio.jiggie.ui.theme.outline
+import com.luisamsampaio.jiggie.ui.theme.outlineStrong
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
@@ -68,6 +72,7 @@ import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.dog
+import jiggie.shared.generated.resources.plus
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.todayIn
@@ -86,6 +91,7 @@ import kotlin.time.Clock
 private fun HomeScreenContent(
     state: HomeUiState,
     onAdicionarCao: () -> Unit = {},
+    onCao: (String) -> Unit = {}
 ) {
     when {
         state.isLoading ->
@@ -118,7 +124,12 @@ private fun HomeScreenContent(
             Spacer(Modifier.height(22.dp))
 
             if (state.temCaes) {
-                Text("TODO: chips dos cães e o cartão de estado")
+                ChipsCaes(
+                    caes = state.caes,
+                    idAtivo = state.caoAtivo?.id,
+                    onCao = onCao,
+                    onAdicionarCao = onAdicionarCao
+                )
             } else {
                 CartaoAdicionarPrimeiroCao(onAdicionarCao)
                 Spacer(Modifier.height(22.dp))
@@ -154,6 +165,7 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         onAdicionarCao = onAdicionarCao,
+        onCao = viewModel::onCao
     )
 }
 
@@ -442,4 +454,100 @@ private fun dataDeHoje(): String {
     return "$dia · $mes/$diaDoMes"
 }
 
+/**
+ * Função para calcular a idade do cão a partir do ano de nascimento*/
+private fun idadeEmAnos(
+    nascimento: String?
+): Int? {
+    val ano = nascimento?.take(4)?.toIntOrNull() ?: return null
+    return Clock.System.todayIn(TimeZone.currentSystemDefault()).year - ano
+}
+
 private data class PassoInicial(val titulo: String, val subtitulo: String)
+
+@Composable
+private fun ChipsCaes(
+    caes: List<CaoDto>,
+    idAtivo: String?,
+    onCao: (String) -> Unit,
+    onAdicionarCao: () -> Unit
+) {
+    Row(
+        modifier = Modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        caes.forEach { cao ->
+            val ativo = cao.id == idAtivo
+            val detalhe = listOfNotNull(
+                cao.raca?.trim()?.ifBlank { null },
+                idadeEmAnos(cao.nascimento)?.toString()
+            ).joinToString(" · ")
+            Row(
+                modifier = Modifier
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(if (ativo) primaryContainer else surface)
+                    .border(
+                        width = if (ativo) 2.dp else 1.dp,
+                        color = if (ativo) primary else outline,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clickable { onCao(cao.id) }
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // avatar
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(coresDosCaes.getOrElse(cao.cor) { dog1 }, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Text(
+                        text = cao.nome.firstOrNull()?.uppercase().orEmpty(),
+                        style = typography.titleSmall,
+                        color = Color.White
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    Text(
+                        text = cao.nome,
+                        style = typography.titleSmall,
+                        color = textStrong
+                    )
+
+                    if (detalhe.isNotEmpty()) {
+                        Text(
+                            text = detalhe,
+                            fontSize = 12.sp,
+                            color = textTertiary
+                        )
+                    }
+                }
+
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .clickable(onClick =  onAdicionarCao)
+                .bordaTracejada(cor = outlineStrong, raio = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.plus),
+                contentDescription = "Add dog",
+                tint = textDisabled,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+    }
+}

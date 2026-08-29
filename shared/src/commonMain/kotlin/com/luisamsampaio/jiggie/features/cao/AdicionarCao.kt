@@ -75,7 +75,7 @@ private fun AdicionarCaoScreenContent(
             CampoTexto(
                 valor = state.anoNascimento,
                 onValor = onAno,
-                placeholder = "Born",
+                placeholder = "Year",
                 tipoDeTeclado = KeyboardType.Number,
                 modifier = Modifier.width(92.dp),
             )
@@ -136,7 +136,10 @@ fun AdicionarCaoScreen(
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state.gravado) {
-        if (state.gravado) onGravado()
+        if (state.gravado){
+            onGravado()
+            viewModel.reiniciar()
+        }
     }
 
     AdicionarCaoScreenContent(

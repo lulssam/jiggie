@@ -22,4 +22,10 @@ data class FamiliaDto(
 )
 
 @Serializable
-data class CaoId(val id: String)
+data class CaoDto(
+    val id: String,
+    val nome: String,
+    val cor: Int,
+    val raca: String? = null,
+    val nascimento: String? = null
+)
