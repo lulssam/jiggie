@@ -40,6 +40,7 @@ val dog2 = Color(0xFFA693C9)
 val dog3 = Color(0xFF69AA77)
 val dog4 = Color(0xFFD7935A)
 val dog5 = Color(0xFFD2736C)
+val coresDosCaes = listOf(dog1, dog2, dog3, dog4, dog5)
 
 // user avatars
 val haloAvatar = Color(0xFFCDEBEC)

@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,6 +52,7 @@ import com.luisamsampaio.jiggie.Historico
 import com.luisamsampaio.jiggie.Home
 import com.luisamsampaio.jiggie.Medicamentos
 import com.luisamsampaio.jiggie.Relatorio
+import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
 import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.meds.MedsScreen
@@ -88,6 +90,8 @@ fun AplicacaoScreen() {
     val entrada by separadores.currentBackStackEntryAsState()
     val destino = entrada?.destination
 
+    var versaoDosCaes by remember { mutableIntStateOf(0) }
+
     Scaffold(
         containerColor = surface,
         contentWindowInsets = WindowInsets(0),
@@ -110,7 +114,12 @@ fun AplicacaoScreen() {
             startDestination = Home,
             modifier = Modifier.padding(espaco)
         ) {
-            composable<Home> { HomeScreen() }
+            composable<Home> {
+                HomeScreen(
+                    versao = versaoDosCaes,
+                    onAdicionarCao = { popUp = TipoDeLog.Cao }
+                )
+            }
             composable<Historico> { HistoricoScreen() }
             composable<Medicamentos> { MedsScreen() }
             composable<Relatorio> { RelatorioScreen() }
@@ -148,7 +157,13 @@ fun AplicacaoScreen() {
                 }
 
                 when (tipo) {
-                    //TipoDeLog.Cao -> PopUpAdicionarCao(onGravado = {popUp = null})
+                    TipoDeLog.Cao -> AdicionarCaoScreen(
+                        onGravado = {
+                            popUp = null
+                            versaoDosCaes++
+                        }
+                    )
+
                     else -> Text("Por fazer $tipo")
                 }
             }

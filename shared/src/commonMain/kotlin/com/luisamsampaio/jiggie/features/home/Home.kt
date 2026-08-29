@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.internal.StabilityInferred
@@ -140,11 +141,19 @@ private fun HomeScreenContent(
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel { HomeViewModel() }
+    viewModel: HomeViewModel = viewModel { HomeViewModel() },
+    versao: Int = 0,
+    onAdicionarCao: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(versao) {
+        if (versao > 0) viewModel.carregar()
+    }
+
     HomeScreenContent(
         state = state,
+        onAdicionarCao = onAdicionarCao,
     )
 }
 
