@@ -1,5 +1,6 @@
 package com.luisamsampaio.jiggie.features.home
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -478,13 +479,10 @@ private fun ChipsCaes(
     ) {
         caes.forEach { cao ->
             val ativo = cao.id == idAtivo
-            val detalhe = listOfNotNull(
-                cao.raca?.trim()?.ifBlank { null },
-                idadeEmAnos(cao.nascimento)?.toString()
-            ).joinToString(" · ")
             Row(
                 modifier = Modifier
                     .height(56.dp)
+                    .animateContentSize()
                     .clip(RoundedCornerShape(16.dp))
                     .background(if (ativo) primaryContainer else surface)
                     .border(
@@ -512,21 +510,27 @@ private fun ChipsCaes(
                     )
                 }
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(1.dp)
-                ) {
-                    Text(
-                        text = cao.nome,
-                        style = typography.titleSmall,
-                        color = textStrong
-                    )
-
-                    if (detalhe.isNotEmpty()) {
+                if (ativo) {
+                    val detalhe = listOfNotNull(
+                        cao.raca?.trim()?.ifBlank { null },
+                        idadeEmAnos(cao.nascimento)?.toString()
+                    ).joinToString(" · ")
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(1.dp)
+                    ) {
                         Text(
-                            text = detalhe,
-                            fontSize = 12.sp,
-                            color = textTertiary
+                            text = cao.nome,
+                            style = typography.titleSmall,
+                            color = textStrong
                         )
+
+                        if (detalhe.isNotEmpty()) {
+                            Text(
+                                text = detalhe,
+                                fontSize = 12.sp,
+                                color = textTertiary
+                            )
+                        }
                     }
                 }
 
@@ -537,7 +541,7 @@ private fun ChipsCaes(
             modifier = Modifier
                 .size(56.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .clickable(onClick =  onAdicionarCao)
+                .clickable(onClick = onAdicionarCao)
                 .bordaTracejada(cor = outlineStrong, raio = 16.dp),
             contentAlignment = Alignment.Center
         ) {
