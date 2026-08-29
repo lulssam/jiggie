@@ -14,9 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -25,14 +25,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.internal.StabilityInferred
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,7 +45,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,7 +57,9 @@ import com.luisamsampaio.jiggie.ui.theme.coresDosCaes
 import com.luisamsampaio.jiggie.ui.theme.danger
 import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.dog1
+import com.luisamsampaio.jiggie.ui.theme.food
 import com.luisamsampaio.jiggie.ui.theme.haloAvatar
+import com.luisamsampaio.jiggie.ui.theme.med
 import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.outlineStrong
 import com.luisamsampaio.jiggie.ui.theme.plexMono
@@ -68,15 +67,19 @@ import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
 import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
+import com.luisamsampaio.jiggie.ui.theme.primaryLink
 import com.luisamsampaio.jiggie.ui.theme.primarySurface
 import com.luisamsampaio.jiggie.ui.theme.success
 import com.luisamsampaio.jiggie.ui.theme.successContainer
 import com.luisamsampaio.jiggie.ui.theme.surface
+import com.luisamsampaio.jiggie.ui.theme.symptom
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import com.luisamsampaio.jiggie.ui.theme.walk
+import com.luisamsampaio.jiggie.ui.theme.water
 import com.luisamsampaio.jiggie.ui.theme.xixi
 import com.luisamsampaio.jiggie.ui.theme.xixiContainer
 import jiggie.shared.generated.resources.Res
@@ -101,7 +104,8 @@ private fun HomeScreenContent(
     state: HomeUiState,
     onAdicionarCao: () -> Unit = {},
     onCao: (String) -> Unit = {},
-    onMedicamentos: () -> Unit = {}
+    onMedicamentos: () -> Unit = {},
+    onHistorico: () -> Unit
 ) {
     when {
         state.isLoading ->
@@ -135,6 +139,12 @@ private fun HomeScreenContent(
 
                 Spacer(Modifier.height(18.dp))
                 EstadoDeHoje(state.estadoDoDia, onMedicamentos = onMedicamentos)
+                Spacer(Modifier.height(18.dp))
+                RecentActivity(
+                    registo = state.recentes,
+                    nomeDoCao = state.caoAtivo?.nome.orEmpty(),
+                    onHistorico = onHistorico
+                )
             } else {
                 Text(
                     text = "Welcome, ${state.primeiroNome}.",
@@ -167,6 +177,7 @@ fun HomeScreen(
     versao: Int = 0,
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
+    onHistorico: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -178,7 +189,8 @@ fun HomeScreen(
         state = state,
         onAdicionarCao = onAdicionarCao,
         onCao = viewModel::onCao,
-        onMedicamentos = onMedicamentos
+        onMedicamentos = onMedicamentos,
+        onHistorico = onHistorico
     )
 }
 
@@ -567,6 +579,81 @@ private fun TituloDeSeccao(texto: String) {
 }
 
 @Composable
+private fun RecentActivity(
+    registo: List<Registo>,
+    nomeDoCao: String,
+    onHistorico: () -> Unit
+){
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TituloDeSeccao("RECENT")
+            Text(
+                text = "All →",
+                style = typography.labelMedium,
+                color = primaryLink,
+                modifier = Modifier.clickable(onClick = onHistorico)
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        if (registo.isEmpty()) {
+            ListaVazia(nomeDoCao)
+        } else {
+            registo.forEach { LinhaDeRegisto(it) }
+        }
+    }
+}
+
+@Composable
+private fun LinhaDeRegisto(
+    registo: Registo
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 9.dp),
+            horizontalArrangement = Arrangement.spacedBy(11.dp)
+        ) {
+            Text(
+                text = registo.hora,
+                fontFamily = plexMono(),
+                fontSize = 11.sp,
+                color = textTertiary,
+                modifier = Modifier.width(58.dp)
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .size(8.dp)
+                    .background(corDoTipo(registo.tipo), CircleShape)
+            )
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = registo.titulo,
+                    style = typography.titleSmall,
+                    color = textStrong
+                )
+                Text(
+                    text = registo.subtitulo,
+                    fontSize = 11.sp,
+                    color = textTertiary
+                )
+            }
+        }
+
+        HorizontalDivider(thickness = 1.dp, color = divider)
+    }
+}
+
+@Composable
 private fun EstadoDeHoje(
     estado: EstadoDoDia,
     onMedicamentos: () -> Unit
@@ -683,4 +770,39 @@ private fun ValorMono(texto: String) {
         fontWeight = FontWeight.SemiBold,
         color = textStrong
     )
+}
+
+private fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
+    TipoDeRegisto.Passeio -> walk
+    TipoDeRegisto.Comida -> food
+    TipoDeRegisto.Agua -> water
+    TipoDeRegisto.Medicamento -> med
+    TipoDeRegisto.Sintoma -> symptom
+}
+
+/** O que se vê enquanto o cão não tem nada registado. */
+@Composable
+private fun ListaVazia(nomeDoCao: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .bordaTracejada(cor = outlineStrong, raio = 12.dp)
+            .padding(horizontal = 14.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Nothing logged for $nomeDoCao yet",
+            style = typography.labelLarge,
+            color = textBody
+        )
+
+        Spacer(Modifier.height(4.dp))
+
+        Text(
+            text = "Tap + below to log a walk, meal, water or symptom.",
+            fontSize = 11.sp,
+            color = textDisabled,
+            textAlign = TextAlign.Center
+        )
+    }
 }

@@ -21,6 +21,7 @@ data class HomeUiState(
     val caes: List<CaoDto> = emptyList(),
     val idCaoAtivo: String? = null,
     val estadoDoDia: EstadoDoDia = EstadoDoDia(),
+    val recentes: List<Registo> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
 ) {

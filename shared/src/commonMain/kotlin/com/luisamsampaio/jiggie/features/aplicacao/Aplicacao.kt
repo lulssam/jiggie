@@ -118,7 +118,8 @@ fun AplicacaoScreen() {
                 HomeScreen(
                     versao = versaoDosCaes,
                     onAdicionarCao = { popUp = TipoDeLog.Cao },
-                    onMedicamentos = {separadores.irPara(Medicamentos)}
+                    onMedicamentos = {separadores.irPara(Medicamentos)},
+                    onHistorico = {separadores.irPara(Historico)}
                 )
             }
             composable<Historico> { HistoricoScreen() }

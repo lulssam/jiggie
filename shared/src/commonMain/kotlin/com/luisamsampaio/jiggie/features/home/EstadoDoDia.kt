@@ -26,3 +26,19 @@ data class EstadoDoDia(
     val agua: String = "No water logged",
     val aguaTotal: String = "0 ml",
 )
+
+/** O tipo de registo. Só isto — a cor do ponto é escolha da UI. */
+enum class TipoDeRegisto { Passeio, Comida, Agua, Medicamento, Sintoma }
+
+/**
+ * Uma linha da actividade recente.
+ *
+ * @property hora Já formatada ("8:15 AM") — quem sabe formatar é o ViewModel.
+ */
+data class Registo(
+    val id: String,
+    val hora: String,
+    val titulo: String,
+    val subtitulo: String,
+    val tipo: TipoDeRegisto,
+)
