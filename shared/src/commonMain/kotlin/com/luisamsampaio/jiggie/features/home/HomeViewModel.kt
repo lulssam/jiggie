@@ -8,6 +8,9 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -104,71 +107,105 @@ class HomeViewModel : ViewModel() {
      * Separado do [carregar], ao trocar de cão, não precisa de voltar a ler o perfil
      * nem a lista de cães*/
     private fun carregarDia(caoId: String) {
-        viewModelScope.launch {
+        // trocar de cão depressa deixava a resposta antiga chegar depois da nova
+        // e sobrepor-se-lhe. Cancelar o pedido anterior resolve.
+        jobDoDia?.cancel()
+
+        jobDoDia = viewModelScope.launch {
             try {
                 val fuso = TimeZone.currentSystemDefault()
                 val inicio = Clock.System.todayIn(fuso).atStartOfDayIn(fuso).toString()
 
-                val passeios = supabase.from("passeio")
-                    .select(Columns.list("id", "dh_passeio", "xixi", "coco", "duracao")) {
-                        filter {
-                            eq("cao_id", caoId)
-                            gte("dh_passeio", inicio)
-                        }
-                    }.decodeList<PasseioDto>()
+                coroutineScope {
+                    val passeios = async {
+                        supabase.from("passeio")
+                            .select(Columns.list("id", "dh_passeio", "xixi", "coco", "duracao")) {
+                                filter {
+                                    eq("cao_id", caoId)
+                                    gte("dh_passeio", inicio)
+                                }
+                            }.decodeList<PasseioDto>()
+                    }
 
-                val refeicoes = supabase.from("comida")
-                    .select(Columns.list("id", "dh_comida", "quantidade", "base", "extras")) {
-                        filter {
-                            eq("cao_id", caoId)
-                            gte("dh_comida", inicio)
-                        }
-                    }.decodeList<ComidaDto>()
+                    val refeicoes = async {
+                        supabase.from("comida")
+                            .select(
+                                Columns.list(
+                                    "id",
+                                    "dh_comida",
+                                    "quantidade",
+                                    "base",
+                                    "extras"
+                                )
+                            ) {
+                                filter {
+                                    eq("cao_id", caoId)
+                                    gte("dh_comida", inicio)
+                                }
+                            }.decodeList<ComidaDto>()
+                    }
 
-                val aguas = supabase.from("agua")
-                    .select(Columns.list("id", "dh_agua", "quantidade")) {
-                        filter {
-                            eq("cao_id", caoId)
-                            gte("dh_agua", inicio)
-                        }
-                    }.decodeList<AguaDto>()
+                    val aguas = async {
+                        supabase.from("agua")
+                            .select(Columns.list("id", "dh_agua", "quantidade")) {
+                                filter {
+                                    eq("cao_id", caoId)
+                                    gte("dh_agua", inicio)
+                                }
+                            }.decodeList<AguaDto>()
+                    }
 
-                val sintomas = supabase.from("sintoma")
-                    .select(Columns.list("id", "dh_sintoma", "tipo", "descricao", "gravidade")) {
-                        filter {
-                            eq("cao_id", caoId)
-                            gte("dh_sintoma", inicio)
-                        }
-                    }.decodeList<SintomaDto>()
+                    val sintomas = async {
+                        supabase.from("sintoma")
+                            .select(
+                                Columns.list(
+                                    "id",
+                                    "dh_sintoma",
+                                    "tipo",
+                                    "descricao",
+                                    "gravidade"
+                                )
+                            ) {
+                                filter {
+                                    eq("cao_id", caoId)
+                                    gte("dh_sintoma", inicio)
+                                }
+                            }.decodeList<SintomaDto>()
+                    }
 
-                val medicamentos = supabase.from("medicamento")
-                    .select(Columns.list("id", "nome", "dose", "hora")) {
-                        filter { eq("cao_id", caoId) }
-                    }.decodeList<MedicamentoDto>()
+                    val medicamentos = async {
+                        supabase.from("medicamento")
+                            .select(Columns.list("id", "nome", "dose", "hora")) {
+                                filter { eq("cao_id", caoId) }
+                            }.decodeList<MedicamentoDto>()
+                    }
 
-                /** Como não há cao id nesta tabela, faz se join com a tabela dos medicamentos.*/
-                val administracoes = supabase.from("administracao_medicamento")
-                    .select(
-                        Columns.raw(
-                            "id, dh_medicamento, medicamento_id, hora_prevista, medicamento!inner(nome, dose)"
-                        )
-                    ) {
-                        filter {
-                            eq("medicamento.cao_id", caoId)
-                            gte("dh_medicamento", inicio)
-                        }
-                    }.decodeList<AdministracaoDto>()
+                    val administracoes = async {
+                        supabase.from("administracao_medicamento")
+                            .select(
+                                Columns.raw(
+                                    "id, dh_medicamento, medicamento_id, hora_prevista, medicamento!inner(nome, dose)"
+                                )
+                            ) {
+                                filter {
+                                    eq("medicamento.cao_id", caoId)
+                                    gte("dh_medicamento", inicio)
+                                }
+                            }.decodeList<AdministracaoDto>()
+                    }
 
-                val dia = resumirDia(
-                    passeios, refeicoes, aguas, medicamentos, sintomas, administracoes
-                )
-
-                _state.update {
-                    it.copy(
-                        estadoDoDia = dia.estado,
-                        recentes = dia.recentes,
-                        sinalizado = dia.sinalizado
+                    val dia = resumirDia(
+                        passeios.await(), refeicoes.await(), aguas.await(),
+                        medicamentos.await(), sintomas.await(), administracoes.await()
                     )
+
+                    _state.update {
+                        it.copy(
+                            estadoDoDia = dia.estado,
+                            recentes = dia.recentes,
+                            sinalizado = dia.sinalizado
+                        )
+                    }
                 }
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
@@ -178,3 +215,5 @@ class HomeViewModel : ViewModel() {
         }
     }
 }
+
+private var jobDoDia: Job? = null
