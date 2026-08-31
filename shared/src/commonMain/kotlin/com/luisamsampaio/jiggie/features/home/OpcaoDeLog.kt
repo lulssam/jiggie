@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.home.menu
+package com.luisamsampaio.jiggie.features.home
 
 import androidx.compose.ui.graphics.Color
 import com.luisamsampaio.jiggie.features.aplicacao.TipoDeLog

@@ -9,16 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,7 +25,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,15 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -58,7 +49,8 @@ import com.luisamsampaio.jiggie.Relatorio
 import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
 import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
-import com.luisamsampaio.jiggie.features.home.menu.OpcaoDeLog
+import com.luisamsampaio.jiggie.features.home.OpcaoDeLog
+import com.luisamsampaio.jiggie.features.log.PasseioScreen
 import com.luisamsampaio.jiggie.features.meds.MedsScreen
 import com.luisamsampaio.jiggie.features.relatorio.RelatorioScreen
 import com.luisamsampaio.jiggie.ui.theme.divider
@@ -73,7 +65,6 @@ import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.walk
 import com.luisamsampaio.jiggie.ui.theme.water
-import io.github.jan.supabase.realtime.Column
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.close
 import jiggie.shared.generated.resources.history
@@ -83,8 +74,6 @@ import jiggie.shared.generated.resources.plus
 import jiggie.shared.generated.resources.summarize
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.Drawable
-import org.jetbrains.skia.FontWeight
 
 
 /** O que o pop up do log está a mostra. Null quando está fechdo*/
@@ -101,6 +90,7 @@ fun AplicacaoScreen() {
     val destino = entrada?.destination
 
     var versaoDosCaes by remember { mutableIntStateOf(0) }
+    var caoAtivo by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         containerColor = surface,
@@ -129,7 +119,8 @@ fun AplicacaoScreen() {
                     versao = versaoDosCaes,
                     onAdicionarCao = { popUp = TipoDeLog.Cao },
                     onMedicamentos = { separadores.irPara(Medicamentos) },
-                    onHistorico = { separadores.irPara(Historico) }
+                    onHistorico = { separadores.irPara(Historico) },
+                    onCaoAtivo = { caoAtivo = it }
                 )
             }
             composable<Historico> { HistoricoScreen() }
@@ -157,7 +148,7 @@ fun AplicacaoScreen() {
                 ) {
                     Text(
                         text = tituloDoPopUp(tipo),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = typography.titleMedium,
                         color = textStrong
                     )
                     Icon(
@@ -177,6 +168,21 @@ fun AplicacaoScreen() {
                             versaoDosCaes++
                         }
                     )
+
+                    TipoDeLog.Passeio -> {
+                        val id = caoAtivo
+                        if (id == null) {
+                            Text("Choose a dog first")
+                        } else {
+                            PasseioScreen(
+                                caoId = id,
+                                onGravado = {
+                                    popUp = null
+                                    versaoDosCaes++
+                                }
+                            )
+                        }
+                    }
 
                     else -> Text("Por fazer $tipo")
                 }

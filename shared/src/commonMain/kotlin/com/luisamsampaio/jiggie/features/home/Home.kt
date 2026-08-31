@@ -194,12 +194,17 @@ fun HomeScreen(
     versao: Int = 0,
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
-    onHistorico: () -> Unit = {}
+    onHistorico: () -> Unit = {},
+    onCaoAtivo: (String) -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(versao) {
         if (versao > 0) viewModel.carregar()
+    }
+
+    LaunchedEffect(state.idCaoAtivo) {
+        state.idCaoAtivo?.let(onCaoAtivo)
     }
 
     HomeScreenContent(
@@ -525,7 +530,7 @@ private fun ChipsCaes(
                 // avatar
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(32.dp)
                         .background(coresDosCaes.getOrElse(cao.cor) { dog1 }, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
@@ -553,7 +558,7 @@ private fun ChipsCaes(
 
                         if (detalhe.isNotEmpty()) {
                             Text(
-                                text = detalhe,
+                                text = "${detalhe}y",
                                 fontSize = 12.sp,
                                 color = textTertiary
                             )
@@ -600,7 +605,7 @@ private fun RecentActivity(
     registo: List<Registo>,
     nomeDoCao: String,
     onHistorico: () -> Unit
-){
+) {
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -829,8 +834,8 @@ private fun ListaVazia(nomeDoCao: String) {
 private fun CartaoSinalizado(
     sinalizado: Sinalizado,
     onHistorico: () -> Unit
-){
-    Column(){
+) {
+    Column() {
         TituloDeSeccao("FLAGGED")
         Spacer(Modifier.height(8.dp))
 
@@ -838,7 +843,7 @@ private fun CartaoSinalizado(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .clip( RoundedCornerShape(13.dp))
+                .clip(RoundedCornerShape(13.dp))
                 .background(symptomContainer)
                 .border(1.dp, symptomBorder, RoundedCornerShape(13.dp))
                 .clickable(onClick = onHistorico)
