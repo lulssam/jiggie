@@ -191,7 +191,8 @@ private fun HomeScreenContent(
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel { HomeViewModel() },
-    versao: Int = 0,
+    versaoDosCaes: Int = 0,
+    versaoDosRegistos: Int = 0,
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
@@ -199,8 +200,12 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(versao) {
-        if (versao > 0) viewModel.carregar()
+    LaunchedEffect(versaoDosCaes) {
+        if (versaoDosCaes > 0) viewModel.carregar()
+    }
+
+    LaunchedEffect(versaoDosRegistos) {
+        if (versaoDosRegistos > 0) viewModel.recarregarDia()
     }
 
     LaunchedEffect(state.idCaoAtivo) {

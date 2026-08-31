@@ -96,7 +96,15 @@ class HomeViewModel : ViewModel() {
     }
 
     fun onCao(id: String) {
-        _state.update { it.copy(idCaoAtivo = id) }
+        if (id == _state.value.idCaoAtivo) return
+        _state.update {
+            it.copy(
+                idCaoAtivo = id,
+                estadoDoDia = EstadoDoDia(),
+                recentes = emptyList(),
+                sinalizado = null
+            )
+        }
         carregarDia(id)
     }
 
@@ -213,6 +221,10 @@ class HomeViewModel : ViewModel() {
                 println("HomeViewModel.carregarDia falhou: $erro")
             }
         }
+    }
+
+    fun recarregarDia() {
+        _state.value.idCaoAtivo?.let { carregarDia(it) }
     }
 }
 

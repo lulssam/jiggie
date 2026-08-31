@@ -90,6 +90,7 @@ fun AplicacaoScreen() {
     val destino = entrada?.destination
 
     var versaoDosCaes by remember { mutableIntStateOf(0) }
+    var versaoDosRegistos by remember { mutableIntStateOf(0) }
     var caoAtivo by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
@@ -116,7 +117,8 @@ fun AplicacaoScreen() {
         ) {
             composable<Home> {
                 HomeScreen(
-                    versao = versaoDosCaes,
+                    versaoDosCaes = versaoDosCaes,
+                    versaoDosRegistos = versaoDosRegistos,
                     onAdicionarCao = { popUp = TipoDeLog.Cao },
                     onMedicamentos = { separadores.irPara(Medicamentos) },
                     onHistorico = { separadores.irPara(Historico) },
@@ -178,7 +180,7 @@ fun AplicacaoScreen() {
                                 caoId = id,
                                 onGravado = {
                                     popUp = null
-                                    versaoDosCaes++
+                                    versaoDosRegistos++
                                 }
                             )
                         }
