@@ -838,7 +838,7 @@ private fun CartaoSinalizado(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .clip(RoundedCornerShape(13.dp))
+                .clip( RoundedCornerShape(13.dp))
                 .background(symptomContainer)
                 .border(1.dp, symptomBorder, RoundedCornerShape(13.dp))
                 .clickable(onClick = onHistorico)
