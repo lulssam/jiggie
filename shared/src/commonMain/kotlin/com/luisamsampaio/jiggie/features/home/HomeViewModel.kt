@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.todayIn
+import kotlin.time.Clock
 
 /**
  * Gere o estado e a lógica do ecrã Home.
@@ -75,6 +79,8 @@ class HomeViewModel : ViewModel() {
                         idCaoAtivo = it.idCaoAtivo ?: caes.firstOrNull()?.id
                     )
                 }
+
+                caes.firstOrNull()?.let { carregarDia(_state.value.idCaoAtivo ?: it.id) }
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
             } catch (erro: Exception) {
@@ -86,5 +92,89 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun onCao(id: String) = _state.update { it.copy(idCaoAtivo = id) }
+    fun onCao(id: String) {
+        _state.update { it.copy(idCaoAtivo = id) }
+        carregarDia(id)
+    }
+
+
+    /**
+     * Vai buscar os registos de hoje de um cão indicado.
+     *
+     * Separado do [carregar], ao trocar de cão, não precisa de voltar a ler o perfil
+     * nem a lista de cães*/
+    private fun carregarDia(caoId: String) {
+        viewModelScope.launch {
+            try {
+                val fuso = TimeZone.currentSystemDefault()
+                val inicio = Clock.System.todayIn(fuso).atStartOfDayIn(fuso).toString()
+
+                val passeios = supabase.from("passeio")
+                    .select(Columns.list("id", "dh_passeio", "xixi", "coco", "duracao")) {
+                        filter {
+                            eq("cao_id", caoId)
+                            gte("dh_passeio", inicio)
+                        }
+                    }.decodeList<PasseioDto>()
+
+                val refeicoes = supabase.from("comida")
+                    .select(Columns.list("id", "dh_comida", "quantidade", "base", "extras")) {
+                        filter {
+                            eq("cao_id", caoId)
+                            gte("dh_comida", inicio)
+                        }
+                    }.decodeList<ComidaDto>()
+
+                val aguas = supabase.from("agua")
+                    .select(Columns.list("id", "dh_agua", "quantidade")) {
+                        filter {
+                            eq("cao_id", caoId)
+                            gte("dh_agua", inicio)
+                        }
+                    }.decodeList<AguaDto>()
+
+                val sintomas = supabase.from("sintoma")
+                    .select(Columns.list("id", "dh_sintoma", "tipo", "descricao", "gravidade")) {
+                        filter {
+                            eq("cao_id", caoId)
+                            gte("dh_sintoma", inicio)
+                        }
+                    }.decodeList<SintomaDto>()
+
+                val medicamentos = supabase.from("medicamento")
+                    .select(Columns.list("id", "nome", "dose", "hora")) {
+                        filter { eq("cao_id", caoId) }
+                    }.decodeList<MedicamentoDto>()
+
+                /** Como não há cao id nesta tabela, faz se join com a tabela dos medicamentos.*/
+                val administracoes = supabase.from("administracao_medicamento")
+                    .select(
+                        Columns.raw(
+                            "id, dh_medicamento, medicamento_id, hora_prevista, medicamento!inner(nome, dose)"
+                        )
+                    ) {
+                        filter {
+                            eq("medicamento.cao_id", caoId)
+                            gte("dh_medicamento", inicio)
+                        }
+                    }.decodeList<AdministracaoDto>()
+
+                val dia = resumirDia(
+                    passeios, refeicoes, aguas, medicamentos, sintomas, administracoes
+                )
+
+                _state.update {
+                    it.copy(
+                        estadoDoDia = dia.estado,
+                        recentes = dia.recentes,
+                        sinalizado = dia.sinalizado
+                    )
+                }
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("HomeViewModel.carregarDia falhou: $erro")
+            }
+        }
+    }
 }

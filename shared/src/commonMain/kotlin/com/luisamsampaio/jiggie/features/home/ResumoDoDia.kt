@@ -9,8 +9,7 @@ data class DadosDoDia(
     val estado: EstadoDoDia,
     val recentes: List<Registo>,
     val sinalizado: Sinalizado?
-) {
-}
+)
 
 fun resumirDia(
     passeios: List<PasseioDto>,
@@ -19,7 +18,7 @@ fun resumirDia(
     medicamentos: List<MedicamentoDto>,
     sintomas: List<SintomaDto>,
     administracoes: List<AdministracaoDto>
-) {
+): DadosDoDia {
     // medicamentos: o que estava previsto - o que já foi dado
     val previstas = medicamentos.flatMap { m -> m.hora.map { m.id to minutosDaHora(it) } }
     val dadas = administracoes
@@ -36,7 +35,7 @@ fun resumirDia(
     val estado = EstadoDoDia(
         medicamentos = medicamentos
             .joinToString(", ") { it.nome }
-            .ifEmpty { "None schedule" },
+            .ifEmpty { "None scheduled" },
         medPastilha = when {
             previstas.isEmpty() -> Pastilha("NONE", Tom.Neutro)
             proxima != null -> Pastilha("DUE ${hora12(proxima.second)}", Tom.Alerta)
@@ -93,7 +92,55 @@ fun resumirDia(
                 )
             )
         }
+
+        aguas.forEach {
+            add(
+                it.quando to Registo(
+                    it.id,
+                    horaDe(it.quando),
+                    "Water",
+                    "${it.quantidade} ml",
+                    TipoDeRegisto.Agua
+                )
+            )
+        }
+
+        administracoes.forEach {
+            val med = it.medicamento
+            add(
+                it.quando to Registo(
+                    it.id, horaDe(it.quando), "Medicine",
+                    if (med == null) "" else "${med.nome} · ${med.dose}",
+                    TipoDeRegisto.Medicamento
+                )
+            )
+        }
+
+        sintomas.forEach {
+            add(
+                it.quando to Registo(
+                    it.id,
+                    horaDe(it.quando), it.tipo,
+                    listOfNotNull(gravidade(it.gravidade), it.descricao?.ifBlank { null })
+                        .joinToString(" · "),
+                    TipoDeRegisto.Sintoma
+                )
+            )
+        }
     }
+        .sortedByDescending { Instant.parse(it.first) }
+        .take(4)
+        .map { it.second }
+
+    val sinalizado = ultimoSintoma?.let {
+        Sinalizado(
+            titulo = "${gravidade(it.gravidade)} ${it.tipo.lowercase()}",
+            subtitulo = listOfNotNull(horaDe(it.quando), it.descricao?.ifBlank { null })
+                .joinToString(" · ")
+        )
+    }
+
+    return DadosDoDia(estado, recentes, sinalizado)
 }
 
 private fun etiquetasDoPasseio(passeio: PasseioDto?): List<Pastilha> {

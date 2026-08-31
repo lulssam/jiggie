@@ -1,11 +1,13 @@
 package com.luisamsampaio.jiggie.features.aplicacao
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,14 +58,21 @@ import com.luisamsampaio.jiggie.Relatorio
 import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
 import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
+import com.luisamsampaio.jiggie.features.home.menu.OpcaoDeLog
 import com.luisamsampaio.jiggie.features.meds.MedsScreen
 import com.luisamsampaio.jiggie.features.relatorio.RelatorioScreen
 import com.luisamsampaio.jiggie.ui.theme.divider
+import com.luisamsampaio.jiggie.ui.theme.food
+import com.luisamsampaio.jiggie.ui.theme.med
+import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.surface
+import com.luisamsampaio.jiggie.ui.theme.symptom
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
+import com.luisamsampaio.jiggie.ui.theme.walk
+import com.luisamsampaio.jiggie.ui.theme.water
 import io.github.jan.supabase.realtime.Column
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.close
@@ -118,8 +128,8 @@ fun AplicacaoScreen() {
                 HomeScreen(
                     versao = versaoDosCaes,
                     onAdicionarCao = { popUp = TipoDeLog.Cao },
-                    onMedicamentos = {separadores.irPara(Medicamentos)},
-                    onHistorico = {separadores.irPara(Historico)}
+                    onMedicamentos = { separadores.irPara(Medicamentos) },
+                    onHistorico = { separadores.irPara(Historico) }
                 )
             }
             composable<Historico> { HistoricoScreen() }
@@ -159,6 +169,8 @@ fun AplicacaoScreen() {
                 }
 
                 when (tipo) {
+                    TipoDeLog.Menu -> MenuDeLog(onEscolha = { popUp = it })
+
                     TipoDeLog.Cao -> AdicionarCaoScreen(
                         onGravado = {
                             popUp = null
@@ -291,4 +303,65 @@ private fun tituloDoPopUp(tipo: TipoDeLog): String = when (tipo) {
     TipoDeLog.Medicamento -> "Give medicine"
     TipoDeLog.Sintoma -> "Log symptom"
     TipoDeLog.Cao -> "Add a dog"
+}
+
+private val opcoesDeLog = listOf(
+    OpcaoDeLog(TipoDeLog.Passeio, "Walk", walk),
+    OpcaoDeLog(TipoDeLog.Comida, "Food", food),
+    OpcaoDeLog(TipoDeLog.Agua, "Water", water),
+    OpcaoDeLog(TipoDeLog.Medicamento, "Medicine", med),
+    OpcaoDeLog(TipoDeLog.Sintoma, "Symptom", symptom),
+)
+
+@Composable
+private fun MenuDeLog(onEscolha: (TipoDeLog) -> Unit) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(9.dp)
+    ) {
+        opcoesDeLog.chunked(2).forEach { linha ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
+            ) {
+                linha.forEach { opcao ->
+
+                    BotaoDeOpcao(
+                        opcao = opcao,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onEscolha(opcao.tipo) }
+                    )
+
+                    if (linha.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun BotaoDeOpcao(
+    opcao: OpcaoDeLog,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(13.dp))
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 15.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(10.dp)
+                .background(opcao.cor, CircleShape)
+        )
+        Text(
+            text = opcao.etiqueta,
+            style = typography.titleSmall,
+            color = textStrong
+        )
+    }
 }
