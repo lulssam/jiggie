@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.log
+package com.luisamsampaio.jiggie.features.log.passeio
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -66,7 +66,7 @@ class PasseioViewModel : ViewModel() {
             try {
                 val dono = supabase.auth.currentUserOrNull()?.id
                 if (dono == null) {
-                    _state.update { it.copy(isLoading = false, error = "User not logged in") }
+                    _state.update { it.copy(error = "User not logged in") }
                     return@launch
                 }
 
@@ -80,12 +80,14 @@ class PasseioViewModel : ViewModel() {
                         quando = (Clock.System.now() - atual.minutosAtras.minutes).toString()
                     )
                 )
-                _state.update { it.copy(isLoading = false, gravado = true) }
+                _state.update { it.copy(gravado = true) }
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
             } catch (erro: Exception) {
                 println("gravar passeio falhou: $erro")
-                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
+                _state.update { it.copy(error = mensagemDeErro(erro)) }
+            } finally {
+                _state.update { it.copy(isLoading = false)}
             }
 
         }

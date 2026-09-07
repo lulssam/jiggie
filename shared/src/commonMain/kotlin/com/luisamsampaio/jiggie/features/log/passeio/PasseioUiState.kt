@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.log
+package com.luisamsampaio.jiggie.features.log.passeio
 
 /**
  * Tudo o que o ecrã Passeio precisa para se mostrar corretamente.

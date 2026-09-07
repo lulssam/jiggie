@@ -1,4 +1,4 @@
-package com.luisamsampaio.jiggie.features.log
+package com.luisamsampaio.jiggie.features.log.passeio
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
