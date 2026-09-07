@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luisamsampaio.jiggie.ui.Etiqueta
@@ -63,7 +64,7 @@ fun ChipsDeHora(
                             1.dp, if (ativo) primaryDark else inputBorder,
                             RoundedCornerShape(9.dp)
                         )
-                        .clickable {onEscolha(minutos)}
+                        .clickable { onEscolha(minutos) }
                         .padding(horizontal = 11.dp, vertical = 7.dp)
                 )
             }
@@ -74,19 +75,18 @@ fun ChipsDeHora(
 
 @Composable
 fun Contador(
-    valor: Int,
-    unidade: String,
+    texto: String,
     onMenos: () -> Unit,
     onMais: () -> Unit
-){
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(14.dp),
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         BotaoDePasso("—", onMenos)
 
         Text(
-            text = "$valor $unidade",
+            text = texto,
             fontFamily = plexMono(),
             fontSize = 22.sp,
             fontWeight = FontWeight.SemiBold,
@@ -137,4 +137,40 @@ fun AlternadorGrande(
             color = if (activo) cor else textSecondary
         )
     }
+}
+
+/**
+ * Chip genérico dos popups
+ * @param texto String do chip
+ * @param ativo Booleano que indica se o chip está ativo ou não
+ * @param onClick Função a ser executada quando o chip é clicado
+ * @param corAtiva Fundo quando selecionado. Leva sempre texto branco por cima
+ * @param raio Raio do rounded corner shape
+ * */
+
+@Composable
+fun ChipEscolha(
+    texto: String,
+    ativo: Boolean,
+    onClick: () -> Unit,
+    corAtiva: Color = primaryDark,
+    raio: Dp = 10.dp
+) {
+    Text(
+        text = texto,
+        style = typography.bodySmall,
+        fontWeight = FontWeight.SemiBold,
+        color = if (ativo) Color.White else textBody,
+        modifier = Modifier
+            .clip(RoundedCornerShape(raio))
+            .background(if (ativo) corAtiva else Color.White)
+            .border(
+                width = 1.dp,
+                color = if (ativo) corAtiva else inputBorder,
+                shape = RoundedCornerShape(raio)
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 7.dp)
+    )
+
 }

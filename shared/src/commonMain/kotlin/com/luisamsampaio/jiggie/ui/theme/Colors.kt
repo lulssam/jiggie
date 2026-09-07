@@ -58,3 +58,7 @@ val symptomContainer = Color(0xFFFFF0E4)
 val symptomBorder = Color(0xFFF5C5B4)
 val symptomText = Color(0xFF6F341F)
 val symptomSub = Color(0xFF785C52)
+
+// tons escuros para chips selecionados, que levam texto branco por cima
+val foodDark = Color(0xFF7E5D1D)
+val symptomDark = Color(0xFFAF5331)
