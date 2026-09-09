@@ -6,11 +6,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.typography
@@ -26,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luisamsampaio.jiggie.ui.Etiqueta
+import com.luisamsampaio.jiggie.ui.theme.foodDark
 import com.luisamsampaio.jiggie.ui.theme.inputBorder
 import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.outlineStrong
@@ -65,7 +70,7 @@ fun ChipsDeHora(
                             RoundedCornerShape(9.dp)
                         )
                         .clickable { onEscolha(minutos) }
-                        .padding(horizontal = 11.dp, vertical = 7.dp)
+                        .padding(horizontal = 12.dp, vertical = 9.dp)
                 )
             }
         }
@@ -140,7 +145,7 @@ fun AlternadorGrande(
 }
 
 /**
- * Chip genérico dos popups
+ * Pills presets para valores
  * @param texto String do chip
  * @param ativo Booleano que indica se o chip está ativo ou não
  * @param onClick Função a ser executada quando o chip é clicado
@@ -170,7 +175,74 @@ fun ChipEscolha(
                 shape = RoundedCornerShape(raio)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 7.dp)
+            .padding(horizontal = 12.dp, vertical = 9.dp)
     )
 
+}
+
+@Composable
+fun ChipBase(
+    base: String,
+    onClick: (String) -> Unit,
+){
+    val opcoes = listOf("seca" to "Kibble", "humida" to "Wet", "mista" to "Mixed")
+
+    Column {
+        Etiqueta("BASE")
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+            opcoes.forEach { (valor, texto) ->
+                val ativo = valor == base
+                Text(
+                    text = texto,
+                    style = typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (ativo) Color.White else textBody,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(if (ativo) primaryDark else Color.White)
+                        .border(
+                            1.dp, if (ativo) primaryDark else inputBorder,
+                            RoundedCornerShape(9.dp)
+                        )
+                        .clickable { onClick(valor) }
+                        .padding(horizontal = 12.dp, vertical = 9.dp)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ChipExtras(
+    extras: List<String>,
+    onClick: (String) -> Unit
+){
+    val opcoes = listOf(
+        "Rice", "Chicken", "Olive Oil", "Pumpkin", "Egg", "Yogurt"
+    )
+
+    Column {
+        Etiqueta("EXTRAS")
+        Spacer(Modifier.height(8.dp))
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+            opcoes.forEach { extra ->
+                ChipEscolha(
+                    texto = extra,
+                    ativo = extra in extras,
+                    onClick = { onClick(extra) },
+                    corAtiva = foodDark,
+                    raio = 18.dp
+                )
+            }
+        }
+    }
 }
