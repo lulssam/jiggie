@@ -154,13 +154,13 @@ private fun etiquetasDoPasseio(passeio: PasseioDto?): List<Pastilha> {
 }
 
 /** "08:00:00" → 480. */
-private fun minutosDaHora(hora: String): Int {
+internal fun minutosDaHora(hora: String): Int {
     val partes = hora.split(":")
     return (partes[0].toIntOrNull() ?: 0) * 60 + (partes.getOrNull(1)?.toIntOrNull() ?: 0)
 }
 
 /** 480 → "8:00 AM". */
-private fun hora12(minutos: Int): String {
+internal fun hora12(minutos: Int): String {
     val h = minutos / 60
     val m = minutos % 60
     val doze = when {
