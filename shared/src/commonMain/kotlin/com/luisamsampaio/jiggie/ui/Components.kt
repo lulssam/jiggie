@@ -33,6 +33,7 @@ import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -220,16 +221,17 @@ fun Modifier.bordaTracejada(
     cor: Color,
     raio: Dp,
     largura: Dp = 1.5.dp
-) = drawBehind {
+) = drawWithCache {
     val traco = largura.toPx()
-    drawRoundRect(
-        color = cor,
-        topLeft = Offset(traco / 2, traco / 2),
-        size = Size(size.width - traco, size.height - traco),
-        cornerRadius = CornerRadius(raio.toPx()),
-        style = Stroke(
-            width = traco,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
-        )
+    val estilo = Stroke(
+        width = traco,
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 6f))
     )
+    val canto = CornerRadius(raio.toPx())
+    val cantoSuperior = Offset(traco / 2, traco / 2)
+    val tamanho = Size(size.width - traco, size.height - traco)
+
+    onDrawBehind {
+        drawRoundRect(cor, cantoSuperior, tamanho, canto, style = estilo)
+    }
 }
