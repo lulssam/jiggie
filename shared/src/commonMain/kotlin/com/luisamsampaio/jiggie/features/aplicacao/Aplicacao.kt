@@ -53,6 +53,7 @@ import com.luisamsampaio.jiggie.features.home.OpcaoDeLog
 import com.luisamsampaio.jiggie.features.log.agua.AguaScreen
 import com.luisamsampaio.jiggie.features.log.comida.ComidaScreen
 import com.luisamsampaio.jiggie.features.log.passeio.PasseioScreen
+import com.luisamsampaio.jiggie.features.log.sintoma.SintomaScreen
 import com.luisamsampaio.jiggie.features.meds.MedsScreen
 import com.luisamsampaio.jiggie.features.relatorio.RelatorioScreen
 import com.luisamsampaio.jiggie.ui.theme.divider
@@ -209,6 +210,21 @@ fun AplicacaoScreen() {
                             Text("Choose a dog first")
                         } else {
                             ComidaScreen(
+                                caoId = id,
+                                onGravado = {
+                                    popUp = null
+                                    versaoDosRegistos++
+                                }
+                            )
+                        }
+                    }
+
+                    TipoDeLog.Sintoma -> {
+                        val id = caoAtivo
+                        if (id == null) {
+                            Text("Choose a dog first")
+                        } else {
+                            SintomaScreen(
                                 caoId = id,
                                 onGravado = {
                                     popUp = null
