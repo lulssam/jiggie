@@ -50,6 +50,7 @@ import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
 import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.home.OpcaoDeLog
+import com.luisamsampaio.jiggie.features.log.administracao.AdministracaoMedsScreen
 import com.luisamsampaio.jiggie.features.log.agua.AguaScreen
 import com.luisamsampaio.jiggie.features.log.comida.ComidaScreen
 import com.luisamsampaio.jiggie.features.log.passeio.PasseioScreen
@@ -229,6 +230,21 @@ fun AplicacaoScreen() {
                                 onGravado = {
                                     popUp = null
                                     versaoDosRegistos++
+                                }
+                            )
+                        }
+                    }
+
+                    TipoDeLog.Medicamento -> {
+                        val id = caoAtivo
+                        if (id == null) Text("Choose a dog first")
+                        else {
+                            AdministracaoMedsScreen(
+                                caoId = id,
+                                onDose = {versaoDosRegistos++},
+                                onGerir = {
+                                    popUp = null
+                                    separadores.irPara(Medicamentos)
                                 }
                             )
                         }

@@ -38,11 +38,13 @@ fun plexSans() = FontFamily(
  * @return A família IBM Plex Mono, nos três pesos que temos.
  */
 @Composable
-fun plexMono() = FontFamily(
-    Font(Res.font.ibm_plex_mono_regular, FontWeight.Normal),
-    Font(Res.font.ibm_plex_mono_semi_bold, FontWeight.SemiBold),
-    Font(Res.font.ibm_plex_mono_bold, FontWeight.Bold),
-)
+fun plexMono(): FontFamily {
+    val regular = Font(Res.font.ibm_plex_mono_regular, FontWeight.Normal)
+    val semiBold = Font(Res.font.ibm_plex_mono_semi_bold, FontWeight.SemiBold)
+    val bold = Font(Res.font.ibm_plex_mono_bold, FontWeight.Bold)
+
+    return remember(regular, semiBold, bold) { FontFamily(regular, semiBold, bold) }
+}
 
 /**
  * Todos os tamanhos e pesos de letra da aplicação, num sítio só.
