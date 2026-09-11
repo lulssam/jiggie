@@ -97,7 +97,7 @@ class JoinFamilyViewModel : ViewModel() {
                 }
 
                 // a partir daqui a conta existe, falhe o codigo ou não
-                _state.update { it.copy(isLoading = false, entrou = true) }
+                _state.update { it.copy(temConta = true) }
 
                 // invocar funçao sql
                 supabase.postgrest.rpc(
