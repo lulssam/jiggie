@@ -3,17 +3,25 @@ package com.luisamsampaio.jiggie.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -39,11 +47,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primaryBorder
 import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primarySurface
+import com.luisamsampaio.jiggie.ui.theme.success
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
@@ -233,5 +245,55 @@ fun Modifier.bordaTracejada(
 
     onDrawBehind {
         drawRoundRect(cor, cantoSuperior, tamanho, canto, style = estilo)
+    }
+}
+
+@Composable
+fun CodigoComCopiar(
+    codigo: String,
+    modifier: Modifier = Modifier,
+    tamanhoCodigo: TextUnit = 19.sp
+) {
+    val areaDeTransferencia = LocalClipboardManager.current
+    var copiado by remember { mutableStateOf(false) }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(9.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .background(primarySurface, RoundedCornerShape(10.dp))
+                .padding(horizontal = 13.dp, vertical = 11.dp)
+                .widthIn(min = 78.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = codigo,
+                fontFamily = plexMono(),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 19.sp,
+                letterSpacing = 2.5.sp,
+                color = primaryDark
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .border(1.dp, outline, RoundedCornerShape(10.dp))
+                .clickable {
+                    areaDeTransferencia.setText(AnnotatedString(codigo))
+                    copiado = true
+                }
+                .padding(horizontal = 14.dp, vertical = 11.dp)
+        ) {
+            Text(
+                text = if (copiado) "Copied" else "Copy",
+                style = typography.labelMedium,
+                color = if (copiado) success else textBody
+            )
+        }
     }
 }

@@ -50,6 +50,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.bordaTracejada
 import com.luisamsampaio.jiggie.ui.theme.alerta
 import com.luisamsampaio.jiggie.ui.theme.alertaContainer
@@ -422,9 +423,6 @@ private fun LinhaDePasso(
 @Composable
 private fun CartaoDeConvite(codigo: String) {
 
-    val areaDeTransferencia = LocalClipboardManager.current
-    var copiado by remember { mutableStateOf(false) }
-
     Column {
         TituloDeSeccao("INVITE THE HOUSEHOLD")
         Spacer(Modifier.height(8.dp))
@@ -444,45 +442,9 @@ private fun CartaoDeConvite(codigo: String) {
 
             Spacer(Modifier.height(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(9.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(primarySurface, RoundedCornerShape(10.dp))
-                        .padding(horizontal = 13.dp, vertical = 11.dp)
-                        .widthIn(min = 78.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = codigo,
-                        fontFamily = plexMono(),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 19.sp,
-                        letterSpacing = 2.5.sp,
-                        color = primaryDark
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .border(1.dp, outline, RoundedCornerShape(10.dp))
-                        .clickable {
-                            areaDeTransferencia.setText(AnnotatedString(codigo))
-                            copiado = true
-                        }
-                        .padding(horizontal = 14.dp, vertical = 11.dp)
-                ) {
-                    Text(
-                        text = if (copiado) "Copied" else "Copy",
-                        style = typography.labelMedium,
-                        color = if (copiado) success else textBody
-                    )
-                }
-            }
+            CodigoComCopiar(
+                codigo = codigo
+            )
         }
     }
 
