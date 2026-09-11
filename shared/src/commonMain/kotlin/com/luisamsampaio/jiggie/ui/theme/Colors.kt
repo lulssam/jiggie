@@ -33,6 +33,7 @@ val med = Color(0xFF7F64AB)
 val symptom = Color(0xFFCB6440)
 val success = Color(0xFF0B7643)
 val danger = Color(0xFFB54A46)
+val dangerBorder = Color(0xFFF0C5C1)
 
 // dog avatar palette
 val dog1 = Color(0xFF56B6BB)

@@ -111,7 +111,8 @@ private fun HomeScreenContent(
     onAdicionarCao: () -> Unit = {},
     onCao: (String) -> Unit = {},
     onMedicamentos: () -> Unit = {},
-    onHistorico: () -> Unit
+    onHistorico: () -> Unit,
+    onUser: () -> Unit = {}
 ) {
     when {
         state.isLoading ->
@@ -132,7 +133,7 @@ private fun HomeScreenContent(
                 .statusBarsPadding()
                 .padding(start = 18.dp, end = 18.dp, top = 4.dp)
         ) {
-            Cabecalho(state)
+            Cabecalho(state, onUser)
             Spacer(Modifier.height(if (state.temCaes) 13.dp else 22.dp))
 
             if (state.temCaes) {
@@ -196,7 +197,8 @@ fun HomeScreen(
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
-    onCaoAtivo: (String) -> Unit = {}
+    onCaoAtivo: (String) -> Unit = {},
+    onUser: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -217,12 +219,16 @@ fun HomeScreen(
         onAdicionarCao = onAdicionarCao,
         onCao = viewModel::onCao,
         onMedicamentos = onMedicamentos,
-        onHistorico = onHistorico
+        onHistorico = onHistorico,
+        onUser = onUser
     )
 }
 
 @Composable
-private fun Cabecalho(state: HomeUiState) {
+private fun Cabecalho(
+    state: HomeUiState,
+    onUser: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -248,7 +254,10 @@ private fun Cabecalho(state: HomeUiState) {
             Box(
                 modifier = Modifier
                     .size(31.dp)
-                    .background(haloAvatar, CircleShape),
+                    .clip(CircleShape)
+                    .background(haloAvatar)
+                    .clickable(onClick = onUser),
+
                 contentAlignment = Alignment.Center
             ) {
                 Box(

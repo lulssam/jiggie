@@ -42,8 +42,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.luisamsampaio.jiggie.Aplicacao
 import com.luisamsampaio.jiggie.Historico
 import com.luisamsampaio.jiggie.Home
+import com.luisamsampaio.jiggie.Login
 import com.luisamsampaio.jiggie.Medicamentos
 import com.luisamsampaio.jiggie.Relatorio
 import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
@@ -57,6 +59,7 @@ import com.luisamsampaio.jiggie.features.log.passeio.PasseioScreen
 import com.luisamsampaio.jiggie.features.log.sintoma.SintomaScreen
 import com.luisamsampaio.jiggie.features.meds.MedsScreen
 import com.luisamsampaio.jiggie.features.relatorio.RelatorioScreen
+import com.luisamsampaio.jiggie.features.user.UserScreen
 import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.food
 import com.luisamsampaio.jiggie.ui.theme.med
@@ -81,14 +84,16 @@ import org.jetbrains.compose.resources.painterResource
 
 
 /** O que o pop up do log está a mostra. Null quando está fechdo*/
-enum class TipoDeLog { Menu, Passeio, Comida, Agua, Sintoma, Medicamento, Cao }
+enum class Acao { Menu, Passeio, Comida, Agua, Sintoma, Medicamento, Cao, User }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AplicacaoScreen() {
+fun AplicacaoScreen(
+    onSair: () -> Unit
+) {
     val separadores = rememberNavController()
-    var popUp by remember { mutableStateOf<TipoDeLog?>(null) }
+    var popUp by remember { mutableStateOf<Acao?>(null) }
 
     val entrada by separadores.currentBackStackEntryAsState()
     val destino = entrada?.destination
@@ -110,7 +115,7 @@ fun AplicacaoScreen() {
                     else -> null
                 },
                 onSeparador = { separadores.irPara(it) },
-                onLog = { popUp = TipoDeLog.Menu }
+                onLog = { popUp = Acao.Menu }
             )
         }
     ) { espaco ->
@@ -123,7 +128,7 @@ fun AplicacaoScreen() {
                 HomeScreen(
                     versaoDosCaes = versaoDosCaes,
                     versaoDosRegistos = versaoDosRegistos,
-                    onAdicionarCao = { popUp = TipoDeLog.Cao },
+                    onAdicionarCao = { popUp = Acao.Cao },
                     onMedicamentos = { separadores.irPara(Medicamentos) },
                     onHistorico = { separadores.irPara(Historico) },
                     onCaoAtivo = { caoAtivo = it }
@@ -166,16 +171,16 @@ fun AplicacaoScreen() {
                 }
 
                 when (tipo) {
-                    TipoDeLog.Menu -> MenuDeLog(onEscolha = { popUp = it })
+                    Acao.Menu -> MenuDeLog(onEscolha = { popUp = it })
 
-                    TipoDeLog.Cao -> AdicionarCaoScreen(
+                    Acao.Cao -> AdicionarCaoScreen(
                         onGravado = {
                             popUp = null
                             versaoDosCaes++
                         }
                     )
 
-                    TipoDeLog.Passeio -> {
+                    Acao.Passeio -> {
                         val id = caoAtivo
                         if (id == null) {
                             Text("Choose a dog first")
@@ -190,7 +195,7 @@ fun AplicacaoScreen() {
                         }
                     }
 
-                    TipoDeLog.Agua -> {
+                    Acao.Agua -> {
                         val id = caoAtivo
                         if (id == null) {
                             Text("Choose a dog first")
@@ -205,7 +210,7 @@ fun AplicacaoScreen() {
                         }
                     }
 
-                    TipoDeLog.Comida -> {
+                    Acao.Comida -> {
                         val id = caoAtivo
                         if (id == null) {
                             Text("Choose a dog first")
@@ -220,7 +225,7 @@ fun AplicacaoScreen() {
                         }
                     }
 
-                    TipoDeLog.Sintoma -> {
+                    Acao.Sintoma -> {
                         val id = caoAtivo
                         if (id == null) {
                             Text("Choose a dog first")
@@ -235,7 +240,7 @@ fun AplicacaoScreen() {
                         }
                     }
 
-                    TipoDeLog.Medicamento -> {
+                    Acao.Medicamento -> {
                         val id = caoAtivo
                         if (id == null) Text("Choose a dog first")
                         else {
@@ -249,6 +254,15 @@ fun AplicacaoScreen() {
                             )
                         }
                     }
+
+                    Acao.User -> UserScreen(
+                        onSair = {
+                            popUp = null
+                            onSair()
+                        }
+                    )
+
+
 
                     else -> Text("Por fazer $tipo")
                 }
@@ -367,26 +381,27 @@ private fun NavController.irPara(rota: Any) {
 }
 
 /** Os títulos vêm do TITLES do desenho. */
-private fun tituloDoPopUp(tipo: TipoDeLog): String = when (tipo) {
-    TipoDeLog.Menu -> "Quick log"
-    TipoDeLog.Passeio -> "Log walk"
-    TipoDeLog.Comida -> "Log food"
-    TipoDeLog.Agua -> "Log water"
-    TipoDeLog.Medicamento -> "Give medicine"
-    TipoDeLog.Sintoma -> "Log symptom"
-    TipoDeLog.Cao -> "Add a dog"
+private fun tituloDoPopUp(tipo: Acao): String = when (tipo) {
+    Acao.Menu -> "Quick log"
+    Acao.Passeio -> "Log walk"
+    Acao.Comida -> "Log food"
+    Acao.Agua -> "Log water"
+    Acao.Medicamento -> "Give medicine"
+    Acao.Sintoma -> "Log symptom"
+    Acao.Cao -> "Add a dog"
+    Acao.User -> "User settings"
 }
 
 private val opcoesDeLog = listOf(
-    OpcaoDeLog(TipoDeLog.Passeio, "Walk", walk),
-    OpcaoDeLog(TipoDeLog.Comida, "Food", food),
-    OpcaoDeLog(TipoDeLog.Agua, "Water", water),
-    OpcaoDeLog(TipoDeLog.Medicamento, "Medicine", med),
-    OpcaoDeLog(TipoDeLog.Sintoma, "Symptom", symptom),
+    OpcaoDeLog(Acao.Passeio, "Walk", walk),
+    OpcaoDeLog(Acao.Comida, "Food", food),
+    OpcaoDeLog(Acao.Agua, "Water", water),
+    OpcaoDeLog(Acao.Medicamento, "Medicine", med),
+    OpcaoDeLog(Acao.Sintoma, "Symptom", symptom),
 )
 
 @Composable
-private fun MenuDeLog(onEscolha: (TipoDeLog) -> Unit) {
+private fun MenuDeLog(onEscolha: (Acao) -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(9.dp)
     ) {

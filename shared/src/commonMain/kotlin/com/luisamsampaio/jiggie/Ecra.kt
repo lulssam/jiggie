@@ -22,6 +22,8 @@ data object Home
 @Serializable data object Medicamentos
 @Serializable data object Relatorio
 
+@Serializable data object User
+
 /**
  * O ecrã que mostra o código de convite acabado de gerar.
  *

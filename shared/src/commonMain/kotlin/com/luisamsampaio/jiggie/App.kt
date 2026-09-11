@@ -130,7 +130,15 @@ private fun Navegacao(inicio: Any) {
         }
 
         composable<Aplicacao> {
-            AplicacaoScreen()
+            AplicacaoScreen(
+                onSair = {
+                    navController.navigate(Login) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 
