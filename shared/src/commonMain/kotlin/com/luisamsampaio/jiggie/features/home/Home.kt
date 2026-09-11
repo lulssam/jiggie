@@ -50,6 +50,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.bordaTracejada
 import com.luisamsampaio.jiggie.ui.theme.alerta
 import com.luisamsampaio.jiggie.ui.theme.alertaContainer
@@ -111,7 +112,8 @@ private fun HomeScreenContent(
     onAdicionarCao: () -> Unit = {},
     onCao: (String) -> Unit = {},
     onMedicamentos: () -> Unit = {},
-    onHistorico: () -> Unit
+    onHistorico: () -> Unit,
+    onUser: () -> Unit = {}
 ) {
     when {
         state.isLoading ->
@@ -132,7 +134,7 @@ private fun HomeScreenContent(
                 .statusBarsPadding()
                 .padding(start = 18.dp, end = 18.dp, top = 4.dp)
         ) {
-            Cabecalho(state)
+            Cabecalho(state, onUser)
             Spacer(Modifier.height(if (state.temCaes) 13.dp else 22.dp))
 
             if (state.temCaes) {
@@ -196,7 +198,8 @@ fun HomeScreen(
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
-    onCaoAtivo: (String) -> Unit = {}
+    onCaoAtivo: (String) -> Unit = {},
+    onUser: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -217,12 +220,16 @@ fun HomeScreen(
         onAdicionarCao = onAdicionarCao,
         onCao = viewModel::onCao,
         onMedicamentos = onMedicamentos,
-        onHistorico = onHistorico
+        onHistorico = onHistorico,
+        onUser = onUser
     )
 }
 
 @Composable
-private fun Cabecalho(state: HomeUiState) {
+private fun Cabecalho(
+    state: HomeUiState,
+    onUser: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -248,7 +255,10 @@ private fun Cabecalho(state: HomeUiState) {
             Box(
                 modifier = Modifier
                     .size(31.dp)
-                    .background(haloAvatar, CircleShape),
+                    .clip(CircleShape)
+                    .background(haloAvatar)
+                    .clickable(onClick = onUser),
+
                 contentAlignment = Alignment.Center
             ) {
                 Box(
@@ -413,9 +423,6 @@ private fun LinhaDePasso(
 @Composable
 private fun CartaoDeConvite(codigo: String) {
 
-    val areaDeTransferencia = LocalClipboardManager.current
-    var copiado by remember { mutableStateOf(false) }
-
     Column {
         TituloDeSeccao("INVITE THE HOUSEHOLD")
         Spacer(Modifier.height(8.dp))
@@ -435,45 +442,9 @@ private fun CartaoDeConvite(codigo: String) {
 
             Spacer(Modifier.height(12.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(9.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(primarySurface, RoundedCornerShape(10.dp))
-                        .padding(horizontal = 13.dp, vertical = 11.dp)
-                        .widthIn(min = 78.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = codigo,
-                        fontFamily = plexMono(),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 19.sp,
-                        letterSpacing = 2.5.sp,
-                        color = primaryDark
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .border(1.dp, outline, RoundedCornerShape(10.dp))
-                        .clickable {
-                            areaDeTransferencia.setText(AnnotatedString(codigo))
-                            copiado = true
-                        }
-                        .padding(horizontal = 14.dp, vertical = 11.dp)
-                ) {
-                    Text(
-                        text = if (copiado) "Copied" else "Copy",
-                        style = typography.labelMedium,
-                        color = if (copiado) success else textBody
-                    )
-                }
-            }
+            CodigoComCopiar(
+                codigo = codigo
+            )
         }
     }
 

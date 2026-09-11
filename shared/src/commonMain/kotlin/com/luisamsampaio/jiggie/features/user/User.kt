@@ -1,0 +1,310 @@
+package com.luisamsampaio.jiggie.features.user
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.ui.CodigoComCopiar
+import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.dangerBorder
+import com.luisamsampaio.jiggie.ui.theme.divider
+import com.luisamsampaio.jiggie.ui.theme.outline
+import com.luisamsampaio.jiggie.ui.theme.plexMono
+import com.luisamsampaio.jiggie.ui.theme.primary
+import com.luisamsampaio.jiggie.ui.theme.primaryContainer
+import com.luisamsampaio.jiggie.ui.theme.primaryLink
+import com.luisamsampaio.jiggie.ui.theme.textDisabled
+import com.luisamsampaio.jiggie.ui.theme.textStrong
+import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import jiggie.shared.generated.resources.Res
+import jiggie.shared.generated.resources.arrow_forward
+import jiggie.shared.generated.resources.check
+import org.jetbrains.compose.resources.painterResource
+
+
+private data class Definicao(
+    val titulo: String,
+    val subtitulo: String
+)
+
+/**
+ * Parte visual do ecrã User.
+ *
+ * Não sabe nada sobre a lógica da aplicação — apenas mostra o que recebe
+ * e avisa quando o utilizador faz algo. Fácil de testar e de pré-visualizar.
+ *
+ * @param state Tudo o que o ecrã precisa para se mostrar corretamente.
+ */
+@Composable
+private fun UserScreenContent(
+    state: UserUiState,
+    onSair: () -> Unit
+) {
+    if (state.isLoading) {
+        Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    Column {
+        CabecalhoDaConta(state)
+        CartaoDaFamilia(state)
+
+        Spacer(Modifier.height(16.dp))
+        ListaDeDefs(state)
+
+        if (state.error != null) {
+            Spacer(Modifier.height(12.dp))
+            Text(state.error, style = typography.bodySmall, color = danger)
+
+        }
+
+        Spacer(Modifier.height(14.dp))
+        BotaoSair(onSair)
+
+        Spacer(Modifier.height(13.dp))
+        Text(
+            text = "Jiggie! v1.0",
+            fontFamily = plexMono(),
+            fontSize = 10.sp,
+            color = textDisabled,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+/**
+ * Liga o [UserViewModel] ao [UserScreenContent].
+ *
+ * Observa o estado do ViewModel e passa-o para o ecrã.
+ * Não contém lógica de UI — apenas faz a ligação.
+ *
+ * @param viewModel O ViewModel que gere o estado deste ecrã.
+ *                  É criado automaticamente pelo Compose se não for fornecido.
+ */
+@Composable
+fun UserScreen(
+    viewModel: UserViewModel = viewModel { UserViewModel() },
+    onSair: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    // cada vez que o pop up abre, rele o viewmodel
+    LaunchedEffect(Unit) {
+        viewModel.carregar()
+    }
+
+    LaunchedEffect(state.logout) {
+        if (state.logout) onSair()
+    }
+
+    UserScreenContent(
+        state = state,
+        onSair = viewModel::sair
+    )
+}
+
+
+@Composable
+private fun CabecalhoDaConta(
+    state: UserUiState
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .background(primary, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = state.nome.firstOrNull()?.uppercase().orEmpty(),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
+        }
+
+        Column(
+            Modifier.weight(1f)
+        ) {
+            Text(
+                text = state.nome,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = textStrong
+            )
+            Text(
+                text = state.email,
+                style = MaterialTheme.typography.bodySmall,
+                color = textTertiary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        Text(
+            text = state.papel,
+            fontFamily = plexMono(),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.5.sp,
+            color = primaryLink,
+            modifier = Modifier
+                .background(primaryContainer, RoundedCornerShape(20.dp))
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
+private fun CartaoDaFamilia(
+    state: UserUiState
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+            .padding(horizontal = 14.dp, vertical = 13.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = state.nomeFamilia,
+                style = MaterialTheme.typography.titleSmall,
+                color = textStrong
+            )
+
+            Text(
+                text = if (state.membros == 1) "1 member" else "${state.membros} members",
+                fontSize = 11.sp,
+                color = textTertiary
+            )
+        }
+
+        Spacer(Modifier.height(9.dp))
+        CodigoComCopiar(state.codigoFamilia, tamanhoCodigo = 15.sp)
+    }
+}
+
+@Composable
+private fun ListaDeDefs(
+    state: UserUiState
+) {
+    val definicoes = listOf(
+        Definicao("Edit profile", "Name, email, password"),
+        Definicao("Family & Members", "${state.membros} in this household"),
+        Definicao("Dogs", state.caes.joinToString(", ".ifEmpty { "None yet" })),
+        Definicao("Reminders", "Medicine alerts, daily nudges"),
+        Definicao("Units & privacy", "Metric · data export"),
+        Definicao("Help & support", "Guides, contact us"),
+
+        )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(13.dp))
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+    ) {
+        definicoes.forEachIndexed { indice, definicao ->
+            if (indice > 0) HorizontalDivider(thickness = 1.dp, color = divider)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {/*TODO: adicionar o resto das páginas*/ }
+                    .padding(horizontal = 14.dp, vertical = 13.dp),
+                horizontalArrangement = Arrangement.spacedBy(11.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = definicao.titulo,
+                        style = typography.titleSmall,
+                        color = textStrong
+                    )
+
+                    Text(
+                        text = definicao.subtitulo,
+                        fontSize = 11.sp,
+                        color = textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Icon(
+                    painter = painterResource(Res.drawable.arrow_forward),
+                    contentDescription = "Check",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BotaoSair(
+    onSair: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, dangerBorder, RoundedCornerShape(12.dp))
+            .clickable(onClick = onSair)
+            .padding(vertical = 14.dp),
+        contentAlignment = Alignment.Center
+    ){
+        Text(
+            text = "Log out",
+            style = typography.titleSmall,
+            color = danger
+        )
+    }
+}

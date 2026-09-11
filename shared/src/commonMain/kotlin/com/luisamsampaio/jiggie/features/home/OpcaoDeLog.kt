@@ -1,12 +1,12 @@
 package com.luisamsampaio.jiggie.features.home
 
 import androidx.compose.ui.graphics.Color
-import com.luisamsampaio.jiggie.features.aplicacao.TipoDeLog
+import com.luisamsampaio.jiggie.features.aplicacao.Acao
 
 /**
  * Uma opção do menu*/
 data class OpcaoDeLog(
-    val tipo: TipoDeLog,
+    val tipo: Acao,
     val etiqueta: String,
     val cor: Color
 )
