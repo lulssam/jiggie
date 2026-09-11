@@ -2,6 +2,7 @@ package com.luisamsampaio.jiggie.features.user
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
@@ -39,6 +45,16 @@ import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primaryLink
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
+import jiggie.shared.generated.resources.Res
+import jiggie.shared.generated.resources.arrow_forward
+import jiggie.shared.generated.resources.check
+import org.jetbrains.compose.resources.painterResource
+
+
+private data class Definicao(
+    val titulo: String,
+    val subtitulo: String
+)
 
 /**
  * Parte visual do ecrã User.
@@ -63,6 +79,15 @@ private fun UserScreenContent(
     Column {
         CabecalhoDaConta(state)
         CartaoDaFamilia(state)
+
+        Spacer(Modifier.height(16.dp))
+        ListaDeDefs(state)
+
+        if (state.error != null) {
+            Spacer(Modifier.height(12.dp))
+            Text(state.error, style = typography.bodySmall, color = danger)
+
+        }
     }
 }
 
@@ -158,7 +183,7 @@ private fun CabecalhoDaConta(
 @Composable
 private fun CartaoDaFamilia(
     state: UserUiState
-){
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,7 +194,7 @@ private fun CartaoDaFamilia(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Text(
                 text = state.nomeFamilia,
                 style = MaterialTheme.typography.titleSmall,
@@ -185,5 +210,64 @@ private fun CartaoDaFamilia(
 
         Spacer(Modifier.height(9.dp))
         CodigoComCopiar(state.codigoFamilia, tamanhoCodigo = 15.sp)
+    }
+}
+
+@Composable
+private fun ListaDeDefs(
+    state: UserUiState
+) {
+    val definicoes = listOf(
+        Definicao("Edit profile", "Name, email, password"),
+        Definicao("Family & Members", "${state.membros} in this household"),
+        Definicao("Dogs", state.caes.joinToString(", ".ifEmpty { "None yet" })),
+        Definicao("Reminders", "Medicine alerts, daily nudges"),
+        Definicao("Units & privacy", "Metric · data export"),
+        Definicao("Help & support", "Guides, contact us"),
+
+        )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(13.dp))
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+    ) {
+        definicoes.forEachIndexed { indice, definicao ->
+            if (indice > 0) HorizontalDivider(thickness = 1.dp, color = divider)
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {/*TODO: adicionar o resto das páginas*/}
+                    .padding(horizontal = 14.dp, vertical = 13.dp),
+                horizontalArrangement = Arrangement.spacedBy(11.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = definicao.titulo,
+                        style = typography.titleSmall,
+                        color = textStrong
+                    )
+
+                    Text(
+                        text = definicao.subtitulo,
+                        fontSize = 11.sp,
+                        color = textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Icon(
+                    painter = painterResource(Res.drawable.arrow_forward),
+                    contentDescription = "Check",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        }
     }
 }
