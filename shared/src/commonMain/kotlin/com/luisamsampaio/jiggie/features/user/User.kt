@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,12 +38,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.dangerBorder
 import com.luisamsampaio.jiggie.ui.theme.divider
 import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryContainer
 import com.luisamsampaio.jiggie.ui.theme.primaryLink
+import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
@@ -88,6 +91,19 @@ private fun UserScreenContent(
             Text(state.error, style = typography.bodySmall, color = danger)
 
         }
+
+        Spacer(Modifier.height(14.dp))
+        BotaoSair(onSair)
+
+        Spacer(Modifier.height(13.dp))
+        Text(
+            text = "Jiggie! v1.0",
+            fontFamily = plexMono(),
+            fontSize = 10.sp,
+            color = textDisabled,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -239,7 +255,7 @@ private fun ListaDeDefs(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {/*TODO: adicionar o resto das páginas*/}
+                    .clickable {/*TODO: adicionar o resto das páginas*/ }
                     .padding(horizontal = 14.dp, vertical = 13.dp),
                 horizontalArrangement = Arrangement.spacedBy(11.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -269,5 +285,26 @@ private fun ListaDeDefs(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun BotaoSair(
+    onSair: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .border(1.dp, dangerBorder, RoundedCornerShape(12.dp))
+            .clickable(onClick = onSair)
+            .padding(vertical = 14.dp),
+        contentAlignment = Alignment.Center
+    ){
+        Text(
+            text = "Log out",
+            style = typography.titleSmall,
+            color = danger
+        )
     }
 }
