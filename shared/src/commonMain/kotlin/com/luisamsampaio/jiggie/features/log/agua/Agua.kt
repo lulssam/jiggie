@@ -64,7 +64,7 @@ private fun AguaScreenContent(
         Spacer(Modifier.height(16.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            listOf(100, 200, 300).forEach { ml ->
+            listOf(250, 500, 1000).forEach { ml ->
                 ChipEscolha(
                     texto = "$ml ml",
                     ativo = state.quantidade == ml,
