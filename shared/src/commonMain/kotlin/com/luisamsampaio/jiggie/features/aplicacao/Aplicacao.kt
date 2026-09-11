@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -24,6 +27,7 @@ import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,6 +38,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -142,13 +148,19 @@ fun AplicacaoScreen(
     }
 
     popUp?.let { tipo ->
+        val alturaEcra = with(LocalDensity.current) {
+            LocalWindowInfo.current.containerSize.height.toDp()
+        }
+
         ModalBottomSheet(
             onDismissRequest = { popUp = null },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = surface,
             shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)
         ) {
             Column(
                 modifier = Modifier
+                    .heightIn(max = alturaEcra * 0.70f)
                     .padding(start = 20.dp, end = 20.dp, bottom = 22.dp)
             ) {
                 Row(
@@ -170,99 +182,105 @@ fun AplicacaoScreen(
                         modifier = Modifier.size(20.dp).clickable { popUp = null }
                     )
                 }
+                    Column(
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        when (tipo) {
+                            Acao.Menu -> MenuDeLog(onEscolha = { popUp = it })
 
-                when (tipo) {
-                    Acao.Menu -> MenuDeLog(onEscolha = { popUp = it })
-
-                    Acao.Cao -> AdicionarCaoScreen(
-                        onGravado = {
-                            popUp = null
-                            versaoDosCaes++
-                        }
-                    )
-
-                    Acao.Passeio -> {
-                        val id = caoAtivo
-                        if (id == null) {
-                            Text("Choose a dog first")
-                        } else {
-                            PasseioScreen(
-                                caoId = id,
+                            Acao.Cao -> AdicionarCaoScreen(
                                 onGravado = {
                                     popUp = null
-                                    versaoDosRegistos++
+                                    versaoDosCaes++
                                 }
                             )
-                        }
-                    }
 
-                    Acao.Agua -> {
-                        val id = caoAtivo
-                        if (id == null) {
-                            Text("Choose a dog first")
-                        } else {
-                            AguaScreen(
-                                caoId = id,
-                                onGravado = {
+                            Acao.Passeio -> {
+                                val id = caoAtivo
+                                if (id == null) {
+                                    Text("Choose a dog first")
+                                } else {
+                                    PasseioScreen(
+                                        caoId = id,
+                                        onGravado = {
+                                            popUp = null
+                                            versaoDosRegistos++
+                                        }
+                                    )
+                                }
+                            }
+
+                            Acao.Agua -> {
+                                val id = caoAtivo
+                                if (id == null) {
+                                    Text("Choose a dog first")
+                                } else {
+                                    AguaScreen(
+                                        caoId = id,
+                                        onGravado = {
+                                            popUp = null
+                                            versaoDosRegistos++
+                                        }
+                                    )
+                                }
+                            }
+
+                            Acao.Comida -> {
+                                val id = caoAtivo
+                                if (id == null) {
+                                    Text("Choose a dog first")
+                                } else {
+                                    ComidaScreen(
+                                        caoId = id,
+                                        onGravado = {
+                                            popUp = null
+                                            versaoDosRegistos++
+                                        }
+                                    )
+                                }
+                            }
+
+                            Acao.Sintoma -> {
+                                val id = caoAtivo
+                                if (id == null) {
+                                    Text("Choose a dog first")
+                                } else {
+                                    SintomaScreen(
+                                        caoId = id,
+                                        onGravado = {
+                                            popUp = null
+                                            versaoDosRegistos++
+                                        }
+                                    )
+                                }
+                            }
+
+                            Acao.Medicamento -> {
+                                val id = caoAtivo
+                                if (id == null) Text("Choose a dog first")
+                                else {
+                                    AdministracaoMedsScreen(
+                                        caoId = id,
+                                        onDose = { versaoDosRegistos++ },
+                                        onGerir = {
+                                            popUp = null
+                                            separadores.irPara(Medicamentos)
+                                        }
+                                    )
+                                }
+                            }
+
+                            Acao.User -> UserScreen(
+                                onSair = {
                                     popUp = null
-                                    versaoDosRegistos++
+                                    onSair()
                                 }
                             )
                         }
                     }
 
-                    Acao.Comida -> {
-                        val id = caoAtivo
-                        if (id == null) {
-                            Text("Choose a dog first")
-                        } else {
-                            ComidaScreen(
-                                caoId = id,
-                                onGravado = {
-                                    popUp = null
-                                    versaoDosRegistos++
-                                }
-                            )
-                        }
-                    }
-
-                    Acao.Sintoma -> {
-                        val id = caoAtivo
-                        if (id == null) {
-                            Text("Choose a dog first")
-                        } else {
-                            SintomaScreen(
-                                caoId = id,
-                                onGravado = {
-                                    popUp = null
-                                    versaoDosRegistos++
-                                }
-                            )
-                        }
-                    }
-
-                    Acao.Medicamento -> {
-                        val id = caoAtivo
-                        if (id == null) Text("Choose a dog first")
-                        else {
-                            AdministracaoMedsScreen(
-                                caoId = id,
-                                onDose = {versaoDosRegistos++},
-                                onGerir = {
-                                    popUp = null
-                                    separadores.irPara(Medicamentos)
-                                }
-                            )
-                        }
-                    }
-
-                    Acao.User -> UserScreen(
-                        onSair = {
-                            popUp = null
-                            onSair()
-                        }
-                    )
-                }
             }
         }
     }
