@@ -131,7 +131,8 @@ fun AplicacaoScreen(
                     onAdicionarCao = { popUp = Acao.Cao },
                     onMedicamentos = { separadores.irPara(Medicamentos) },
                     onHistorico = { separadores.irPara(Historico) },
-                    onCaoAtivo = { caoAtivo = it }
+                    onCaoAtivo = { caoAtivo = it },
+                    onUser = { popUp = Acao.User }
                 )
             }
             composable<Historico> { HistoricoScreen() }
@@ -261,10 +262,6 @@ fun AplicacaoScreen(
                             onSair()
                         }
                     )
-
-
-
-                    else -> Text("Por fazer $tipo")
                 }
             }
         }

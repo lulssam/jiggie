@@ -1,6 +1,7 @@
 package com.luisamsampaio.jiggie.features.user
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.theme.danger
+import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primary
 import com.luisamsampaio.jiggie.ui.theme.primaryContainer
@@ -59,6 +62,7 @@ private fun UserScreenContent(
 
     Column {
         CabecalhoDaConta(state)
+        CartaoDaFamilia(state)
     }
 }
 
@@ -148,5 +152,38 @@ private fun CabecalhoDaConta(
                 .background(primaryContainer, RoundedCornerShape(20.dp))
                 .padding(horizontal = 8.dp, vertical = 4.dp)
         )
+    }
+}
+
+@Composable
+private fun CartaoDaFamilia(
+    state: UserUiState
+){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, outline, RoundedCornerShape(13.dp))
+            .padding(horizontal = 14.dp, vertical = 13.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                text = state.nomeFamilia,
+                style = MaterialTheme.typography.titleSmall,
+                color = textStrong
+            )
+
+            Text(
+                text = if (state.membros == 1) "1 member" else "${state.membros} members",
+                fontSize = 11.sp,
+                color = textTertiary
+            )
+        }
+
+        Spacer(Modifier.height(9.dp))
+        CodigoComCopiar(state.codigoFamilia, tamanhoCodigo = 15.sp)
     }
 }
