@@ -2,6 +2,7 @@ package com.luisamsampaio.jiggie.features.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.features.codigo.buscarCodigoConvite
 import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
@@ -53,7 +54,7 @@ class UserViewModel : ViewModel() {
                 coroutineScope {
                     val perfil = async {
                         supabase.from("dono")
-                            .select(Columns.raw("nome, papel, familia(nome, codigo_convite)")) {
+                            .select(Columns.raw("nome, papel, familia(nome)")) {
                                 filter { eq("id", user.id) }
                             }.decodeSingle<UserDto>()
                     }
@@ -74,6 +75,7 @@ class UserViewModel : ViewModel() {
                     val p = perfil.await()
                     val totalMembros = membros.await().size
                     val nomesDosCaes = caes.await().map { c -> c.nome }
+                    val codigo = if (p.familia != null) buscarCodigoConvite() else ""
 
                     _state.update {
                         it.copy(
@@ -81,7 +83,7 @@ class UserViewModel : ViewModel() {
                             email = user.email.orEmpty(),
                             papel = if (p.papel == "dono") "OWNER" else "MEMBER",
                             nomeFamilia = p.familia?.nome.orEmpty(),
-                            codigoFamilia = p.familia?.codigoConvite.orEmpty(),
+                            codigoFamilia = codigo,
                             membros = totalMembros,
                             caes = nomesDosCaes,
                         )
