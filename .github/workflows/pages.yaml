@@ -25,9 +25,13 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew :webApp:wasmJsBrowserDistribution
+      - run: |
+          mkdir -p site/app
+          cp -r landing/. site/
+          cp -r webApp/build/dist/wasmJs/productionExecutable/. site/app/
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: webApp/build/dist/wasmJs/productionExecutable
+          path: site
 
   deploy:
     needs: build
