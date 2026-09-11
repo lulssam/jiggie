@@ -2,6 +2,6 @@
   "name": "Jiggie",
   "short_name": "Jiggie",
   "start_url": "./",
-  "scope": "./",
+  "scope": "../",
   "display": "standalone"
 }
