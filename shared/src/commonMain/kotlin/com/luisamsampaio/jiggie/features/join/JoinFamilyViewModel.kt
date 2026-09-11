@@ -25,7 +25,11 @@ import kotlinx.serialization.json.put
  */
 class JoinFamilyViewModel : ViewModel() {
 
-    private val _state = MutableStateFlow(JoinFamilyUiState())
+    private val _state = MutableStateFlow(
+        JoinFamilyUiState(
+            temConta = supabase.auth.currentSessionOrNull() != null
+        )
+    )
 
     /**
      * O estado atual do ecrã, disponível para o Composable observar.
@@ -66,21 +70,34 @@ class JoinFamilyViewModel : ViewModel() {
             _state.update { it.copy(isLoading = true, error = null) }
 
             try {
-                supabase.auth.signUpWith(Email) {
-                    email = currentState.email.trim()
-                    password = currentState.password
-                    data = buildJsonObject { put("nome", currentState.yourName.trim()) }
+                /*
+                * Criar a conta e entrar na fam são dois pedidos. Se o código falhar, a conta
+                * ficou criada e na proxima tentativa, salta o registo para não dar o erro de
+                * email já em uso
+                *
+                */
+
+                if (!currentState.temConta) {
+                    supabase.auth.signUpWith(Email) {
+                        email = currentState.email.trim()
+                        password = currentState.password
+                        data = buildJsonObject { put("nome", currentState.yourName.trim()) }
+                    }
                 }
+
 
                 if (supabase.auth.currentSessionOrNull() == null) {
                     _state.update {
                         it.copy(
-                            isLoading = true,
+                            isLoading = false,
                             error = "Check your email to confirm your account, then log in."
                         )
                     }
                     return@launch
                 }
+
+                // a partir daqui a conta existe, falhe o codigo ou não
+                _state.update { it.copy(temConta = true) }
 
                 // invocar funçao sql
                 supabase.postgrest.rpc(

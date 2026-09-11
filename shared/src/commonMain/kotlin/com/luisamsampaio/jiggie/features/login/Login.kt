@@ -203,7 +203,7 @@ fun LoginScreenContent(
                     color = textTertiary,
                 )
                 Text(
-                    text = "Create a family",
+                    text = "Create or join a family",
                     style = typography.bodyMedium,
                     color = primaryLink,
                     modifier = Modifier.clickable(onClick = onCriarFamilia),

@@ -135,7 +135,8 @@ private fun JoinFamilyScreenContent(
                 Spacer(Modifier.height(8.dp))
 
                 Text(
-                    text = "Used to sign in on your other devices.",
+                    text = if (state.temConta) "Your account is ready — you only need a valid code."
+                    else "Used to sign in on your other devices.",
                     style = typography.bodySmall,
                     color = textTertiary
                 )
@@ -197,6 +198,7 @@ private fun JoinFamForms(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+
         // code
         Etiqueta("INVITE CODE")
         Spacer(Modifier.height(7.dp))
@@ -212,42 +214,45 @@ private fun JoinFamForms(
             )
         )
 
-        Spacer(Modifier.height(16.dp))
+        if (!state.temConta) {
+            Spacer(Modifier.height(16.dp))
 
-        // name
-        Etiqueta("YOUR NAME")
-        Spacer(Modifier.height(7.dp))
-        CampoTexto(
-            valor = state.yourName,
-            onValor = onYourNameChange,
-            placeholder = "e.g. Matilde",
-            tipoDeTeclado = KeyboardType.Text
-        )
+            // name
+            Etiqueta("YOUR NAME")
+            Spacer(Modifier.height(7.dp))
+            CampoTexto(
+                valor = state.yourName,
+                onValor = onYourNameChange,
+                placeholder = "e.g. Matilde",
+                tipoDeTeclado = KeyboardType.Text
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        // email
-        Etiqueta("EMAIL")
-        Spacer(Modifier.height(7.dp))
-        CampoTexto(
-            valor = state.email,
-            onValor = onEmailChange,
-            placeholder = "your@email.address",
-            tipoDeTeclado = KeyboardType.Email
-        )
+            // email
+            Etiqueta("EMAIL")
+            Spacer(Modifier.height(7.dp))
+            CampoTexto(
+                valor = state.email,
+                onValor = onEmailChange,
+                placeholder = "your@email.address",
+                tipoDeTeclado = KeyboardType.Email
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        // password
-        Etiqueta("PASSWORD")
-        Spacer(Modifier.height(7.dp))
-        CampoTexto(
-            valor = state.password,
-            onValor = onPasswordChange,
-            placeholder = "At least $MINIMO_PASSWORD characters",
-            tipoDeTeclado = KeyboardType.Password,
-            esconderTexto = true
-        )
+            // password
+            Etiqueta("PASSWORD")
+            Spacer(Modifier.height(7.dp))
+            CampoTexto(
+                valor = state.password,
+                onValor = onPasswordChange,
+                placeholder = "At least $MINIMO_PASSWORD characters",
+                tipoDeTeclado = KeyboardType.Password,
+                esconderTexto = true
+            )
+        }
+
     }
 
 }
