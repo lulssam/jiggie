@@ -2,6 +2,7 @@ package com.luisamsampaio.jiggie.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.features.codigo.buscarCodigoConvite
 import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
@@ -62,22 +63,24 @@ class HomeViewModel : ViewModel() {
 
                 val perfil = supabase.from("dono")
                     .select(
-                        Columns.raw("nome, familia(nome, codigo_convite)")
+                        Columns.raw("nome, familia(nome)")
                     ) {
                         filter { eq("id", uid) }
                     }
                     .decodeSingle<PerfilDto>()
 
+
                 val caes = supabase.from("cao")
                     .select(Columns.list("id", "nome", "cor", "raca", "nascimento"))
                     .decodeList<CaoDto>()
 
+                val codigo = if (perfil.familia != null) buscarCodigoConvite() else ""
                 _state.update {
                     it.copy(
                         isLoading = false,
                         primeiroNome = perfil.nome.trim().substringBefore(' '),
                         nomeFamilia = perfil.familia?.nome.orEmpty(),
-                        codigoFamilia = perfil.familia?.codigoConvite.orEmpty(),
+                        codigoFamilia = codigo,
                         caes = caes,
                         idCaoAtivo = it.idCaoAtivo ?: caes.firstOrNull()?.id
                     )

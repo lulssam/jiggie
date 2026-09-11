@@ -1,6 +1,4 @@
 package com.luisamsampaio.jiggie.features.home
-
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -18,7 +16,6 @@ data class PerfilDto(
 @Serializable
 data class FamiliaDto(
     val nome: String,
-    @SerialName("codigo_convite") val codigoConvite: String
 )
 
 @Serializable
