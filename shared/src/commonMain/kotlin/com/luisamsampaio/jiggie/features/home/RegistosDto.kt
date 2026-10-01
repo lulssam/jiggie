@@ -1,6 +1,5 @@
 package com.luisamsampaio.jiggie.features.home
 
-import io.ktor.util.collections.StringMap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -38,17 +37,10 @@ data class SintomaDto(
     val gravidade: Int,
 )
 
-/** O `hora` é a coluna `time[]` — os horários previstos para cada dia. */
-@Serializable
-data class MedicamentoDto(
-    val id: String,
-    val nome: String,
-    val dose: String,
-    val hora: List<String>,
-)
+
 
 /**
- * Uma dose já dada. O [horaPrevista] diz a que horário do [MedicamentoDto.hora]
+ * Uma dose já dada. O [horaPrevista] diz a que horário do medicamento
  * corresponde — é o que permite saber o que falta dar.
  */
 @Serializable

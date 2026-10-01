@@ -1,8 +1,11 @@
 package com.luisamsampaio.jiggie.ui.theme
 
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.ibm_plex_mono_bold
 import jiggie.shared.generated.resources.ibm_plex_mono_regular
@@ -11,9 +14,6 @@ import jiggie.shared.generated.resources.ibm_plex_sans_bold
 import jiggie.shared.generated.resources.ibm_plex_sans_regular
 import jiggie.shared.generated.resources.ibm_plex_sans_semi_bold
 import org.jetbrains.compose.resources.Font
-import androidx.compose.material3.Typography
-import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.sp
 
 /**
  * A letra normal do Jiggie, usada em quase todo o texto da aplicação.

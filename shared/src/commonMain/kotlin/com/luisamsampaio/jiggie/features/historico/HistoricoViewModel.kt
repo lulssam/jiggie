@@ -2,14 +2,12 @@ package com.luisamsampaio.jiggie.features.historico
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.luisamsampaio.jiggie.features.home.Registo
 import com.luisamsampaio.jiggie.features.home.TipoDeRegisto
 import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.realtime.Column
 import io.ktor.utils.io.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

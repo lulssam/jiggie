@@ -1,9 +1,5 @@
-package com.luisamsampaio.jiggie.historico
+package com.luisamsampaio.jiggie.features.historico
 
-import com.luisamsampaio.jiggie.features.historico.DadosDoRegisto
-import com.luisamsampaio.jiggie.features.historico.RegistoDto
-import com.luisamsampaio.jiggie.features.historico.agruparPorDia
-import com.luisamsampaio.jiggie.features.historico.paraRegisto
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test

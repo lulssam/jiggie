@@ -5,11 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.exception.AuthErrorCode
-import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

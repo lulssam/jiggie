@@ -2,20 +2,38 @@ package com.luisamsampaio.jiggie.features.meds
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.luisamsampaio.jiggie.features.meds.domain.AdicionarMedicamento
+import com.luisamsampaio.jiggie.features.meds.domain.AlternarToma
+import com.luisamsampaio.jiggie.features.meds.domain.ArquivarMedicamento
+import com.luisamsampaio.jiggie.features.meds.domain.ObterMedicacaoDeHoje
+import com.luisamsampaio.jiggie.features.meds.domain.TomaDeHoje
+import com.luisamsampaio.jiggie.features.meds.ui.paraUi
+import com.luisamsampaio.jiggie.mensagemDeErro
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalTime
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
- * Gere o estado e a lógica do ecrã Meds.
+ * Gere o estado do ecrã Meds.
  *
- * Vai buscar os dados necessários ao backend e guarda-os no estado
- * para o ecrã mostrar. O ecrã nunca fala diretamente com o backend —
- * passa sempre por aqui.
+ * Só conhece casos de uso — nem Supabase, nem DTOs, nem o repositório. É
+ * isso que deixa testá-lo com um repositório falso, sem rede.
  */
-class MedsViewModel : ViewModel() {
+class MedsViewModel(
+    private val obterMedicacaoDeHoje: ObterMedicacaoDeHoje,
+    private val adicionarMedicamento: AdicionarMedicamento,
+    private val arquivarMedicamento: ArquivarMedicamento,
+    private val alternarToma: AlternarToma
+) : ViewModel() {
 
     private val _state = MutableStateFlow(MedsUiState(isLoading = true))
 
@@ -25,31 +43,136 @@ class MedsViewModel : ViewModel() {
      */
     val state: StateFlow<MedsUiState> = _state.asStateFlow()
 
-    init {
+    private val _registosMudaram = Channel<Unit>(Channel.CONFLATED)
+
+    /**
+     * Avisa que algo gravado aqui muda o que outros ecrãs mostram.
+     *
+     * É um evento e não estado: chega uma vez só, e só depois de a base ter
+     * aceitado — senão a Home recarregava antes de a escrita acabar.
+     */
+    val registosMudaram: Flow<Unit> = _registosMudaram.receiveAsFlow()
+
+    private var caoId: String? = null
+    private var versaoCarregada = -1
+    private var pedido: Job? = null
+
+    /** Só recarrega se o cão ou os registos mudaram. */
+    fun sincronizar(caoId: String?, versaoDosRegistos: Int) {
+        if (caoId == this.caoId && versaoDosRegistos == versaoCarregada) return
+
+        if (caoId != this.caoId) {
+            // outro cao: os cartões do anterior não podem ficar no ecrã à espera.
+            _state.update { it.copy(medicamentos = emptyList(), isLoading = caoId != null) }
+        }
+        this.caoId = caoId
+        versaoCarregada = versaoDosRegistos
         carregar()
     }
 
-    /**
-     * Vai buscar os dados ao backend e atualiza o estado do ecrã.
-     *
-     * Mostra um indicador de carregamento enquanto espera,
-     * e um erro se algo correr mal.
-     */
+    /**Vai buscar os medicamentos de hoje. A lista antiga fica no ecrã até chegar a nova*/
     fun carregar() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-
-            // Carregar dados aqui
-
+        pedido?.cancel()
+        val id = caoId ?: run {
             _state.update { it.copy(isLoading = false) }
+            return
+        }
+        pedido = viewModelScope.launch {
+            try {
+                val medicacao = obterMedicacaoDeHoje(id)
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        medicamentos = medicacao.paraUi(),
+                        error = null
+                    )
+                }
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("MedsViewModel.carregar falhou: $erro")
+                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
+            }
         }
     }
 
-    /**
-     * Transforma um erro do backend numa frase legível para o utilizador.
-     *
-     * @param erro O erro devolvido pelo backend.
-     * @return Uma mensagem em português para mostrar no ecrã.
-     */
-    private fun mensagem(erro: Any): String = "Erro desconhecido"
+    fun onNome(nome: String) = mudarFormulario { it.copy(nome = nome) }
+    fun onDose(dose: String) = mudarFormulario { it.copy(dose = dose) }
+    fun onOpcao(opcao: OpcaoDeFrequencia) = mudarFormulario { it.copy(opcao = opcao) }
+    fun onVezesPorDia(vezes: Int) = mudarFormulario { it.copy(vezesPorDia = vezes) }
+    fun onDia(dia: DayOfWeek) = mudarFormulario {
+        it.copy(dias = if (dia in it.dias) it.dias - dia else it.dias + dia)
+    }
+
+    fun adicionar() {
+        val id = caoId ?: return
+        val formulario = _state.value.formulario
+        if (!formulario.podeAdicionar) return
+
+        mudarFormulario { it.copy(aGuardar = true) }
+        viewModelScope.launch {
+            try {
+                adicionarMedicamento(
+                    caoId = id,
+                    nome = formulario.nome,
+                    dose = formulario.dose,
+                    frequencia = formulario.frequencia(),
+                    vezesPorDia = formulario.vezesPorDia
+
+                )
+                _state.update { it.copy(formulario = FormularioUi()) }
+                _registosMudaram.trySend(Unit)
+                carregar()
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("MedsViewModel.adicionar falhou: $erro")
+                _state.update {
+                    it.copy(
+                        formulario = it.formulario.copy(aGuardar = false),
+                        error = mensagemDeErro(erro)
+                    )
+                }
+            }
+        }
+    }
+
+    fun arquivar(medicamentoId: String) = executar { arquivarMedicamento(medicamentoId) }
+
+    fun alternar(medicamentoId: String, toma: TomaUi) {
+        // muda já no ecrã: esperar pela rede para mostrar um certo parece lento.
+        // se a base recusar, desfaz-se.
+        inverter(medicamentoId, toma.hora)
+        executar(desfazer = { inverter(medicamentoId, toma.hora) }) {
+            alternarToma(medicamentoId, TomaDeHoje(toma.hora, toma.dada))
+        }
+    }
+
+    private fun executar(desfazer: () -> Unit = {}, acao: suspend () -> Unit) {
+        viewModelScope.launch {
+            try {
+                acao()
+                _registosMudaram.trySend(Unit)
+                carregar()
+            } catch (cancelamento: CancellationException) {
+                throw cancelamento
+            } catch (erro: Exception) {
+                println("MedsViewModel: acao falhou: $erro")
+                desfazer()
+                _state.update { it.copy(error = mensagemDeErro(erro)) }
+            }
+        }
+    }
+
+    private fun inverter(medicamentoId: String, hora: LocalTime) = _state.update { estado ->
+        estado.copy(medicamentos = estado.medicamentos.map { m ->
+            if (m.id != medicamentoId) m
+            else m.copy(tomas = m.tomas.map { t -> if (t.hora == hora) t.copy(dada = !t.dada) else t })
+        })
+    }
+
+
+    private fun mudarFormulario(mudanca: (FormularioUi) -> FormularioUi) =
+        _state.update { it.copy(formulario = mudanca(it.formulario)) }
+
 }

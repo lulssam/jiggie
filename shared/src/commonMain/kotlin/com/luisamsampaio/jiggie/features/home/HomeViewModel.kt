@@ -3,6 +3,7 @@ package com.luisamsampaio.jiggie.features.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.luisamsampaio.jiggie.features.codigo.buscarCodigoConvite
+import com.luisamsampaio.jiggie.features.meds.domain.ObterMedicacaoDeHoje
 import com.luisamsampaio.jiggie.mensagemDeErro
 import com.luisamsampaio.jiggie.supabase
 import io.github.jan.supabase.auth.auth
@@ -29,7 +30,9 @@ import kotlin.time.Clock
  * para o ecrã mostrar. O ecrã nunca fala diretamente com o backend —
  * passa sempre por aqui.
  */
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val obterMedicacao: ObterMedicacaoDeHoje
+) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState(isLoading = true))
 
@@ -184,11 +187,8 @@ class HomeViewModel : ViewModel() {
                             }.decodeList<SintomaDto>()
                     }
 
-                    val medicamentos = async {
-                        supabase.from("medicamento")
-                            .select(Columns.list("id", "nome", "dose", "hora")) {
-                                filter { eq("cao_id", caoId) }
-                            }.decodeList<MedicamentoDto>()
+                    val medicacao = async {
+                        obterMedicacao(caoId)
                     }
 
                     val administracoes = async {
@@ -207,7 +207,7 @@ class HomeViewModel : ViewModel() {
 
                     val dia = resumirDia(
                         passeios.await(), refeicoes.await(), aguas.await(),
-                        medicamentos.await(), sintomas.await(), administracoes.await()
+                        medicacao.await(), sintomas.await(), administracoes.await()
                     )
 
                     _state.update {
