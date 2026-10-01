@@ -198,7 +198,7 @@ fun HomeScreen(
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
-    onCaoAtivo: (String) -> Unit = {},
+    onCaoAtivo: (CaoDto) -> Unit = {},
     onUser: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
@@ -211,8 +211,8 @@ fun HomeScreen(
         if (versaoDosRegistos > 0) viewModel.recarregarDia()
     }
 
-    LaunchedEffect(state.idCaoAtivo) {
-        state.idCaoAtivo?.let(onCaoAtivo)
+    LaunchedEffect(state.caoAtivo) {
+        state.caoAtivo?.let(onCaoAtivo)
     }
 
     HomeScreenContent(
@@ -566,7 +566,7 @@ private fun ChipsCaes(
 
 /** Os títulos em maiúsculas e monoespaçado que separam as secções da Home. */
 @Composable
-private fun TituloDeSeccao(texto: String) {
+internal fun TituloDeSeccao(texto: String) {
     Text(
         text = texto,
         fontFamily = plexMono(),
@@ -608,7 +608,7 @@ private fun RecentActivity(
 }
 
 @Composable
-private fun LinhaDeRegisto(
+internal fun LinhaDeRegisto(
     registo: Registo
 ) {
     Column {
@@ -644,6 +644,14 @@ private fun LinhaDeRegisto(
                     fontSize = 11.sp,
                     color = textTertiary
                 )
+
+                if (registo.pastilhas.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        registo.pastilhas.forEach { PastilhaDeEstado(it) }
+                    }
+                }
             }
         }
 
@@ -750,11 +758,11 @@ private fun PastilhaDeEstado(pastilha: Pastilha) {
         text = pastilha.texto,
         fontFamily = plexMono(),
         fontSize = 10.sp,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         color = cor,
         modifier = Modifier
             .background(fundo, RoundedCornerShape(20.dp))
-            .padding(horizontal = 7.dp, vertical = 3.dp)
+            .padding(horizontal = 7.dp)
     )
 }
 
@@ -770,7 +778,7 @@ private fun ValorMono(texto: String) {
     )
 }
 
-private fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
+internal fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
     TipoDeRegisto.Passeio -> walk
     TipoDeRegisto.Comida -> food
     TipoDeRegisto.Agua -> water

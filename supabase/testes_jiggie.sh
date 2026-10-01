@@ -175,6 +175,16 @@ N=$(get "$TOKEN_MAE" "passeio?select=id" | python3 -c 'import sys,json;print(len
   && ok "membro da família vê o passeio da Lu" \
   || bad "membro da família devia ver 1 passeio, vê $N"
 
+N=$(get "$TOKEN_EXT" "registo?select=id" | python3 -c 'import sys,json;print(len(json.load(sys.stdin)))' 2>/dev/null || echo "?")
+[[ "$N" == "0" ]] \
+  && ok "estranho não vê nada no histórico ($N registos)" \
+  || bad "FALHA GRAVE: a view registo ignora a RLS — estranho vê $N registos"
+
+N=$(get "$TOKEN_MAE" "registo?select=id" | python3 -c 'import sys,json;print(len(json.load(sys.stdin)))' 2>/dev/null || echo "?")
+[[ "$N" == "1" ]] \
+  && ok "membro da família vê o passeio da Lu no histórico" \
+  || bad "membro da família devia ver 1 registo no histórico, vê $N"
+
 
 # ---------------------------------------------------------------------------
 head_ "6. Privilégios de coluna"

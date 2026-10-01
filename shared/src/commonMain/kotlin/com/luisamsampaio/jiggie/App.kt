@@ -18,6 +18,7 @@ import com.luisamsampaio.jiggie.features.aplicacao.AplicacaoScreen
 import com.luisamsampaio.jiggie.features.aplicacao.AplicacaoViewModel
 import com.luisamsampaio.jiggie.features.codigo.CodigoFamiliaScreen
 import com.luisamsampaio.jiggie.features.create.CreateFamScreen
+import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.login.LoginScreen
 import com.luisamsampaio.jiggie.features.welcome.WelcomeScreen

@@ -144,16 +144,7 @@ create index on administracao_medicamento (medicamento_id);
 --
 -- Ao acrescentar um raise novo, dá-lhe código. Sem "using errcode" volta a
 -- ser P0001 e o cliente fica outra vez a comparar texto.
---
--- search_path = '' em todas: estas funções são security definer, ou seja
--- correm com os privilégios do dono e não de quem as chama. Com a lista de
--- procura vazia, um nome não qualificado não resolve para lado nenhum — não
--- há como enganar a função com uma tabela plantada noutro esquema. O preço é
--- qualificar tudo à mão: public.<tabela> e extensions.<função>. O pg_catalog
--- é a excepção, porque o Postgres procura-o sempre (daí o upper, substr,
--- encode, now, count e make_interval ficarem como estão).
 -- =============================================================================
-
 -- -----------------------------------------------------------------------------
 -- Família do utilizador actual.
 --
@@ -161,53 +152,43 @@ create index on administracao_medicamento (medicamento_id);
 --                   que chama esta função — recursão infinita.
 -- stable:           o default é volatile, que a faria correr uma vez por linha.
 -- -----------------------------------------------------------------------------
-create or replace function current_familia_id()
-returns uuid
-language sql
-security definer
-stable
-set search_path = ''
-as $$
-  select familia_id from public.dono where id = auth.uid();
+create or replace function current_familia_id () returns uuid language sql security definer stable
+set
+  search_path = public as $$
+  select familia_id from dono where id = auth.uid();
 $$;
 
-
--- A família vem sempre da sessão, nunca do cliente. Fica aqui e não na
--- "create table" da secção 2 porque a função só existe a partir desta linha.
-alter table cao alter column familia_id set default current_familia_id();
-
+-- Só aqui, e não na "create table" da secção 2: a função ainda não existia
+-- nessa altura. A família vem sempre da sessão, nunca do cliente.
+alter table cao
+alter column familia_id
+set default current_familia_id ();
 
 -- -----------------------------------------------------------------------------
 -- Cria a linha em "dono" quando nasce um utilizador no auth.
 -- O nome vem do metadata do signup.
 -- -----------------------------------------------------------------------------
-create or replace function handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function handle_new_user () returns trigger language plpgsql security definer
+set
+  search_path = public as $$
 begin
-  insert into public.dono (id, nome)
+  insert into dono (id, nome)
   values (new.id, coalesce(new.raw_user_meta_data->>'nome', 'Sem nome'));
   return new;
 end;
 $$;
 
 create trigger on_auth_user_created
-after insert on auth.users
-for each row execute function handle_new_user();
-
+after insert on auth.users for each row
+execute function handle_new_user ();
 
 -- -----------------------------------------------------------------------------
 -- Criar família
 -- -----------------------------------------------------------------------------
-create or replace function create_familia(p_nome text)
-returns table (familia_id uuid, codigo_convite text)
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function create_familia (p_nome text) returns table (familia_id uuid, codigo_convite text) language plpgsql security definer
+set
+  search_path = public,
+  extensions as $$
 declare
   v_familia_id uuid;
   v_codigo text;
@@ -216,22 +197,20 @@ begin
     raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
-  if exists (select 1 from public.dono d where d.id = auth.uid() and d.familia_id is not null) then
+  if exists (select 1 from dono d where d.id = auth.uid() and d.familia_id is not null) then
     raise exception 'Já pertences a uma família' using errcode = 'JG002';
   end if;
 
-  v_codigo := upper(substr(encode(extensions.gen_random_bytes(6), 'hex'), 1, 6));
+  v_codigo := upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 6));
 
-  insert into public.familia (nome, codigo_convite, codigo_expira_em)
+  insert into familia (nome, codigo_convite, codigo_expira_em)
   values (p_nome, v_codigo, now() + interval '24 hours')
   returning id into v_familia_id;
 
-  -- Quem cria a família é o dono dela. Sem esta linha ficava 'membro', que é
-  -- o valor por omissão da coluna, e o ecrã do código mostrava-a como membro.
-  update public.dono d
-  set familia_id = v_familia_id,
-      papel = 'dono'
-  where d.id = auth.uid();
+  update dono d
+set familia_id = v_familia_id,
+    papel = 'dono'
+where d.id = auth.uid();
 
   if not found then
     raise exception 'Perfil de utilizador não encontrado — cria o teu perfil antes de criares uma família'
@@ -242,16 +221,12 @@ begin
 end;
 $$;
 
-
 -- -----------------------------------------------------------------------------
 -- Entrar numa família
 -- -----------------------------------------------------------------------------
-create or replace function join_familia(codigo text)
-returns uuid
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function join_familia (codigo text) returns uuid language plpgsql security definer
+set
+  search_path = public as $$
 declare
   v_familia_id uuid;
   v_expira_em timestamptz;
@@ -260,12 +235,12 @@ begin
     raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
-  if exists (select 1 from public.dono where id = auth.uid() and familia_id is not null) then
+  if exists (select 1 from dono where id = auth.uid() and familia_id is not null) then
     raise exception 'Já pertences a uma família' using errcode = 'JG002';
   end if;
 
   select id, codigo_expira_em into v_familia_id, v_expira_em
-  from public.familia
+  from familia
   where codigo_convite = codigo;
 
   if v_familia_id is null then
@@ -276,7 +251,7 @@ begin
     raise exception 'Código de convite expirado' using errcode = 'JG005';
   end if;
 
-  update public.dono set familia_id = v_familia_id where id = auth.uid();
+  update dono set familia_id = v_familia_id where id = auth.uid();
 
   -- O "if not found" tem de vir imediatamente a seguir ao update da "dono":
   -- qualquer statement pelo meio reescreve o FOUND e o guarda deixa de valer.
@@ -286,24 +261,20 @@ begin
   end if;
 
   -- Alguém voltou a entrar: a família já não está órfã.
-  update public.familia set orfa_desde = null where id = v_familia_id;
+  update familia set orfa_desde = null where id = v_familia_id;
 
   return v_familia_id;
 end;
 $$;
-
 
 -- -----------------------------------------------------------------------------
 -- Sair da família.
 -- Se sair o último membro, marca como órfã em vez de apagar — apagar levaria
 -- os cães e todo o histórico à frente, por cascade.
 -- -----------------------------------------------------------------------------
-create or replace function leave_familia()
-returns void
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function leave_familia () returns void language plpgsql security definer
+set
+  search_path = public as $$
 declare
   v_familia_id uuid;
   v_restantes int;
@@ -312,34 +283,29 @@ begin
     raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
-  select familia_id into v_familia_id from public.dono where id = auth.uid();
+  select familia_id into v_familia_id from dono where id = auth.uid();
 
   if v_familia_id is null then
     raise exception 'Não pertences a nenhuma família' using errcode = 'JG006';
   end if;
 
-  -- O papel volta ao valor por omissão: quem era dono aqui não é dono
-  -- da próxima família em que entrar.
-  update public.dono set familia_id = null, papel = 'membro' where id = auth.uid();
+  update dono set familia_id = null where id = auth.uid();
 
-  select count(*) into v_restantes from public.dono where familia_id = v_familia_id;
+  select count(*) into v_restantes from dono where familia_id = v_familia_id;
 
   if v_restantes = 0 then
-    update public.familia set orfa_desde = now() where id = v_familia_id;
+    update familia set orfa_desde = now() where id = v_familia_id;
   end if;
 end;
 $$;
 
-
 -- -----------------------------------------------------------------------------
 -- Código de convite actual. Renova-o se tiver expirado.
 -- -----------------------------------------------------------------------------
-create or replace function get_codigo_convite()
-returns table (codigo_convite text, codigo_expira_em timestamptz)
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function get_codigo_convite () returns table (codigo_convite text, codigo_expira_em timestamptz) language plpgsql security definer
+set
+  search_path = public,
+  extensions as $$
 declare
   v_familia_id uuid;
   v_codigo text;
@@ -349,20 +315,20 @@ begin
     raise exception 'Utilizador não autenticado' using errcode = 'JG001';
   end if;
 
-  select familia_id into v_familia_id from public.dono where id = auth.uid();
+  select familia_id into v_familia_id from dono where id = auth.uid();
 
   if v_familia_id is null then
     raise exception 'Não pertences a nenhuma família' using errcode = 'JG006';
   end if;
 
   select f.codigo_convite, f.codigo_expira_em into v_codigo, v_expira
-  from public.familia f where f.id = v_familia_id;
+  from familia f where f.id = v_familia_id;
 
   if v_expira < now() then
-    v_codigo := upper(substr(encode(extensions.gen_random_bytes(6), 'hex'), 1, 6));
+    v_codigo := upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 6));
     v_expira := now() + interval '24 hours';
 
-    update public.familia set codigo_convite = v_codigo, codigo_expira_em = v_expira
+    update familia set codigo_convite = v_codigo, codigo_expira_em = v_expira
     where id = v_familia_id;
   end if;
 
@@ -370,20 +336,16 @@ begin
 end;
 $$;
 
-
 -- -----------------------------------------------------------------------------
 -- Limpeza de famílias órfãs. Corre por cron ou à mão — nunca pelo cliente.
 -- -----------------------------------------------------------------------------
-create or replace function limpar_familias_orfas(p_dias int default 30)
-returns int
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function limpar_familias_orfas (p_dias int default 30) returns int language plpgsql security definer
+set
+  search_path = public as $$
 declare
   v_apagadas int;
 begin
-  delete from public.familia
+  delete from familia
   where orfa_desde is not null
     and orfa_desde < now() - make_interval(days => p_dias);
 
@@ -392,7 +354,6 @@ begin
 end;
 $$;
 
-
 -- -----------------------------------------------------------------------------
 -- Preenchimento do familia_id nas tabelas de evento.
 --
@@ -400,12 +361,9 @@ $$;
 -- O trigger é a única fonte do valor, o que garante que a RLS de leitura,
 -- que confia nele, nunca mente.
 -- -----------------------------------------------------------------------------
-create or replace function set_familia_por_cao()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function set_familia_por_cao () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
 begin
   select c.familia_id into new.familia_id
   from public.cao c where c.id = new.cao_id;
@@ -413,23 +371,30 @@ begin
 end;
 $$;
 
-create trigger trg_familia before insert or update on passeio
-  for each row execute function set_familia_por_cao();
-create trigger trg_familia before insert or update on comida
-  for each row execute function set_familia_por_cao();
-create trigger trg_familia before insert or update on agua
-  for each row execute function set_familia_por_cao();
-create trigger trg_familia before insert or update on sintoma
-  for each row execute function set_familia_por_cao();
+create trigger trg_familia before insert
+or
+update on passeio for each row
+execute function set_familia_por_cao ();
 
+create trigger trg_familia before insert
+or
+update on comida for each row
+execute function set_familia_por_cao ();
+
+create trigger trg_familia before insert
+or
+update on agua for each row
+execute function set_familia_por_cao ();
+
+create trigger trg_familia before insert
+or
+update on sintoma for each row
+execute function set_familia_por_cao ();
 
 -- A administracao_medicamento não tem cao_id: chega à família pelo medicamento.
-create or replace function set_familia_por_medicamento()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function set_familia_por_medicamento () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
 begin
   select c.familia_id into new.familia_id
   from public.medicamento m
@@ -439,20 +404,18 @@ begin
 end;
 $$;
 
-create trigger trg_familia before insert or update on administracao_medicamento
-  for each row execute function set_familia_por_medicamento();
-
+create trigger trg_familia before insert
+or
+update on administracao_medicamento for each row
+execute function set_familia_por_medicamento ();
 
 -- -----------------------------------------------------------------------------
 -- Se um cão mudar de família, o familia_id dos eventos tem de o seguir.
 -- Sem isto a RLS passa a mentir nos dois sentidos, em silêncio.
 -- -----------------------------------------------------------------------------
-create or replace function propagar_familia()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
+create or replace function propagar_familia () returns trigger language plpgsql security definer
+set
+  search_path = '' as $$
 begin
   if new.familia_id is distinct from old.familia_id then
     update public.passeio set familia_id = new.familia_id where cao_id = new.id;
@@ -467,8 +430,10 @@ begin
 end;
 $$;
 
-create trigger trg_propagar after update on cao
-  for each row execute function propagar_familia();
+create trigger trg_propagar
+after
+update on cao for each row
+execute function propagar_familia ();
 
 -- =============================================================================
 -- 5. PRIVILÉGIOS DE EXECUÇÃO
@@ -1118,7 +1083,59 @@ create policy "delete_administracao" on administracao_medicamento for delete usi
 );
 
 -- =============================================================================
--- 9. REALTIME
+-- 9. HISTÓRICO
+--
+-- A view junta os cinco tipos de registo numa lista só: o ecrã lê uma página
+-- com um pedido, já ordenada e filtrada pelo servidor.
+--
+-- security_invoker: por omissão uma view corre com os privilégios de quem a
+-- criou (o postgres), que ignora a RLS. Sem esta opção, qualquer utilizador
+-- autenticado lia o histórico de todas as famílias. Com ela, a query passa
+-- pelas policies de cada tabela, como se fosse directa.
+--
+-- O que muda de tipo para tipo vai no "dados" (jsonb), para as cinco partes
+-- do union terem as mesmas colunas.
+-- =============================================================================
+create or replace view registo
+with (security_invoker = true)
+as
+select id, 'passeio' as tipo, dh_passeio as quando, cao_id,
+       jsonb_build_object('duracao', duracao, 'xixi', xixi, 'coco', coco) as dados
+from passeio
+
+union all
+
+select id, 'comida', dh_comida, cao_id,
+       jsonb_build_object('quantidade', quantidade, 'base', base, 'extras', extras)
+from comida
+
+union all
+
+select id, 'agua', dh_agua, cao_id,
+       jsonb_build_object('quantidade', quantidade)
+from agua
+
+union all
+
+select id, 'sintoma', dh_sintoma, cao_id,
+       jsonb_build_object('sintoma', tipo, 'descricao', descricao, 'gravidade', gravidade)
+from sintoma
+
+union all
+
+-- A administração não tem cao_id: chega ao cão pelo medicamento.
+select a.id, 'medicamento', a.dh_medicamento, m.cao_id,
+       jsonb_build_object('nome', m.nome, 'dose', m.dose)
+from administracao_medicamento a
+join medicamento m on m.id = a.medicamento_id;
+
+-- Só leitura, e só com sessão. O Supabase dá tudo a anon e authenticated em
+-- cada objecto novo do public; aqui fica só o que é preciso.
+revoke all on registo from anon, authenticated;
+grant select on registo to authenticated;
+
+-- =============================================================================
+-- 10. REALTIME
 --
 -- Vai no fim porque precisa das tabelas já criadas.
 --
