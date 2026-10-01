@@ -46,7 +46,7 @@ class MedsViewModel(
     private var pedido: Job? = null
 
     /** Só recarrega se o cão ou os registos mudaram. */
-    fun sincronizar(caoId: String, versaoDosRegistos: Int) {
+    fun sincronizar(caoId: String?, versaoDosRegistos: Int) {
         if (caoId == this.caoId && versaoDosRegistos == versaoCarregada) return
 
         if (caoId != this.caoId) {

@@ -145,7 +145,7 @@ fun AplicacaoScreen(
             composable<Historico> {
                 HistoricoScreen(cao = caoAtivo, versaoDosRegistos = versaoDosRegistos)
             }
-            composable<Medicamentos> { MedsScreen() }
+            composable<Medicamentos> { MedsScreen(cao = caoAtivo, versaoDosRegistos = versaoDosRegistos) }
             composable<Relatorio> { RelatorioScreen() }
         }
     }
