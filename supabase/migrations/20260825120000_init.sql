@@ -40,8 +40,20 @@ create table medicamento (
   id uuid primary key default gen_random_uuid (),
   nome text not null,
   dose text not null,
-  hora time[] not null,
-  cao_id uuid not null references cao (id) on delete cascade
+  hora time[] not null constraint medicamento_tem_horas check (cardinality(hora) > 0),
+  -- 'dias_da_semana' usa a coluna dias (ISO: 1 = segunda … 7 = domingo).
+  frequencia text not null default 'diaria'
+    constraint medicamento_frequencia_valida
+    check (frequencia in ('diaria', 'dia_sim_dia_nao', 'dias_da_semana')),
+  -- O cliente manda sempre o dia local; o default é só rede de segurança.
+  inicio date not null default current_date,
+  dias smallint[] not null default '{}'
+    constraint medicamento_dias_validos check (dias <@ '{1,2,3,4,5,6,7}'),
+  -- Remover um medicamento é arquivá-lo: as tomas dadas ficam no histórico.
+  arquivado_em timestamptz,
+  cao_id uuid not null references cao (id) on delete cascade,
+  constraint medicamento_dias_quando_preciso
+    check (frequencia <> 'dias_da_semana' or cardinality(dias) > 0)
 );
 
 create table administracao_medicamento (
@@ -577,6 +589,10 @@ from
 grant
 update (dh_medicamento, quantidade, medicamento_id) on administracao_medicamento to authenticated;
 
+-- Medicamentos não se apagam, arquivam-se: o delete levava as tomas dadas
+-- atrás, por cascade, e com elas o histórico e o relatório do veterinário.
+revoke delete on medicamento from anon, authenticated;
+
 -- =============================================================================
 -- 8. POLICIES
 --
@@ -758,20 +774,6 @@ with
         )
     )
   );
-
-create policy "delete_medicamento" on medicamento for delete using (
-  cao_id in (
-    select
-      id
-    from
-      cao
-    where
-      familia_id = (
-        select
-          current_familia_id ()
-      )
-  )
-);
 
 -- tabelas de evento -----------------------------------------------------------
 -- Leitura por familia_id: sem join, e filtrável do lado do servidor pelo Realtime.
