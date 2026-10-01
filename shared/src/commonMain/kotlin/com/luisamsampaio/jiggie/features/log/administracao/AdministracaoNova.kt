@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class AdministracaoNova(
     @SerialName("medicamento_id") val medicamentoId: String,
     @SerialName("dono_id") val donoId: String,
-    val quantidade: Int = 1,
+    val quantidade: Int,
     @SerialName("hora_prevista") val horaPrevista: String,
 )

@@ -199,6 +199,19 @@ CODE=$(echo "$R" | jget code)
   && ok "tentativa de mudar familia_id à mão bloqueada ($CODE)" \
   || bad "FALHA GRAVE: consegui mudar o familia_id directamente — o grant de coluna não pegou"
 
+# ---------------------------------------------------------------------------
+head_ "7. Medicamentos: arquivar em vez de apagar"
+# ---------------------------------------------------------------------------
+MED_ID=$(post "$TOKEN_LU" medicamento \
+  "{\"nome\":\"Carprofen\",\"dose\":\"75mg\",\"hora\":[\"08:00\"],\"frequencia\":\"diaria\",\"inicio\":\"2026-10-01\",\"dias\":[],\"cao_id\":\"$CAO_ID\"}" | jget 0 id)
+[[ -n "$MED_ID" ]] && ok "medicamento criado" || bad "não criou o medicamento"
+
+R=$(curl -s -X DELETE "$SUPA_URL/rest/v1/medicamento?id=eq.$MED_ID" \
+  -H "apikey: $SUPA_KEY" -H "Authorization: Bearer $TOKEN_LU")
+CODE=$(echo "$R" | jget code)
+[[ -n "$CODE" ]] \
+  && ok "apagar medicamento bloqueado ($CODE) — só se arquiva" \
+  || bad "FALHA: consegui apagar um medicamento — as tomas dadas iam atrás"
 
 # ---------------------------------------------------------------------------
 printf "\n\033[1m%d passaram, %d falharam\033[0m\n\n" "$PASS" "$FAIL"

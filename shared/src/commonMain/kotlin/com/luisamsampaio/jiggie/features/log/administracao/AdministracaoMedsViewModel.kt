@@ -115,7 +115,8 @@ class AdministracaoMedsViewModel : ViewModel() {
                     AdministracaoNova(
                         medicamentoId = dose.medicamentoId,
                         donoId = dono,
-                        horaPrevista = dose.hora
+                        horaPrevista = dose.hora,
+                        quantidade = 1
                     )
                 )
 
