@@ -5,6 +5,7 @@ import com.luisamsampaio.jiggie.features.home.TipoDeRegisto
 import com.luisamsampaio.jiggie.features.home.base
 import com.luisamsampaio.jiggie.features.home.gravidade
 import com.luisamsampaio.jiggie.features.home.horaDe
+import com.luisamsampaio.jiggie.features.home.pastilhasDoPasseio
 import com.luisamsampaio.jiggie.features.home.quantidade
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -36,8 +37,10 @@ internal fun RegistoDto.paraRegisto(): Registo? {
     val d = dados
 
     return when (tipoDeRegisto) {
-        TipoDeRegisto.Passeio ->
-            Registo(id, hora, "Walk", "${d.duracao ?: 0} min", tipoDeRegisto)
+        TipoDeRegisto.Passeio -> Registo(
+            id, hora, "Walk", "${d.duracao ?: 0} min", tipoDeRegisto,
+            pastilhas = pastilhasDoPasseio(d.xixi, d.coco),
+        )
 
         TipoDeRegisto.Comida -> {
             val extras = if (d.extras.isEmpty()) "" else " + ${d.extras.joinToString(", ")}"
@@ -48,11 +51,18 @@ internal fun RegistoDto.paraRegisto(): Registo? {
                 tipoDeRegisto
             )
         }
+
         TipoDeRegisto.Agua ->
             Registo(id, hora, "Water", "${d.quantidade?.toInt() ?: 0} ml", tipoDeRegisto)
 
         TipoDeRegisto.Medicamento ->
-            Registo(id, hora, "Medicine", listOfNotNull(d.nome, d.dose).joinToString(" · "), tipoDeRegisto)
+            Registo(
+                id,
+                hora,
+                "Medicine",
+                listOfNotNull(d.nome, d.dose).joinToString(" · "),
+                tipoDeRegisto
+            )
 
         TipoDeRegisto.Sintoma -> Registo(
             id, hora, d.sintoma.orEmpty(),

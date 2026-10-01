@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luisamsampaio.jiggie.features.home.basesDaComida
 import com.luisamsampaio.jiggie.ui.CampoTexto
 import com.luisamsampaio.jiggie.ui.Etiqueta
 import com.luisamsampaio.jiggie.ui.theme.foodDark
@@ -192,7 +193,6 @@ fun ChipBase(
     base: String,
     onClick: (String) -> Unit,
 ) {
-    val opcoes = listOf("seca" to "Kibble", "humida" to "Wet", "mista" to "Mixed")
 
     Column {
         Etiqueta("BASE")
@@ -201,7 +201,7 @@ fun ChipBase(
         Row(
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            opcoes.forEach { (valor, texto) ->
+            basesDaComida.forEach { (valor, texto) ->
                 val ativo = valor == base
                 Text(
                     text = texto,

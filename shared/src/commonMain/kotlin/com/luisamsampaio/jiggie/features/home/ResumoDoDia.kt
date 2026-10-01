@@ -77,7 +77,8 @@ fun resumirDia(
                     horaDe(it.quando),
                     "Walk",
                     "${it.duracao} min",
-                    TipoDeRegisto.Passeio
+                    TipoDeRegisto.Passeio,
+                    pastilhasDoPasseio(it.xixi, it.coco)
                 )
             )
         }
@@ -143,16 +144,6 @@ fun resumirDia(
     return DadosDoDia(estado, recentes, sinalizado)
 }
 
-private fun etiquetasDoPasseio(passeio: PasseioDto?): List<Pastilha> {
-    if (passeio == null) return listOf(Pastilha("NONE YET", Tom.Neutro))
-
-    val etiquetas = buildList {
-        if (passeio.xixi) add(Pastilha("PEE", Tom.Xixi))
-        if (passeio.coco) add(Pastilha("POOP", Tom.Coco))
-    }
-    return etiquetas.ifEmpty { listOf(Pastilha("NO OUTPUT", Tom.Neutro)) }
-}
-
 /** "08:00:00" → 480. */
 internal fun minutosDaHora(hora: String): Int {
     val partes = hora.split(":")
@@ -181,11 +172,20 @@ internal fun horaDe(iso: String): String {
 internal fun quantidade(q: Double): String =
     if (q == q.toInt().toDouble()) q.toInt().toString() else q.toString()
 
-internal fun base(base: String): String = when (base) {
-    "seca" -> "Dry"
-    "humida" -> "Wet"
-    else -> "Mixed"
-}
+/**
+ * As bases da comida: o valor da coluna `base` e o texto que se mostra.
+ *
+ * É a única tradução — o formulário e as listas usam esta, para não
+ * voltarem a dizer coisas diferentes.
+ */
+internal val basesDaComida = listOf(
+    "seca" to "Kibble",
+    "humida" to "Wet",
+    "mista" to "Mixed",
+)
+
+internal fun base(base: String): String =
+    basesDaComida.firstOrNull { it.first == base }?.second ?: base
 
 internal fun gravidade(nivel: Int): String = when (nivel) {
     1 -> "Mild"

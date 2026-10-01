@@ -644,6 +644,14 @@ internal fun LinhaDeRegisto(
                     fontSize = 11.sp,
                     color = textTertiary
                 )
+
+                if (registo.pastilhas.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        registo.pastilhas.forEach { PastilhaDeEstado(it) }
+                    }
+                }
             }
         }
 
@@ -750,11 +758,11 @@ private fun PastilhaDeEstado(pastilha: Pastilha) {
         text = pastilha.texto,
         fontFamily = plexMono(),
         fontSize = 10.sp,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
         color = cor,
         modifier = Modifier
             .background(fundo, RoundedCornerShape(20.dp))
-            .padding(horizontal = 7.dp, vertical = 3.dp)
+            .padding(horizontal = 7.dp)
     )
 }
 

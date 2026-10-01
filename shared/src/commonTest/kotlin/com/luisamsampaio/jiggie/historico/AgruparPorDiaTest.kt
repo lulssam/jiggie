@@ -3,6 +3,7 @@ package com.luisamsampaio.jiggie.historico
 import com.luisamsampaio.jiggie.features.historico.DadosDoRegisto
 import com.luisamsampaio.jiggie.features.historico.RegistoDto
 import com.luisamsampaio.jiggie.features.historico.agruparPorDia
+import com.luisamsampaio.jiggie.features.historico.paraRegisto
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlin.test.Test
@@ -42,5 +43,15 @@ class AgruparPorDiaTest {
         )
 
         assertTrue(dias.isEmpty())
+    }
+
+    @Test
+    fun passeioMostraXixiECoco() {
+        val passeio = RegistoDto(
+            "p", "passeio", "2026-09-25T09:00:00Z",
+            DadosDoRegisto(duracao = 20, xixi = true, coco = true),
+        )
+
+        assertEquals(listOf("PEE", "POOP"), passeio.paraRegisto()?.pastilhas?.map { it.texto })
     }
 }
