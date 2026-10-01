@@ -2,7 +2,7 @@
 
 **Shared health tracking for your whole pack.** One family, every dog, on the same page.
 
-Jiggie is a small web app for households that share the care of one or more dogs. Everyone in the family logs walks, meals, water, medicine and symptoms in one place, so nobody has to ask *"did anyone feed her yet?"* again.
+Jiggie is a small web app for households that share the care of one or more dogs. Everyone in the family logs walks, meals, water, medicine and symptoms in one place, so nobody has to ask *"did anyone feed him yet?"* again.
 
 👉 **Try it:** [lulssam.github.io/jiggie](https://lulssam.github.io/jiggie/). It installs as a PWA from the browser's "Add to Home Screen".
 
@@ -121,4 +121,4 @@ Every push to `main` runs [`pages.yaml`](.github/workflows/pages.yaml), which:
 
 ---
 
-Made with ❤[U+FE0F] by [Luísa Sampaio](https://github.com/lulssam) for Jiggie.
+Made by [Luísa Sampaio](https://github.com/lulssam) for Jiggie, my dog.
