@@ -198,7 +198,7 @@ fun HomeScreen(
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
-    onCaoAtivo: (String) -> Unit = {},
+    onCaoAtivo: (CaoDto) -> Unit = {},
     onUser: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
@@ -211,8 +211,8 @@ fun HomeScreen(
         if (versaoDosRegistos > 0) viewModel.recarregarDia()
     }
 
-    LaunchedEffect(state.idCaoAtivo) {
-        state.idCaoAtivo?.let(onCaoAtivo)
+    LaunchedEffect(state.caoAtivo) {
+        state.caoAtivo?.let(onCaoAtivo)
     }
 
     HomeScreenContent(
@@ -566,7 +566,7 @@ private fun ChipsCaes(
 
 /** Os títulos em maiúsculas e monoespaçado que separam as secções da Home. */
 @Composable
-private fun TituloDeSeccao(texto: String) {
+internal fun TituloDeSeccao(texto: String) {
     Text(
         text = texto,
         fontFamily = plexMono(),
@@ -608,7 +608,7 @@ private fun RecentActivity(
 }
 
 @Composable
-private fun LinhaDeRegisto(
+internal fun LinhaDeRegisto(
     registo: Registo
 ) {
     Column {
@@ -770,7 +770,7 @@ private fun ValorMono(texto: String) {
     )
 }
 
-private fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
+internal fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
     TipoDeRegisto.Passeio -> walk
     TipoDeRegisto.Comida -> food
     TipoDeRegisto.Agua -> water

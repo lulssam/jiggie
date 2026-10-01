@@ -56,6 +56,7 @@ import com.luisamsampaio.jiggie.Medicamentos
 import com.luisamsampaio.jiggie.Relatorio
 import com.luisamsampaio.jiggie.features.cao.AdicionarCaoScreen
 import com.luisamsampaio.jiggie.features.historico.HistoricoScreen
+import com.luisamsampaio.jiggie.features.home.CaoDto
 import com.luisamsampaio.jiggie.features.home.HomeScreen
 import com.luisamsampaio.jiggie.features.home.OpcaoDeLog
 import com.luisamsampaio.jiggie.features.log.administracao.AdministracaoMedsScreen
@@ -106,7 +107,7 @@ fun AplicacaoScreen(
 
     var versaoDosCaes by remember { mutableIntStateOf(0) }
     var versaoDosRegistos by remember { mutableIntStateOf(0) }
-    var caoAtivo by remember { mutableStateOf<String?>(null) }
+    var caoAtivo by remember { mutableStateOf<CaoDto?>(null) }
 
     Scaffold(
         containerColor = surface,
@@ -141,7 +142,9 @@ fun AplicacaoScreen(
                     onUser = { popUp = Acao.User }
                 )
             }
-            composable<Historico> { HistoricoScreen() }
+            composable<Historico> {
+                HistoricoScreen(cao = caoAtivo, versaoDosRegistos = versaoDosRegistos)
+            }
             composable<Medicamentos> { MedsScreen() }
             composable<Relatorio> { RelatorioScreen() }
         }
@@ -198,7 +201,7 @@ fun AplicacaoScreen(
                             )
 
                             Acao.Passeio -> {
-                                val id = caoAtivo
+                                val id = caoAtivo?.id
                                 if (id == null) {
                                     Text("Choose a dog first")
                                 } else {
@@ -213,7 +216,7 @@ fun AplicacaoScreen(
                             }
 
                             Acao.Agua -> {
-                                val id = caoAtivo
+                                val id = caoAtivo?.id
                                 if (id == null) {
                                     Text("Choose a dog first")
                                 } else {
@@ -228,7 +231,7 @@ fun AplicacaoScreen(
                             }
 
                             Acao.Comida -> {
-                                val id = caoAtivo
+                                val id = caoAtivo?.id
                                 if (id == null) {
                                     Text("Choose a dog first")
                                 } else {
@@ -243,7 +246,7 @@ fun AplicacaoScreen(
                             }
 
                             Acao.Sintoma -> {
-                                val id = caoAtivo
+                                val id = caoAtivo?.id
                                 if (id == null) {
                                     Text("Choose a dog first")
                                 } else {
@@ -258,7 +261,7 @@ fun AplicacaoScreen(
                             }
 
                             Acao.Medicamento -> {
-                                val id = caoAtivo
+                                val id = caoAtivo?.id
                                 if (id == null) Text("Choose a dog first")
                                 else {
                                     AdministracaoMedsScreen(
