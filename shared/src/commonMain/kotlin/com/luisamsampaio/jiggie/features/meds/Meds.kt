@@ -61,7 +61,7 @@ private fun MedsScreenContent(
  */
 @Composable
 fun MedsScreen(
-    viewModel: MedsViewModel = viewModel { MedsViewModel() }
+    viewModel: MedsViewModel = viewModel { MedsModulo.viewModel() }
 ) {
     val state by viewModel.state.collectAsState()
     MedsScreenContent(
