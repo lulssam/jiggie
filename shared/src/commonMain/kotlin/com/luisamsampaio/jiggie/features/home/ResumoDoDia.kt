@@ -172,22 +172,22 @@ internal fun hora12(minutos: Int): String {
 }
 
 /** A hora local de um timestamp da base. */
-private fun horaDe(iso: String): String {
+internal fun horaDe(iso: String): String {
     val local = Instant.parse(iso).toLocalDateTime(TimeZone.currentSystemDefault())
     return hora12(local.hour * 60 + local.minute)
 }
 
 /** 1.0 → "1", 1.5 → "1.5". A coluna é numeric(4,2) e "1.0 cup" lê-se mal. */
-private fun quantidade(q: Double): String =
+internal fun quantidade(q: Double): String =
     if (q == q.toInt().toDouble()) q.toInt().toString() else q.toString()
 
-private fun base(base: String): String = when (base) {
+internal fun base(base: String): String = when (base) {
     "seca" -> "Dry"
     "humida" -> "Wet"
     else -> "Mixed"
 }
 
-private fun gravidade(nivel: Int): String = when (nivel) {
+internal fun gravidade(nivel: Int): String = when (nivel) {
     1 -> "Mild"
     2 -> "Moderate"
     else -> "Severe"
