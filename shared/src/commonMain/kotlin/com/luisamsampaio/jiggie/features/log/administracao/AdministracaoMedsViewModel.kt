@@ -2,25 +2,17 @@ package com.luisamsampaio.jiggie.features.log.administracao
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.luisamsampaio.jiggie.features.home.AdministracaoDto
-import com.luisamsampaio.jiggie.features.home.MedicamentoDto
 import com.luisamsampaio.jiggie.features.home.hora12
-import com.luisamsampaio.jiggie.features.home.minutosDaHora
+import com.luisamsampaio.jiggie.features.meds.domain.AlternarToma
+import com.luisamsampaio.jiggie.features.meds.domain.ObterMedicacaoDeHoje
+import com.luisamsampaio.jiggie.features.meds.domain.TomaDeHoje
 import com.luisamsampaio.jiggie.mensagemDeErro
-import com.luisamsampaio.jiggie.supabase
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.todayIn
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Clock
 
 /**
  * Gere o estado e a lógica do ecrã AdministracaoMeds.
@@ -29,7 +21,10 @@ import kotlin.time.Clock
  * para o ecrã mostrar. O ecrã nunca fala diretamente com o backend —
  * passa sempre por aqui.
  */
-class AdministracaoMedsViewModel : ViewModel() {
+class AdministracaoMedsViewModel(
+    private val obterMedicacao: ObterMedicacaoDeHoje,
+    private val alternarToma: AlternarToma
+) : ViewModel() {
 
     private val _state = MutableStateFlow(AdministracaoMedsUiState())
 
@@ -52,53 +47,30 @@ class AdministracaoMedsViewModel : ViewModel() {
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-
             try {
-                val fuso = TimeZone.currentSystemDefault()
-                val inicio = Clock.System
-                    .todayIn(fuso)
-                    .atStartOfDayIn(fuso)
-                    .toString()
-
-                val medicamentos = supabase.from("medicamento")
-                    .select(Columns.list("id", "nome", "dose", "hora")) {
-                        filter { eq("cao_id", caoId) }
-                    }.decodeList<MedicamentoDto>()
-
-                val dadas = supabase.from("administracao_medicamento")
-                    .select(
-                        Columns
-                            .raw("id, dh_medicamento, medicamento_id, hora_prevista, medicamento!inner(nome, dose)")
-                    ) {
-                        filter {
-                            eq("medicamento.cao_id", caoId)
-                            gte("dh_medicamento", inicio)
-                        }
-                    }.decodeList<AdministracaoDto>()
-
-                val jaDadas = dadas
-                    .mapNotNull { a -> a.horaPrevista?.let { a.medicamentoId to it } }
-                    .toSet()
-
-                val doses = medicamentos.flatMap { m ->
-                    m.hora.map { hora ->
+                // Só as tomas de hoje: os dias de descanso e os arquivados já
+                // ficaram de fora no domínio.
+                val doses = obterMedicacao(caoId).planos.flatMap { plano ->
+                    plano.tomas.map { toma ->
                         DoseDoDia(
-                            medicamentoId = m.id,
-                            nome = "${m.nome} ${m.dose}",
-                            hora = hora,
-                            horaTexto = hora12(minutosDaHora(hora)),
-                            dada = (m.id to hora) in jaDadas,
+                            medicamentoId = plano.medicamento.id,
+                            nome = "${plano.medicamento.nome} ${plano.medicamento.dose}",
+                            hora = toma.hora,
+                            horaTexto = hora12(toma.hora.hour * 60 + toma.hora.minute),
+                            dada = toma.dada,
                         )
                     }
                 }.sortedBy { it.hora }
 
-                _state.update { it.copy(isLoading = false, doses = doses, gravado = true) }
+                _state.update { it.copy(doses = doses, gravado = true) }
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
             } catch (erro: Exception) {
                 println("carregar doses falhou: $erro")
-                _state.update { it.copy(isLoading = false, error = mensagemDeErro(erro)) }
+                _state.update { it.copy(error = mensagemDeErro(erro)) }
             } finally {
+                // Também num cancelamento: sem isto, o guarda do início
+                // bloqueava a folha para sempre.
                 _state.update { it.copy(isLoading = false) }
             }
         }
@@ -109,17 +81,8 @@ class AdministracaoMedsViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val dono = supabase.auth.currentUserOrNull()?.id ?: return@launch
-
-                supabase.from("administracao_medicamento").insert(
-                    AdministracaoNova(
-                        medicamentoId = dose.medicamentoId,
-                        donoId = dono,
-                        horaPrevista = dose.hora,
-                        quantidade = 1
-                    )
-                )
-
+                // dada = false: a folha só dá tomas, nunca as desfaz
+                alternarToma(dose.medicamentoId, TomaDeHoje(dose.hora, dada = false))
                 carregar(caoId)
             } catch (cancelamento: CancellationException) {
                 throw cancelamento

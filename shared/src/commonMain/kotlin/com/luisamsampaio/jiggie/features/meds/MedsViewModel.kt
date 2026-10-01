@@ -5,15 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.luisamsampaio.jiggie.features.meds.domain.AdicionarMedicamento
 import com.luisamsampaio.jiggie.features.meds.domain.AlternarToma
 import com.luisamsampaio.jiggie.features.meds.domain.ArquivarMedicamento
-import com.luisamsampaio.jiggie.features.meds.domain.Medicamento
 import com.luisamsampaio.jiggie.features.meds.domain.ObterMedicacaoDeHoje
 import com.luisamsampaio.jiggie.features.meds.domain.TomaDeHoje
 import com.luisamsampaio.jiggie.features.meds.ui.paraUi
 import com.luisamsampaio.jiggie.mensagemDeErro
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
@@ -40,6 +42,16 @@ class MedsViewModel(
      * Só o ViewModel pode alterar este valor — o ecrã apenas o lê.
      */
     val state: StateFlow<MedsUiState> = _state.asStateFlow()
+
+    private val _registosMudaram = Channel<Unit>(Channel.CONFLATED)
+
+    /**
+     * Avisa que algo gravado aqui muda o que outros ecrãs mostram.
+     *
+     * É um evento e não estado: chega uma vez só, e só depois de a base ter
+     * aceitado — senão a Home recarregava antes de a escrita acabar.
+     */
+    val registosMudaram: Flow<Unit> = _registosMudaram.receiveAsFlow()
 
     private var caoId: String? = null
     private var versaoCarregada = -1
@@ -109,6 +121,7 @@ class MedsViewModel(
 
                 )
                 _state.update { it.copy(formulario = FormularioUi()) }
+                _registosMudaram.trySend(Unit)
                 carregar()
             } catch (cancelamento: CancellationException) {
                 throw cancelamento
@@ -139,6 +152,7 @@ class MedsViewModel(
         viewModelScope.launch {
             try {
                 acao()
+                _registosMudaram.trySend(Unit)
                 carregar()
             } catch (cancelamento: CancellationException) {
                 throw cancelamento

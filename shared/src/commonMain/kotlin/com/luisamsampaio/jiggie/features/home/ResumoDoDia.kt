@@ -1,5 +1,6 @@
 package com.luisamsampaio.jiggie.features.home
 
+import com.luisamsampaio.jiggie.features.meds.domain.MedicacaoDeHoje
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
@@ -15,17 +16,16 @@ fun resumirDia(
     passeios: List<PasseioDto>,
     refeicoes: List<ComidaDto>,
     aguas: List<AguaDto>,
-    medicamentos: List<MedicamentoDto>,
+    medicacao: MedicacaoDeHoje,
     sintomas: List<SintomaDto>,
     administracoes: List<AdministracaoDto>
 ): DadosDoDia {
-    // medicamentos: o que estava previsto - o que já foi dado
-    val previstas = medicamentos.flatMap { m -> m.hora.map { m.id to minutosDaHora(it) } }
-    val dadas = administracoes
-        .mapNotNull { a -> a.horaPrevista?.let { a.medicamentoId to minutosDaHora(it) } }
-        .toSet()
-    val porDar = previstas.filterNot { it in dadas }
-    val proxima = porDar.minByOrNull { it.second }
+    // medicamentos: o domínio dos medicamentos já sabe quais tocam hoje,
+    // quais estão arquivados e que tomas já foram dadas
+    val tomasDeHoje = medicacao.planos.flatMap { it.tomas }
+    val porDar = tomasDeHoje.filterNot { it.dada }
+    val proxima = porDar.minByOrNull { it.hora }
+    val semMedicamentos = medicacao.planos.isEmpty()
 
     // passeio, comida, agua
     val ultimoPasseio = passeios.maxByOrNull { Instant.parse(it.quando) }
@@ -33,18 +33,22 @@ fun resumirDia(
     val ultimoSintoma = sintomas.maxByOrNull { Instant.parse(it.quando) }
 
     val estado = EstadoDoDia(
-        medicamentos = medicamentos
-            .joinToString(", ") { it.nome }
+        medicamentos = medicacao.planos
+            .joinToString(", ") { it.medicamento.nome }
             .ifEmpty { "None scheduled" },
         medPastilha = when {
-            previstas.isEmpty() -> Pastilha("NONE", Tom.Neutro)
-            proxima != null -> Pastilha("DUE ${hora12(proxima.second)}", Tom.Alerta)
+            semMedicamentos -> Pastilha("NONE", Tom.Neutro)
+            tomasDeHoje.isEmpty() -> Pastilha("NOT TODAY", Tom.Neutro)
+            proxima != null -> Pastilha("DUE ${hora12(proxima.hora.hour * 60 + proxima.hora.minute)}", Tom.Alerta)
             else -> Pastilha("ALL GIVEN", Tom.Bom)
         },
 
         // meds
-        medContagem = if (previstas.isEmpty()) "Tap to add"
-        else "${previstas.size - porDar.size} / ${previstas.size} given",
+        medContagem = when {
+            semMedicamentos -> "Tap to add"
+            tomasDeHoje.isEmpty() -> "Rest day"
+            else -> "${tomasDeHoje.size - porDar.size} / ${tomasDeHoje.size} given"
+        },
 
         // passeios
         passeio = ultimoPasseio
@@ -142,12 +146,6 @@ fun resumirDia(
     }
 
     return DadosDoDia(estado, recentes, sinalizado)
-}
-
-/** "08:00:00" → 480. */
-internal fun minutosDaHora(hora: String): Int {
-    val partes = hora.split(":")
-    return (partes[0].toIntOrNull() ?: 0) * 60 + (partes.getOrNull(1)?.toIntOrNull() ?: 0)
 }
 
 /** 480 → "8:00 AM". */

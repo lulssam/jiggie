@@ -20,7 +20,6 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,7 +60,6 @@ import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textStrong
 import com.luisamsampaio.jiggie.ui.theme.textTertiary
-import io.github.jan.supabase.realtime.Column
 import kotlinx.datetime.DayOfWeek
 
 /**
@@ -420,9 +418,17 @@ fun Cabecalho(nomeDoCao: String) {
 fun MedsScreen(
     cao: CaoDto?,
     versaoDosRegistos: Int,
+    onRegistosMudarem: () -> Unit = {},
     viewModel: MedsViewModel = viewModel { MedsModulo.viewModel() }
 ) {
     val state by viewModel.state.collectAsState()
+
+    // o efeito vive enquanto o ecrã existir; o rememberUpdatedState garante
+    // que chama sempre a versão mais recente do callback, e não a do arranque
+    val aoMudar by rememberUpdatedState(onRegistosMudarem)
+    LaunchedEffect(viewModel) {
+        viewModel.registosMudaram.collect { aoMudar() }
+    }
 
     LaunchedEffect(cao?.id, versaoDosRegistos) {
         viewModel.sincronizar(cao?.id, versaoDosRegistos)
@@ -438,6 +444,7 @@ fun MedsScreen(
         onVezesPorDia = viewModel::onVezesPorDia,
         onAdicionar = viewModel::adicionar,
         onArquivar = viewModel::arquivar,
-        onTentarOutraVez = viewModel::carregar
+        onTentarOutraVez = viewModel::carregar,
+        onAlternar = viewModel::alternar
     )
 }

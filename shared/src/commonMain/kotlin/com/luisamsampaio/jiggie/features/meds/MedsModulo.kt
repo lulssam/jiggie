@@ -25,6 +25,10 @@ internal object MedsModulo {
         SupabaseMedicamentosRepository(supabase, fuso)
     }
 
+    /** Usados também fora daqui: pela Home e pela folha "Give medicine". */
+    val obterMedicacaoDeHoje by lazy { ObterMedicacaoDeHoje(repository, calendario) }
+    val alternarToma by lazy { AlternarToma(repository, calendario) }
+
     fun viewModel() = MedsViewModel(
         obterMedicacaoDeHoje = ObterMedicacaoDeHoje(repository, calendario),
         adicionarMedicamento = AdicionarMedicamento(repository, calendario),

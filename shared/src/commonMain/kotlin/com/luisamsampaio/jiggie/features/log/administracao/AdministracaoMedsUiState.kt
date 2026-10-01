@@ -1,5 +1,7 @@
 package com.luisamsampaio.jiggie.features.log.administracao
 
+import kotlinx.datetime.LocalTime
+
 /**
  * Tudo o que o ecrã AdministracaoMeds precisa para se mostrar corretamente.
  *
@@ -22,7 +24,7 @@ data class AdministracaoMedsUiState(
 data class DoseDoDia(
     val medicamentoId: String,
     val nome: String,       // "Carprofen 75mg"
-    val hora: String,       // "08:00:00" — o que se envia
+    val hora: LocalTime,       // "08:00:00" — o que se envia
     val horaTexto: String,  // "8:00 AM" — o que se mostra
     val dada: Boolean,
 )
