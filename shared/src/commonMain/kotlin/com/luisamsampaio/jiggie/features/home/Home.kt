@@ -40,6 +40,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -731,9 +732,9 @@ private fun LinhaDeEstado(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(titulo, style = typography.titleSmall, color = textStrong)
-            Text(subtitulo, fontSize = 11.sp, color = textTertiary)
+            Text(subtitulo, fontSize = 11.sp, color = textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         valor()
     }
@@ -753,11 +754,14 @@ private fun PastilhaDeEstado(pastilha: Pastilha) {
         text = pastilha.texto,
         fontFamily = plexMono(),
         fontSize = 10.sp,
+        maxLines = 1,
         fontWeight = FontWeight.Bold,
         color = cor,
+        overflow = TextOverflow.Clip,
         modifier = Modifier
             .background(fundo, RoundedCornerShape(20.dp))
             .padding(horizontal = 7.dp)
+
     )
 }
 
