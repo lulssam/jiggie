@@ -4,14 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jiggie!</title>
 
+    <script>document.documentElement.classList.add('js')</script>
+    <link rel="stylesheet" href="./style.css">
     <!-- Se abrirem pelo icone do ecrã principal, abre a app e não o site -->
     <script>
         if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) {
             location.replace('app/')
         }
     </script>
+    <title>Jiggie! Every walk, meal and dose in one record</title>
+    <meta name="description" content="Jiggie! keeps the whole household on the same page about the dogs — walks, meals, water and medicine, logged in two taps. ">
 
     <!-- O manifest é o da app: é por isso que adicionar daqui instala a app -->
     <link rel="manifest" href="app/manifest.json">
@@ -19,104 +22,60 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Jiggie">
 
-    <meta name="description" content="Walks, meals, water, medicine and symptoms, logged by the whole household in one shared record.">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="wrap"></div>
-    <section id="welcome" class="section">
-        <div>
-            <h1 class="title" style="max-width: 25ch">Every walk, meal and dose. One record your vet can read.</h1>
-            <p>Jiggie! turns the small daily things into a clinical history. Log in two taps, share the household, and hand your vet a proper record instead of a guess.</p>
+    <div class="envolve">
+        <header class="topo">
+            <a class="logo" href="./">Jiggie<span>!</span></a>
+            <nav class="nav">
+                <a href="how">How it Works</a>
+                <a href="vet">Fot vets</a>
+                <a class="btn btn--escuro btn--pequeno" href="app/">Get the app</a>
+            </nav>
+        </header>
+    </div>
+    
+    <section class="hero">
+        <div class="hero__texto">
+            <p class="eyebrow eyebrow--pilula" data-revela>One record, the whole household</p>
+            <h1 data-revela>Every walk, meal and dose. The whole house on the same page.</h1>
+            <p class="lead" data-revela>
+                Jiggie! turns the small daily things into a clinical history. Log in two taps, share the household, and hand your vet a proper record instead of a guess
+            </p>
+            
+            <div class="botoes" data-revela>
+                <a href="app/" class="btn btn--escuro">Start tracking free</a>
+                <a href="#how" class="btn btn--linha">See how it works</a>
+            </div>
+
+            <ul class="factos" data-revela>
+                <li>iOS &amp; Android</li>
+                <li>Free, open source</li>
+                <li>No ads</li>
+            </ul>
         </div>
-    </section>
 
-    <section id="how" class="section">
-        <div class="eyebrow">HOW IT WORKS</div>
-        <h2 class="section-title" style="max-width: 20ch">Set it up once. Then it's two taps a day.</h2>
-
-        <ol class="grid steps" style="--min: 230px">
-            <li class="card">
-                <span class="step-n">1</span>
-                <h3 class="card-title">Add your dog</h3>
-                <p class="card-text">Name, breed, age, colour. Twenty seconds, and the record starts.</p>
-            </li>
-
-            <li class="card">
-                <span class="step-n">2</span>
-                <h3 class="card-title">Invite the household</h3>
-                <p class="card-text">Share one code. Everyone logs into the same history — no duplicate doses.</p>
-            </li>
-
-            <li class="card">
-                <span class="step-n">3</span>
-                <h3 class="card-title">Log as you go</h3>
-                <p class="card-text">The + button covers walk, food, water, medicine and symptoms in two taps.</p>
-            </li>
-        </ol>
-    </section>
-
-   <section class="day">
-    <div class="day__sticky">
-        <div class="grid day__grid" style="--min: 260px">
-
-            <div>
-                <div class="eyebrow">A DAY WITH JIGGIE!</div>
-                <h2 class="section-title day__title">The record writes itself as the day goes.</h2>
-                <div class="day__clock" data-hora>6:00 PM</div>
-
-                <div class="day__story">
-                    <div class="day__rail"><div class="day__rail-fill"></div></div>
-                    <ol class="day__beats">
-                        <li class="beat" style="--c: var(--walk)">
-                            <h3 class="beat__title"><span class="dot"></span>Morning walk</h3>
-                            <p class="card-text">Two taps on the way back in: 30 minutes, pee, poop.</p>
-                        </li>
-                        <!-- mais três li: ver a tabela -->
-                    </ol>
-                </div>
+        <div class="hero__telefone" data-revela>
+            <div class="telefone" aria-hidden="true">
+                <img class="telefone_img"
+                src="/mockups/mockup1.png" 
+                    
+                fetchpriority="high"
+                alt="Jiggie! home screen" 
+                >
             </div>
+        </div>
+        
 
-            <div class="day__phone-wrap" aria-hidden="true">
-                <div class="phone day__phone">
-                    <div class="phone__status"><span data-hora>6:00 PM</span><span>▮▮▮</span></div>
-                    <div class="phone__body">
-                        <div class="day__dog">
-                            <span class="avatar">C</span>
-                            <div class="day__dog-name">Cooper<small>Today · <span data-registos>4 entries</span></small></div>
-                            <span class="live-dot"></span>
-                        </div>
-
-                        <div class="day__stats">
-                            <div class="day__stat"><b data-passeio>30</b>min walked</div>
-                            <div class="day__stat"><b data-agua>250</b>ml water</div>
-                            <div class="day__stat"><b data-tomas>1/2</b>doses given</div>
-                        </div>
-
-                        <div class="phone__label">TIMELINE</div>
-                        <div class="timeline">
-                            <div class="entry" style="--c: var(--walk); --above: 3">
-                                <span class="entry__time">7:20 AM</span>
-                                <span class="dot"></span>
-                                <div class="entry__text">Walk<small>30 min</small></div>
-                                <span class="tag tag--xixi">PEE · POOP</span>
-                            </div>
-                            <!-- mais três: ver a tabela -->
-                        </div>
-
-                        <div class="phone__nav">
-                            <span class="is-current">⌂</span><span>≡</span><span class="fab">＋</span><span>◷</span><span>⎙</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    </section>
+    
+    <script src="./script.js"></script>
 
         </div>
     </div>

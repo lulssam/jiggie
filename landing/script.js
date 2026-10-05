@@ -1,3 +1,12 @@
+const observador = new IntersectionObserver((entradas) => {
+    for (const entrada of entradas) {
+        if (!entrada.isIntersecting) continue;
+        entrada.target.classList.add('dentro');
+        observador.unobserve(entrada.target); // revela uma vez e esquece
+    }
+}, {threshold: 0.15, rootMargin: '0px 0px -10% 0px'});
+
+document.querySelectorAll('[data-revela]').forEach(el => observador.observe(el))
 // "A day with Jiggie!": o HTML já mostra o dia completo; aqui recua-se até onde o scroll vai.
 // p vai de 0 (topo da secção no topo do ecrã) a 1 (fundo da secção no fundo do ecrã)
 const dia = document.querySelector('.day')
