@@ -10,16 +10,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luisamsampaio.jiggie.features.home.basesDaComida
 import com.luisamsampaio.jiggie.ui.CampoTexto
 import com.luisamsampaio.jiggie.ui.Etiqueta
 import com.luisamsampaio.jiggie.ui.theme.foodDark
@@ -39,10 +37,7 @@ import com.luisamsampaio.jiggie.ui.theme.outline
 import com.luisamsampaio.jiggie.ui.theme.outlineStrong
 import com.luisamsampaio.jiggie.ui.theme.plexMono
 import com.luisamsampaio.jiggie.ui.theme.primaryDark
-import com.luisamsampaio.jiggie.ui.theme.symptom
-import com.luisamsampaio.jiggie.ui.theme.symptomBorder
 import com.luisamsampaio.jiggie.ui.theme.symptomDark
-import com.luisamsampaio.jiggie.ui.theme.symptomSub
 import com.luisamsampaio.jiggie.ui.theme.textBody
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
@@ -192,7 +187,6 @@ fun ChipBase(
     base: String,
     onClick: (String) -> Unit,
 ) {
-    val opcoes = listOf("seca" to "Kibble", "humida" to "Wet", "mista" to "Mixed")
 
     Column {
         Etiqueta("BASE")
@@ -201,7 +195,7 @@ fun ChipBase(
         Row(
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            opcoes.forEach { (valor, texto) ->
+            basesDaComida.forEach { (valor, texto) ->
                 val ativo = valor == base
                 Text(
                     text = texto,

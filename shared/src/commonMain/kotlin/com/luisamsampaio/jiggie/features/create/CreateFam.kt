@@ -14,14 +14,10 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,30 +25,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.luisamsampaio.jiggie.MINIMO_PASSWORD
 import com.luisamsampaio.jiggie.ui.BotaoPrincipal
 import com.luisamsampaio.jiggie.ui.CampoTexto
 import com.luisamsampaio.jiggie.ui.Etiqueta
-import com.luisamsampaio.jiggie.ui.theme.JiggieTheme
 import com.luisamsampaio.jiggie.ui.theme.danger
-import com.luisamsampaio.jiggie.ui.theme.plexSans
-import com.luisamsampaio.jiggie.ui.theme.primaryDark
 import com.luisamsampaio.jiggie.ui.theme.surface
-import com.luisamsampaio.jiggie.ui.theme.textDisabled
 import com.luisamsampaio.jiggie.ui.theme.textSecondary
 import com.luisamsampaio.jiggie.ui.theme.textStrong
-import com.luisamsampaio.jiggie.ui.theme.textTertiary
 import jiggie.shared.generated.resources.Res
 import jiggie.shared.generated.resources.left_arrow
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skia.paragraph.Alignment
 
 /**
  * Parte visual do ecrã CreateFam.

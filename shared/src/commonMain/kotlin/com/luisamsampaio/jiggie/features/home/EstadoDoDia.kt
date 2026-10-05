@@ -34,6 +34,7 @@ enum class TipoDeRegisto { Passeio, Comida, Agua, Medicamento, Sintoma }
  * Uma linha da actividade recente.
  *
  * @property hora Já formatada ("8:15 AM") — quem sabe formatar é o ViewModel.
+ * * @property pastilhas O que aparece à direita da linha ("PEE", "POOP"). Vazia nos outros tipos.
  */
 data class Registo(
     val id: String,
@@ -41,6 +42,7 @@ data class Registo(
     val titulo: String,
     val subtitulo: String,
     val tipo: TipoDeRegisto,
+    val pastilhas: List<Pastilha> = emptyList()
 )
 
 /**
@@ -49,3 +51,13 @@ data class Sinalizado(
     val titulo: String,
     val subtitulo: String
 )
+internal fun pastilhasDoPasseio(xixi: Boolean, coco: Boolean): List<Pastilha> = buildList {
+    if (xixi) add(Pastilha("PEE", Tom.Xixi))
+    if (coco) add(Pastilha("POOP", Tom.Coco))
+}
+
+internal fun etiquetasDoPasseio(passeio: PasseioDto?): List<Pastilha> {
+    if (passeio == null) return listOf(Pastilha("NONE YET", Tom.Neutro))
+    return pastilhasDoPasseio(passeio.xixi, passeio.coco)
+        .ifEmpty { listOf(Pastilha("NO OUTPUT", Tom.Neutro)) }
+}

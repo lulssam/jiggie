@@ -1,48 +1,234 @@
 :root {
-  /* tinta */
-  --ink:        oklch(0.22 0.02 200);   /* títulos */
-  --ink-2:      oklch(0.25 0.02 200);   /* botões escuros, números */
-  --texto:      oklch(0.45 0.01 250);
-  --texto-2:    oklch(0.50 0.01 250);
-  --texto-3:    oklch(0.55 0.01 250);   /* eyebrows, legendas */
-  --texto-4:    oklch(0.58 0.01 250);
+    /* as mesmas cores do Colors.kt */
+    --primary: #0099A0;
+    --primary-dark: #162525;
+    --primary-link: #00848B;
+    --primary-container: #E6FAFA;
+    --primary-surface: #F4FAFA;
+    --on-surface: #1E2226;
+    --text-body: #44484D;
+    --text-secondary: #5F6469;
+    --text-tertiary: #6D7277;
+    --text-disabled: #7C8186;
+    --outline: #DDE2E6;
+    --outline-strong: #D3D8DE;
+    --divider: #E9EBEE;
 
-  /* linhas */
-  --linha:      oklch(0.91 0.008 250);  /* cartões */
-  --linha-2:    oklch(0.93 0.006 250);  /* divisórias */
-  --linha-3:    oklch(0.95 0.004 250);  /* linhas dentro do telefone */
+    --walk: var(--primary);
+    --food: #A38043;
+    --water: #3A89B3;
+    --med: #7F64AB;
+    --symptom: #CB6440;
+    --dog1: #56B6BB;
 
-  --acento:     oklch(0.62 0.11 200);
-  --acento-txt: oklch(0.55 0.11 200);
-  --med:        oklch(0.56 0.11 300);
-  --sintoma:    oklch(0.62 0.14 40);
-  --comida:     oklch(0.62 0.09 80);
-  --agua:       oklch(0.60 0.10 235);
+    --success: #0B7643;
+    --success-container: #DFF3E6;
+    --alerta: #9D4616;
+    --alerta-container: #FFECD8;
+    --xixi: #7C5F00;
+    --xixi-container: #FAF2D4;
 
-  /* superfícies */
-  --suave:      oklch(0.975 0.008 220);
-  --sombra-tel: 0 24px 60px -22px oklch(0.3 0.03 220 / .45);
-
-  --r-card: 16px;
-  --r-bloco: 22px;
-  --r-btn: 13px;
+    --shadow: rgb(28 49 56 / .45);
+    --mono: 'IBM Plex Mono', monospace;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .js [data-revela] {
-        opacity: 0;
-        transform: translateY(24.px);
-    }
+*, *::before, *::after { box-sizing: border-box; }
 
-    .js [data-revela].dentro {
-        opacity: 1;
-        transform: none;
-        transition: opacity .6s ease, transform .6s cubic-bezier(.2, .8, .2, 1);
-        transition-delay: calc(var(--i, 0) * 70ms);
-    }
+body {
+    margin: 0;
+    background: #fff;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    color: var(--on-surface);
+    -webkit-font-smoothing: antialiased;
 }
-.telefone__img {
-    display: block;
-    width: 100%;
-    height: auto;
+
+h1, h2, h3, p { margin: 0; }
+a { color: var(--primary-link); text-decoration: none; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 90px; }
+.section { padding-top: 72px; }
+
+/* a etiqueta em maiúsculas por cima dos títulos */
+.eyebrow {
+    margin-bottom: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    color: var(--text-tertiary);
+}
+
+.section-title {
+    margin-bottom: 38px;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--primary-dark);
+    text-wrap: balance;
+}
+
+/* passa sozinha a uma coluna; cada secção escolhe a largura mínima com style="--min: 200px".
+   O min(…, 100%) evita scroll horizontal em ecrãs mais estreitos do que --min */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--min, 250px), 100%), 1fr));
+    gap: 18px;
+}
+
+.card { padding: 22px; border: 1px solid var(--outline); border-radius: 16px; }
+.card-title { margin-bottom: 7px; font-size: 16px; font-weight: 700; }
+.card-text { font-size: 13px; line-height: 1.6; color: var(--text-secondary); text-wrap: pretty; }
+
+.btn { display: inline-block; padding: 15px 26px; border-radius: 13px; font-size: 15px; font-weight: 700; }
+.btn--primary { background: var(--primary-dark); color: #fff; }
+.btn--ghost { border: 1px solid var(--outline-strong); color: var(--on-surface); font-weight: 600; }
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    white-space: nowrap;
+}
+.tag--ok { color: var(--success); background: var(--success-container); }
+.tag--warn { color: var(--alerta); background: var(--alerta-container); }
+.tag--xixi { color: var(--xixi); background: var(--xixi-container); }
+.tag--food { color: #7E5D1D; background: #FEF0D4; } /* foodDark do Colors.kt */
+.tag--water { color: #06658E; background: #DCF2FF; }
+
+/* bolinha de cor: a cor vem de fora, com style="--c: var(--med)" */
+.dot { width: 9px; height: 9px; flex-shrink: 0; border-radius: 50%; background: var(--c, var(--primary)); }
+
+.steps { margin: 0; padding: 0; list-style: none; }
+
+.step-n {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-bottom: 15px;
+    border-radius: 50%;
+    background: var(--primary-dark);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Sem JS (ou com "reduzir movimento") é uma secção normal, com o dia completo.
+   O script acrescenta .is-animated: a secção passa a ter 3,3 ecrãs de altura
+   e o conteúdo fica preso enquanto o scroll a atravessa */
+.day { margin-top: 74px; }
+.day.is-animated { min-height: 330vh; }
+
+.day.is-animated .day__sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh; /* no telemóvel, conta com a barra do browser */
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.day__grid { width: 100%; gap: 44px; align-items: center; }
+.day__title { max-width: 18ch; margin-bottom: 10px; }
+.day__clock { margin-bottom: 26px; font-family: var(--mono); font-size: 11px; color: var(--text-disabled); }
+
+/* a linha que vai enchendo à esquerda dos momentos */
+.day__story { display: flex; gap: 16px; }
+
+.day__rail {
+    position: relative;
+    width: 3px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--divider);
+}
+
+.day__rail-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--rail, 1) * 100%);
+    border-radius: 3px;
+    background: var(--primary);
+    transition: height .12s linear;
+}
+
+.day__beats { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+
+.beat { padding: 9px 0; transition: opacity .35s, transform .35s; }
+.beat.is-off { opacity: .28; transform: translateX(-6px); }
+.beat__title { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; font-size: 15px; }
+.beat .dot { width: 8px; height: 8px; transition: background .35s, box-shadow .35s; }
+.beat.is-off .dot { background: var(--outline-strong); }
+.beat.is-now .dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 16%, transparent); }
+
+/* depois do .phone no ficheiro, para ganhar com a mesma especificidade */
+.day__phone-wrap { display: flex; justify-content: center; }
+
+.day__phone {
+    width: 270px;
+    border-radius: 40px;
+    transform: rotate(calc(2.5deg - var(--p, 1) * 4deg)) translateY(calc((.5 - var(--p, 1)) * 14px));
+    transition: transform .5s cubic-bezier(.2, .8, .2, 1);
+}
+
+.day__dog { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+.day__dog-name { flex: 1; font-size: 13px; font-weight: 700; }
+.day__dog-name small { display: block; font-size: 10px; font-weight: 400; color: var(--text-tertiary); }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: #269E5F; opacity: var(--live, 1); }
+
+.day__stats { display: flex; gap: 7px; margin-bottom: 14px; }
+
+.day__stat {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 9px;
+    border: 1px solid var(--divider);
+    border-radius: 10px;
+    font-size: 9px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+
+.day__stat b { display: block; font-family: var(--mono); font-size: 15px; font-weight: 600; line-height: 1.25; color: var(--primary-dark); }
+
+.timeline { position: relative; height: 196px; }
+
+/* --lp: 0 = ainda não aconteceu, 1 = registado */
+.entry {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    background: #fff;
+    border: 1px solid var(--divider);
+    border-radius: 11px;
+    box-shadow: 0 4px 14px -10px var(--shadow);
+    opacity: var(--lp, 1);
+    transform: translateY(calc(var(--above) * 48px + (1 - var(--lp, 1)) * 26px)) scale(calc(.94 + var(--lp, 1) * .06));
+    transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .3s;
+}
+
+.entry__time { width: 50px; flex-shrink: 0; font-family: var(--mono); font-size: 10px; color: var(--text-tertiary); }
+.entry__text { flex: 1; min-width: 0; font-size: 11px; font-weight: 600; }
+.entry__text small { display: block; font-size: 9px; font-weight: 400; color: var(--text-tertiary); }
+.entry .dot { width: 7px; height: 7px; }
+.entry .tag { padding: 3px 6px; font-size: 8px; letter-spacing: 0; }
+
+.day .fab { transform: scale(var(--fab, 1)); transition: transform .3s; }
+
+/* Texto e telemóvel empilhados dão ~1000px, e um telemóvel mostra ~650–750px.
+   Com o overflow: hidden, o que sobra seria cortado; ali fica só o texto */
+@media (max-width: 640px) {
+    .day.is-animated .day__phone-wrap { display: none; }
 }

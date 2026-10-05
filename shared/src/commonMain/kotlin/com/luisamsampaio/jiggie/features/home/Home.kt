@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,23 +32,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.luisamsampaio.jiggie.features.meds.MedsModulo
 import com.luisamsampaio.jiggie.ui.CodigoComCopiar
 import com.luisamsampaio.jiggie.ui.bordaTracejada
 import com.luisamsampaio.jiggie.ui.theme.alerta
@@ -192,13 +188,13 @@ private fun HomeScreenContent(
  */
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel { HomeViewModel() },
+    viewModel: HomeViewModel = viewModel { HomeViewModel(MedsModulo.obterMedicacaoDeHoje) },
     versaoDosCaes: Int = 0,
     versaoDosRegistos: Int = 0,
     onAdicionarCao: () -> Unit = {},
     onMedicamentos: () -> Unit = {},
     onHistorico: () -> Unit = {},
-    onCaoAtivo: (String) -> Unit = {},
+    onCaoAtivo: (CaoDto) -> Unit = {},
     onUser: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
@@ -211,8 +207,8 @@ fun HomeScreen(
         if (versaoDosRegistos > 0) viewModel.recarregarDia()
     }
 
-    LaunchedEffect(state.idCaoAtivo) {
-        state.idCaoAtivo?.let(onCaoAtivo)
+    LaunchedEffect(state.caoAtivo) {
+        state.caoAtivo?.let(onCaoAtivo)
     }
 
     HomeScreenContent(
@@ -566,7 +562,7 @@ private fun ChipsCaes(
 
 /** Os títulos em maiúsculas e monoespaçado que separam as secções da Home. */
 @Composable
-private fun TituloDeSeccao(texto: String) {
+internal fun TituloDeSeccao(texto: String) {
     Text(
         text = texto,
         fontFamily = plexMono(),
@@ -608,7 +604,7 @@ private fun RecentActivity(
 }
 
 @Composable
-private fun LinhaDeRegisto(
+internal fun LinhaDeRegisto(
     registo: Registo
 ) {
     Column {
@@ -644,6 +640,14 @@ private fun LinhaDeRegisto(
                     fontSize = 11.sp,
                     color = textTertiary
                 )
+
+                if (registo.pastilhas.isNotEmpty()) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    ) {
+                        registo.pastilhas.forEach { PastilhaDeEstado(it) }
+                    }
+                }
             }
         }
 
@@ -728,9 +732,9 @@ private fun LinhaDeEstado(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(titulo, style = typography.titleSmall, color = textStrong)
-            Text(subtitulo, fontSize = 11.sp, color = textTertiary)
+            Text(subtitulo, fontSize = 11.sp, color = textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         valor()
     }
@@ -750,11 +754,14 @@ private fun PastilhaDeEstado(pastilha: Pastilha) {
         text = pastilha.texto,
         fontFamily = plexMono(),
         fontSize = 10.sp,
-        fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        fontWeight = FontWeight.Bold,
         color = cor,
+        overflow = TextOverflow.Clip,
         modifier = Modifier
             .background(fundo, RoundedCornerShape(20.dp))
-            .padding(horizontal = 7.dp, vertical = 3.dp)
+            .padding(horizontal = 7.dp)
+
     )
 }
 
@@ -770,7 +777,7 @@ private fun ValorMono(texto: String) {
     )
 }
 
-private fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
+internal fun corDoTipo(tipo: TipoDeRegisto): Color = when (tipo) {
     TipoDeRegisto.Passeio -> walk
     TipoDeRegisto.Comida -> food
     TipoDeRegisto.Agua -> water
